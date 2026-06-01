@@ -656,9 +656,9 @@
       background: #fff;
       border: 1px solid var(--line);
       border-radius: 14px;
-      padding: 14px;
+      padding: 13px;
       display: grid;
-      gap: 12px;
+      gap: 10px;
       box-shadow: 0 8px 22px rgba(31, 41, 55, 0.05);
     }
 
@@ -679,7 +679,9 @@
 
     .mobile-edit-grid {
       display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 8px;
+      align-items: end;
     }
 
     .mobile-edit-grid .inline-edit,
@@ -687,15 +689,21 @@
       width: 100%;
       max-width: none;
       min-width: 0;
-      min-height: 40px;
+      min-height: 38px;
+      padding: 7px 9px;
+      font-size: 13px;
     }
 
     .mobile-edit-grid label {
       display: grid;
-      gap: 5px;
+      gap: 4px;
       color: var(--sub);
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 800;
+    }
+
+    .mobile-edit-grid label.memo-field {
+      grid-column: 1 / -1;
     }
 
     .list-summary {
@@ -928,7 +936,6 @@
                         <th>분류</th>
                         <th>위치</th>
                         <th>상태</th>
-                        <th>동작</th>
                         <th>관리대상</th>
                       </tr>
                     </thead>
@@ -969,7 +976,7 @@
             <div class="card-header">
               <div>
                 <h2 class="card-title">확인 목록</h2>
-                <div class="card-sub">정상 장비는 확인 체크만 처리하고, 이상 장비만 상태·메모를 작성합니다.</div>
+                <div class="card-sub">정상 장비는 확인 체크만 처리하고, 변경 사항이 있는 장비만 위치·상태·메모를 작성합니다.</div>
               </div>
             </div>
             <div class="card-body">
@@ -1000,7 +1007,7 @@
               </div>
 
               <div class="list-summary" id="monthlyListSummary"></div>
-              <div class="mobile-filter-note">모바일에서는 월별 확인 항목을 카드형으로 표시합니다. 정상 장비는 확인 체크만 하고, 변경 장비만 위치·상태·메모를 수정하면 됩니다.</div>
+              <div class="mobile-filter-note">모바일에서는 월별 확인 항목을 카드형으로 표시합니다. 위치와 상태를 한 줄에서 빠르게 수정할 수 있습니다.</div>
               <div class="table-wrap responsive-table">
                 <table>
                   <thead>
@@ -1011,7 +1018,6 @@
                       <th>원장 위치</th>
                       <th>이번달 위치</th>
                       <th>상태</th>
-                      <th>동작</th>
                       <th>메모</th>
                     </tr>
                   </thead>
@@ -1088,15 +1094,7 @@
                       <option>폐기</option>
                     </select>
                   </div>
-                  <div class="form-field">
-                    <label class="label">동작 상태</label>
-                    <select class="select" id="newOperation">
-                      <option>정상</option>
-                      <option>이상</option>
-                      <option>미확인</option>
-                    </select>
-                  </div>
-                  <div class="form-field">
+<div class="form-field">
                     <label class="label">사용 상태</label>
                     <select class="select" id="newUsageStatus">
                       <option>사용중</option>
@@ -1381,7 +1379,6 @@
 
     function isIssueRow(row) {
       return row.monthStatus !== "정상"
-        || row.operation === "이상"
         || row.monthLocation !== row.masterLocation
         || !row.checked
         || Boolean(row.memo && row.memo.trim());
@@ -1498,7 +1495,7 @@
               <span class="badge ${statusBadgeClass(row.monthStatus)}">${escapeHtml(row.monthStatus)}</span>
             </div>
             <div style="font-size:13px;color:var(--sub);margin-top:5px;">
-              위치: ${escapeHtml(row.monthLocation)} / 동작: ${escapeHtml(row.operation)}
+              위치: ${escapeHtml(row.monthLocation)}
             </div>
             ${row.memo ? `<div style="font-size:13px;margin-top:5px;">${escapeHtml(row.memo)}</div>` : ""}
           </div>
@@ -1546,11 +1543,10 @@
             <td>${escapeHtml(eq.category)}</td>
             <td>${escapeHtml(eq.location)}</td>
             <td><span class="badge ${statusBadgeClass(eq.status)}">${escapeHtml(eq.status)}</span></td>
-            <td><span class="badge ${eq.operation === "정상" ? "normal" : eq.operation === "이상" ? "repair" : "gray"}">${escapeHtml(eq.operation)}</span></td>
             <td>${eq.includeMonthly ? `<span class="badge normal">포함</span>` : `<span class="badge gray">제외</span>`}</td>
           </tr>
         `).join("")
-        : `<tr><td colspan="7" class="empty">검색 결과가 없습니다.</td></tr>`;
+        : `<tr><td colspan="6" class="empty">검색 결과가 없습니다.</td></tr>`;
 
       const mobileList = document.getElementById("equipmentCardList");
       if (mobileList) {
@@ -1566,7 +1562,6 @@
               </div>
               <div class="mobile-card-badges">
                 <span class="badge ${statusBadgeClass(eq.status)}">${escapeHtml(eq.status)}</span>
-                <span class="badge ${eq.operation === "정상" ? "normal" : eq.operation === "이상" ? "repair" : "gray"}">동작 ${escapeHtml(eq.operation)}</span>
                 ${eq.includeMonthly ? `<span class="badge normal">월별 포함</span>` : `<span class="badge gray">월별 제외</span>`}
               </div>
               <div class="mobile-card-meta">
@@ -1615,7 +1610,6 @@
         <div class="kv"><div class="k">분류</div><div class="v">${escapeHtml(eq.category)}</div></div>
         <div class="kv"><div class="k">현재 위치</div><div class="v">${escapeHtml(eq.location)}</div></div>
         <div class="kv"><div class="k">현재 상태</div><div class="v"><span class="badge ${statusBadgeClass(eq.status)}">${escapeHtml(eq.status)}</span></div></div>
-        <div class="kv"><div class="k">동작 상태</div><div class="v">${escapeHtml(eq.operation)}</div></div>
         <div class="kv"><div class="k">관리대상</div><div class="v">${eq.includeMonthly ? "월별 현황 포함" : "월별 현황 제외"}</div></div>
         <div class="kv"><div class="k">구성품</div><div class="v">${escapeHtml(eq.components || "-")}</div></div>
         <div class="kv"><div class="k">비고</div><div class="v">${escapeHtml(eq.note || "-")}</div></div>
@@ -1678,16 +1672,11 @@
               </select>
             </td>
             <td>
-              <select class="inline-edit monthly-field" data-field="operation">
-                ${optionHtml(operations, row.operation)}
-              </select>
-            </td>
-            <td>
               <input class="memo-input monthly-field" data-field="memo" value="${escapeHtml(row.memo)}" placeholder="메모">
             </td>
           </tr>
         `).join("")
-        : `<tr><td colspan="8" class="empty">해당 조건의 월별 현황 데이터가 없습니다.</td></tr>`;
+        : `<tr><td colspan="7" class="empty">해당 조건의 월별 현황 데이터가 없습니다.</td></tr>`;
 
       const mobileList = document.getElementById("monthlyCardList");
       if (mobileList) {
@@ -1721,11 +1710,6 @@
                 </div>
               </div>
 
-              <div class="mobile-card-badges">
-                <span class="badge ${statusBadgeClass(row.monthStatus)}">${escapeHtml(row.monthStatus)}</span>
-                <span class="badge ${row.operation === "정상" ? "normal" : row.operation === "이상" ? "repair" : "gray"}">동작 ${escapeHtml(row.operation)}</span>
-              </div>
-
               <div class="mobile-edit-grid">
                 <label>이번달 위치
                   <select class="inline-edit monthly-field" data-field="monthLocation">
@@ -1737,12 +1721,7 @@
                     ${optionHtml(statuses, row.monthStatus)}
                   </select>
                 </label>
-                <label>동작 상태
-                  <select class="inline-edit monthly-field" data-field="operation">
-                    ${optionHtml(operations, row.operation)}
-                  </select>
-                </label>
-                <label>메모
+                <label class="memo-field">메모
                   <input class="memo-input monthly-field" data-field="memo" value="${escapeHtml(row.memo)}" placeholder="위치 변경, 대여, 이상 내용 입력">
                 </label>
               </div>
@@ -1911,7 +1890,7 @@
         <table>
           <thead>
             <tr>
-              <th>장비번호</th><th>장비명</th><th>원장 위치</th><th>확인 위치</th><th>상태</th><th>동작</th><th>메모</th>
+              <th>장비번호</th><th>장비명</th><th>원장 위치</th><th>확인 위치</th><th>상태</th><th>메모</th>
             </tr>
           </thead>
           <tbody>
@@ -1922,10 +1901,9 @@
                 <td>${escapeHtml(row.masterLocation)}</td>
                 <td>${escapeHtml(row.monthLocation)}</td>
                 <td>${escapeHtml(row.monthStatus)}</td>
-                <td>${escapeHtml(row.operation)}</td>
                 <td>${escapeHtml(row.memo || "-")}</td>
               </tr>
-            `).join("") || `<tr><td colspan="7" class="empty">조치 필요 장비가 없습니다.</td></tr>`}
+            `).join("") || `<tr><td colspan="6" class="empty">조치 필요 장비가 없습니다.</td></tr>`}
           </tbody>
         </table>
 
@@ -1995,7 +1973,7 @@
         category,
         location: document.getElementById("newLocation").value,
         status: document.getElementById("newStatus").value,
-        operation: document.getElementById("newOperation").value,
+        operation: "미확인",
         usageStatus: document.getElementById("newUsageStatus").value,
         includeMonthly: document.getElementById("newIncludeMonthly").checked,
         components: document.getElementById("newComponents").value.trim(),
@@ -2119,7 +2097,7 @@
       if (window.innerWidth <= 820) {
         const eq = state.equipment.find(item => item.id === equipmentId);
         if (!eq) return;
-        alert(`${eq.code} · ${eq.name}\n\n위치: ${eq.location}\n상태: ${eq.status}\n동작: ${eq.operation}\n관리대상: ${eq.includeMonthly ? "월별 현황 포함" : "월별 현황 제외"}\n구성품: ${eq.components || "-"}`);
+        alert(`${eq.code} · ${eq.name}\n\n위치: ${eq.location}\n상태: ${eq.status}\n관리대상: ${eq.includeMonthly ? "월별 현황 포함" : "월별 현황 제외"}\n구성품: ${eq.components || "-"}`);
       } else if (detail) {
         detail.scrollIntoView({ behavior: "smooth", block: "start" });
       }
