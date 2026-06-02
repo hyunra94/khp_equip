@@ -692,6 +692,179 @@
       color: #374151;
     }
 
+
+    /* 장비관리대장 목록/상세 레이아웃 개선 */
+    #equipmentView:not(.detail-open) .layout-2 {
+      grid-template-columns: 1fr;
+    }
+
+    #equipmentView:not(.detail-open) .detail-panel {
+      display: none;
+    }
+
+    #equipmentView.detail-open .layout-2 {
+      grid-template-columns: minmax(420px, .98fr) minmax(390px, 1.02fr);
+    }
+
+    #equipmentView.detail-open .equipment-list-panel .card-body,
+    #equipmentView.detail-open #equipmentDetail {
+      max-height: calc(100vh - 196px);
+      overflow: auto;
+      scrollbar-gutter: stable;
+    }
+
+    .equipment-row {
+      grid-template-columns: 76px minmax(190px, 1.55fr) minmax(130px, .95fr) minmax(150px, 1.1fr) minmax(110px, .85fr) minmax(86px, .65fr);
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+    }
+
+    .equipment-row .equipment-top {
+      display: contents;
+    }
+
+    .equipment-row .eq-photo {
+      width: 68px;
+      height: 56px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      object-fit: cover;
+      background: #edf3fa;
+      display: grid;
+      place-items: center;
+      color: var(--primary);
+      font-weight: 900;
+      font-size: 12px;
+    }
+
+    .equipment-row .eq-cell {
+      min-width: 0;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+
+    .equipment-row .eq-label {
+      display: block;
+      color: var(--sub);
+      font-size: 11px;
+      font-weight: 900;
+      margin-bottom: 4px;
+    }
+
+    .equipment-row .eq-value {
+      display: block;
+      font-size: 14px;
+      font-weight: 850;
+      line-height: 1.35;
+    }
+
+    .equipment-row .eq-name .eq-value {
+      font-size: 15px;
+      letter-spacing: -0.04em;
+    }
+
+    .equipment-row .eq-sub {
+      display: block;
+      color: var(--sub);
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 4px;
+      line-height: 1.25;
+    }
+
+    #equipmentView:not(.detail-open) .equipment-row {
+      min-height: 92px;
+    }
+
+    #equipmentView.detail-open .equipment-row {
+      grid-template-columns: 48px minmax(110px, 1.5fr) minmax(74px, .85fr) minmax(92px, 1fr) minmax(82px, .8fr) 66px;
+      gap: 10px;
+      padding: 10px 12px;
+      min-height: 66px;
+    }
+
+    #equipmentView.detail-open .equipment-row .eq-photo {
+      width: 42px;
+      height: 36px;
+      border-radius: 9px;
+      font-size: 10px;
+    }
+
+    #equipmentView.detail-open .equipment-row .eq-label {
+      display: none;
+    }
+
+    #equipmentView.detail-open .equipment-row .eq-value {
+      font-size: 12px;
+      line-height: 1.25;
+    }
+
+    #equipmentView.detail-open .equipment-row .eq-name .eq-value {
+      font-size: 13px;
+    }
+
+    #equipmentView.detail-open .equipment-row .eq-sub {
+      font-size: 11px;
+      margin-top: 2px;
+    }
+
+    #equipmentView.detail-open .equipment-row .badge {
+      font-size: 11px;
+      min-height: 22px;
+      padding: 2px 7px;
+    }
+
+    #equipmentView.detail-open .equipment-card.active {
+      background: #eef6ff;
+      border-color: #acc6e7;
+    }
+
+    .detail-close-row {
+      display: flex;
+      justify-content: flex-end;
+      margin: -4px 0 10px;
+    }
+
+
+    .mobile-inline-detail {
+      display: none;
+    }
+
+    @media (max-width: 840px) {
+      #equipmentView.detail-open .equipment-list-panel .card-body,
+      #equipmentView.detail-open #equipmentDetail {
+        max-height: none;
+        overflow: visible;
+      }
+
+      #equipmentView.detail-open .layout-2 {
+        grid-template-columns: 1fr;
+      }
+
+      #equipmentView .detail-panel {
+        display: none;
+      }
+
+      .mobile-inline-detail {
+        display: block;
+        border: 1px solid #cbd9ea;
+        background: #fff;
+        border-radius: 14px;
+        padding: 14px;
+        box-shadow: 0 12px 26px rgba(31, 58, 95, 0.08);
+        margin-top: -2px;
+      }
+
+      .mobile-inline-detail .detail-cover {
+        margin-top: 4px;
+      }
+
+      .mobile-inline-detail .kv {
+        grid-template-columns: 112px 1fr;
+      }
+    }
+
     @media (max-width: 1120px) {
       .stats { grid-template-columns: repeat(3, minmax(0,1fr)); }
       .layout-2 { grid-template-columns: 1fr; }
@@ -729,6 +902,35 @@
       .page-title { font-size: 17px; }
       .chip { display: none; }
       .meta-grid { grid-template-columns: 1fr; }
+      .equipment-row,
+      #equipmentView.detail-open .equipment-row {
+        grid-template-columns: 54px minmax(0, 1fr);
+        gap: 12px;
+      }
+      .equipment-row .eq-photo,
+      #equipmentView.detail-open .equipment-row .eq-photo {
+        grid-row: span 5;
+        width: 48px;
+        height: 42px;
+      }
+      .equipment-row .eq-label,
+      #equipmentView.detail-open .equipment-row .eq-label {
+        display: inline;
+        margin-right: 6px;
+      }
+      .equipment-row .eq-value,
+      #equipmentView.detail-open .equipment-row .eq-value {
+        display: inline;
+        font-size: 13px;
+      }
+      .equipment-row .eq-name .eq-value,
+      #equipmentView.detail-open .equipment-row .eq-name .eq-value {
+        display: block;
+        font-size: 14px;
+      }
+      .equipment-row .eq-sub {
+        display: block;
+      }
       .monthly-edit { grid-template-columns: 1fr; }
       .kv { grid-template-columns: 112px 1fr; }
       .card-body { padding: 16px; }
@@ -851,7 +1053,7 @@
           </div>
 
           <div class="layout-2">
-            <div class="card">
+            <div class="card equipment-list-panel">
               <div class="card-header">
                 <div>
                   <h2 class="card-title">장비 원장</h2>
@@ -1272,7 +1474,9 @@ SN번호복사 / 텍스트
         const data = await api(`/api/equipment?${qs.toString()}`);
         equipmentRows = data.rows || [];
 
-        if (!selectedEquipmentId && equipmentRows[0]) selectedEquipmentId = equipmentRows[0].id;
+        if (selectedEquipmentId && !equipmentRows.some(row => row.id === selectedEquipmentId)) {
+          selectedEquipmentId = "";
+        }
 
         renderEquipmentList();
         renderEquipmentDetail();
@@ -1294,7 +1498,11 @@ SN번호복사 / 텍스트
 
     function renderEquipmentList() {
       const includeCount = equipmentRows.filter(row => row.월별현황포함).length;
-      $("#equipmentSummary").textContent = `조회 결과 ${equipmentRows.length}건 · 월별현황 포함 ${includeCount}건`;
+      $("#equipmentSummary").textContent = selectedEquipmentId
+        ? `조회 결과 ${equipmentRows.length}건 · 월별현황 포함 ${includeCount}건 · 상세 열림`
+        : `조회 결과 ${equipmentRows.length}건 · 월별현황 포함 ${includeCount}건 · 장비를 클릭하면 상세가 열립니다`;
+
+      $("#equipmentView").classList.toggle("detail-open", Boolean(selectedEquipmentId));
 
       $("#equipmentList").innerHTML = equipmentRows.length
         ? equipmentRows.map(row => equipmentCardHtml(row, true)).join("")
@@ -1302,96 +1510,98 @@ SN번호복사 / 텍스트
 
       $$("#equipmentList .equipment-card").forEach(card => {
         card.addEventListener("click", () => {
-          selectedEquipmentId = card.dataset.id;
+          if (selectedEquipmentId === card.dataset.id) {
+            selectedEquipmentId = "";
+          } else {
+            selectedEquipmentId = card.dataset.id;
+          }
           renderEquipmentList();
           renderEquipmentDetail();
         });
       });
+
+      bindDetailButtons($("#equipmentList"));
     }
 
     function equipmentCardHtml(row, selectable = false) {
       const active = selectable && row.id === selectedEquipmentId ? " active" : "";
-      const thumb = row.대표사진URL
-        ? `<img class="thumb" src="${escapeHtml(row.대표사진URL)}" alt="">`
-        : `<div class="thumb">${escapeHtml(row.분류 || "EQ")}</div>`;
+      const photo = row.대표사진URL
+        ? `<img class="eq-photo" src="${escapeHtml(row.대표사진URL)}" alt="">`
+        : `<div class="eq-photo">${escapeHtml(row.분류 || "EQ")}</div>`;
 
-      return `
-        <article class="equipment-card${active}" data-id="${escapeHtml(row.id)}">
+      const rowHtml = `
+        <article class="equipment-card equipment-row${active}" data-id="${escapeHtml(row.id)}">
           <div class="equipment-top">
-            ${thumb}
-            <div class="equipment-title">
-              <strong>${escapeHtml(row.장비명 || "-")}</strong>
-              <span>자체일련번호 ${escapeHtml(row.자체일련번호 || "-")} · SN ${escapeHtml(row.SN번호 || "-")}</span>
+            ${photo}
+            <div class="eq-cell eq-name">
+              <span class="eq-label">장비명</span>
+              <span class="eq-value">${escapeHtml(row.장비명 || "-")}</span>
+              <span class="eq-sub">SN ${escapeHtml(row.SN번호 || "-")}</span>
             </div>
           </div>
-          <div class="badges">
-            <span class="badge ${statusClass(row.장비상태등)}">${escapeHtml(row.장비상태등 || "-")}</span>
-            <span class="badge gray">${escapeHtml(row.배치장소 || "미지정")}</span>
-            <span class="badge gray">${escapeHtml(row.분류 || "분류 없음")}</span>
-            ${row.월별현황포함 ? `<span class="badge normal">월별 포함</span>` : `<span class="badge gray">월별 제외</span>`}
+
+          <div class="eq-cell">
+            <span class="eq-label">위치</span>
+            <span class="eq-value">${escapeHtml(row.배치장소 || "미지정")}</span>
+            ${row.세부위치 ? `<span class="eq-sub">${escapeHtml(row.세부위치)}</span>` : ""}
           </div>
-          <div class="meta-grid">
-            <div class="meta-box"><div class="k">취득가격</div><div class="v">${money(row.취득가격)}</div></div>
-            <div class="meta-box"><div class="k">취득년월일</div><div class="v">${escapeHtml(row.취득년월일 || "-")}</div></div>
+
+          <div class="eq-cell">
+            <span class="eq-label">자체일련번호</span>
+            <span class="eq-value">${escapeHtml(row.자체일련번호 || "-")}</span>
+          </div>
+
+          <div class="eq-cell">
+            <span class="eq-label">취득년월일</span>
+            <span class="eq-value">${escapeHtml(row.취득년월일 || "-")}</span>
+            <span class="eq-sub">${money(row.취득가격)}</span>
+          </div>
+
+          <div class="eq-cell">
+            <span class="eq-label">상태</span>
+            <span class="badge ${statusClass(row.장비상태등)}">${escapeHtml(row.장비상태등 || "-")}</span>
           </div>
         </article>
       `;
+
+      const inlineDetail = selectable && row.id === selectedEquipmentId
+        ? `<div class="mobile-inline-detail">${equipmentDetailHtml(row, "Inline")}</div>`
+        : "";
+
+      return rowHtml + inlineDetail;
     }
 
     function renderEquipmentDetail() {
       const row = equipmentRows.find(item => item.id === selectedEquipmentId);
+      $("#equipmentView").classList.toggle("detail-open", Boolean(row));
+
       if (!row) {
-        $("#equipmentDetail").innerHTML = `<div class="empty">선택된 장비가 없습니다.</div>`;
+        $("#equipmentDetail").innerHTML = `<div class="empty">장비를 클릭하면 상세 정보가 열립니다.</div>`;
         return;
       }
 
-      const cover = row.대표사진URL
-        ? `<img class="detail-cover" src="${escapeHtml(row.대표사진URL)}" alt="">`
-        : `<div class="detail-cover">${escapeHtml(row.분류 || "EQ")}</div>`;
-
-      $("#equipmentDetail").innerHTML = `
-        ${cover}
-
-        <div class="kv"><div class="k">① SN번호</div><div class="v">${escapeHtml(row.SN번호 || "-")}</div></div>
-        <div class="kv"><div class="k">② 작성년월일</div><div class="v">${escapeHtml(row.작성년월일 || "-")}</div></div>
-        <div class="kv"><div class="k">③ 장비명</div><div class="v">${escapeHtml(row.장비명 || "-")}</div></div>
-        <div class="kv"><div class="k">④ 제작회사</div><div class="v">${escapeHtml(row.제작회사 || "-")}</div></div>
-        <div class="kv"><div class="k">⑤ 배치장소</div><div class="v">${escapeHtml(row.배치장소 || "-")}${row.세부위치 ? " / " + escapeHtml(row.세부위치) : ""}</div></div>
-        <div class="kv"><div class="k">⑥ 규격</div><div class="v">${escapeHtml(row.규격 || "-")}</div></div>
-        <div class="kv"><div class="k">⑦ 자체일련번호</div><div class="v">${escapeHtml(row.자체일련번호 || "-")}</div></div>
-        <div class="kv"><div class="k">⑧ 장비점검일자</div><div class="v">${escapeHtml(row.장비점검일자 || "-")}</div></div>
-        <div class="kv"><div class="k">⑨ 취득가격</div><div class="v">${money(row.취득가격)}</div></div>
-        <div class="kv"><div class="k">⑩ 취득년월일</div><div class="v">${escapeHtml(row.취득년월일 || "-")}</div></div>
-        <div class="kv"><div class="k">⑪ 내용연수</div><div class="v">${row.내용연수 ?? "-"}</div></div>
-        <div class="kv"><div class="k">⑫ 취득근거</div><div class="v">${escapeHtml(row.취득근거 || "-")}</div></div>
-        <div class="kv"><div class="k">⑬ 장비상태 등</div><div class="v"><span class="badge ${statusClass(row.장비상태등)}">${escapeHtml(row.장비상태등 || "-")}</span></div></div>
-        <div class="kv"><div class="k">⑬ 기타</div><div class="v">${escapeHtml(row.기타 || "-")}</div></div>
-
-        <div class="toolbar" style="margin-top:16px;">
-          <button class="btn primary" id="loadPhotosBtn">▼ ⑭ 장비사진 보기</button>
-          ${row.url ? `<a class="btn ghost" href="${escapeHtml(row.url)}" target="_blank" rel="noreferrer">노션에서 열기</a>` : ""}
-        </div>
-        <div id="photosArea"></div>
-      `;
-
-      $("#loadPhotosBtn").addEventListener("click", loadPhotos);
+      $("#equipmentDetail").innerHTML = equipmentDetailHtml(row, "Desktop");
+      bindDetailButtons($("#equipmentDetail"));
     }
 
-    async function loadPhotos() {
+    async function loadPhotos(targetArea = null) {
       const row = equipmentRows.find(item => item.id === selectedEquipmentId);
       if (!row) return;
 
-      $("#photosArea").innerHTML = `<div class="notice">노션 페이지 내부의 ⑭ 장비사진을 불러오는 중입니다.</div>`;
+      const area = targetArea || $("#photosArea") || document.querySelector(".photos-area");
+      if (!area) return;
+
+      area.innerHTML = `<div class="notice">노션 페이지 내부의 ⑭ 장비사진을 불러오는 중입니다.</div>`;
 
       try {
         const data = await api(`/api/equipment/${encodeURIComponent(row.id)}/photos`);
         const photos = data.photos || [];
 
-        $("#photosArea").innerHTML = photos.length
+        area.innerHTML = photos.length
           ? `<div class="photos-grid">${photos.map(photo => `<img src="${escapeHtml(photo.url)}" alt="">`).join("")}</div>`
           : `<div class="notice">조회된 장비사진이 없습니다. 노션 페이지 내부에 “⑭ 장비 사진” 토글이 있는지 확인하세요.</div>`;
       } catch (error) {
-        $("#photosArea").innerHTML = `<div class="notice error">${escapeHtml(error.message)}</div>`;
+        area.innerHTML = `<div class="notice error">${escapeHtml(error.message)}</div>`;
       }
     }
 
