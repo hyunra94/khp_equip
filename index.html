@@ -902,18 +902,22 @@
 
     /* 장비 원장 / 상세 패널 크기 조절 */
     #equipmentView {
-      --equipment-left: 50%;
-      --equipment-right: 50%;
+      --equipment-left-fr: 7fr;
+      --equipment-right-fr: 3fr;
+      --equipment-left-percent: 70;
     }
 
     #equipmentView.detail-open .layout-2 {
-      grid-template-columns: minmax(360px, var(--equipment-left)) 10px minmax(360px, var(--equipment-right));
+      grid-template-columns:
+        minmax(420px, var(--equipment-left-fr, 7fr))
+        12px
+        minmax(320px, var(--equipment-right-fr, 3fr));
       gap: 8px;
     }
 
     .pane-resizer {
       display: none;
-      width: 10px;
+      width: 12px;
       align-self: stretch;
       min-height: 420px;
       border-radius: 999px;
@@ -921,6 +925,7 @@
       cursor: col-resize;
       user-select: none;
       touch-action: none;
+      z-index: 5;
     }
 
     #equipmentView.detail-open .pane-resizer {
@@ -2045,16 +2050,17 @@ SN번호복사 / 텍스트
 
 
     function applyEquipmentPaneWidth(percent) {
-      const clamped = Math.max(34, Math.min(66, Number(percent) || 50));
+      const clamped = Math.max(45, Math.min(82, Number(percent) || 70));
       const view = $("#equipmentView");
-      view.style.setProperty("--equipment-left", `${clamped}%`);
-      view.style.setProperty("--equipment-right", `${100 - clamped}%`);
-      localStorage.setItem("equipment_pane_left", String(clamped));
+      view.style.setProperty("--equipment-left-fr", `${clamped}fr`);
+      view.style.setProperty("--equipment-right-fr", `${100 - clamped}fr`);
+      view.style.setProperty("--equipment-left-percent", String(clamped));
+      localStorage.setItem("equipment_pane_left_v2", String(clamped));
     }
 
     function initEquipmentPaneResize() {
-      const saved = localStorage.getItem("equipment_pane_left");
-      if (saved) applyEquipmentPaneWidth(saved);
+      const saved = localStorage.getItem("equipment_pane_left_v2");
+      applyEquipmentPaneWidth(saved || 70);
 
       const resizer = $("#equipmentPaneResizer");
       const view = $("#equipmentView");
@@ -2068,7 +2074,8 @@ SN번호복사 / 텍스트
         if (!layout) return;
 
         const rect = layout.getBoundingClientRect();
-        const x = (event.touches?.[0]?.clientX ?? event.clientX) - rect.left;
+        const clientX = event.touches?.[0]?.clientX ?? event.clientX;
+        const x = clientX - rect.left;
         const percent = (x / rect.width) * 100;
         applyEquipmentPaneWidth(percent);
       };
