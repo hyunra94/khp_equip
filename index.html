@@ -864,6 +864,27 @@
       }
     }
 
+
+    /* 목록/상세 간격 및 분류 배지 */
+    #equipmentView .layout-2 {
+      gap: 12px;
+    }
+
+    #equipmentView.detail-open .layout-2 {
+      gap: 12px;
+    }
+
+    @media (max-width: 840px) {
+      #equipmentView .layout-2,
+      #equipmentView.detail-open .layout-2 {
+        gap: 10px;
+      }
+
+      .mobile-inline-detail {
+        margin-top: -6px;
+      }
+    }
+
     @media (max-width: 1120px) {
       .stats { grid-template-columns: repeat(3, minmax(0,1fr)); }
       .layout-2 { grid-template-columns: 1fr; }
@@ -1188,11 +1209,7 @@
                     <label class="label">⑪ 내용연수</label>
                     <input class="input" type="number" name="내용연수" />
                   </div>
-                  <div class="form-field">
-                    <label class="label">분류</label>
-                    <select class="select" name="분류" id="newCategory"></select>
-                  </div>
-                  <div class="form-field full">
+<div class="form-field full">
                     <label class="label">⑫ 취득근거</label>
                     <input class="input" name="취득근거" />
                   </div>
@@ -1277,7 +1294,6 @@ SN번호 / 텍스트
 기타 / 텍스트
 대표사진URL / URL
 자산유형 / 선택
-분류 / 선택
 월별현황포함 / 체크박스
 사용상태 / 선택
 비고 / 텍스트
@@ -1323,7 +1339,6 @@ SN번호복사 / 텍스트
 
     const locations = ["XR실", "장비보관실", "VR체험버스", "지하1층 스튜디오", "스튜디오", "교육장", "외부대여", "수리업체", "확인필요", "미지정"];
     const statuses = ["정상", "대여중", "위치확인필요", "분실의심", "고장/수리중", "폐기", "기타"];
-    const categories = ["HMD", "카메라", "노트북", "태블릿", "촬영장비", "음향장비", "충전기/부속", "기타"];
     const assetTypes = ["장비", "소프트웨어", "유지보수", "소모품", "기타"];
     const usageStatuses = ["사용중", "보관", "제외", "폐기"];
 
@@ -1526,7 +1541,7 @@ SN번호복사 / 텍스트
     function equipmentInlineDetailHtml(row) {
       const cover = row.대표사진URL
         ? `<img class="detail-cover" src="${escapeHtml(row.대표사진URL)}" alt="">`
-        : `<div class="detail-cover">${escapeHtml(row.분류 || "EQ")}</div>`;
+        : `<div class="detail-cover">EQ</div>`;
 
       return `
         <div class="mobile-inline-detail" data-inline-detail-id="${escapeHtml(row.id)}">
@@ -1589,11 +1604,13 @@ SN번호복사 / 텍스트
       });
     }
 
+
+
     function equipmentCardHtml(row, selectable = false) {
       const active = selectable && row.id === selectedEquipmentId ? " active" : "";
       const photo = row.대표사진URL
         ? `<img class="eq-photo" src="${escapeHtml(row.대표사진URL)}" alt="">`
-        : `<div class="eq-photo">${escapeHtml(row.분류 || "EQ")}</div>`;
+        : `<div class="eq-photo">EQ</div>`;
 
       const rowHtml = `
         <article class="equipment-card equipment-row${active}" data-id="${escapeHtml(row.id)}">
@@ -1648,7 +1665,7 @@ SN번호복사 / 텍스트
 
       const cover = row.대표사진URL
         ? `<img class="detail-cover" src="${escapeHtml(row.대표사진URL)}" alt="">`
-        : `<div class="detail-cover">${escapeHtml(row.분류 || "EQ")}</div>`;
+        : `<div class="detail-cover">EQ</div>`;
 
       $("#equipmentDetail").innerHTML = `
         <div class="detail-close-row">
@@ -1973,7 +1990,6 @@ SN번호복사 / 텍스트
       $("#equipmentStatusFilter").innerHTML = optionHtml(statuses, "", "상태 전체");
       $("#monthlyLocationFilter").innerHTML = optionHtml(locations, "", "위치 전체");
       $("#newLocation").innerHTML = optionHtml(locations, "XR실");
-      $("#newCategory").innerHTML = optionHtml(categories, "HMD");
       $("#newStatus").innerHTML = optionHtml(statuses, "정상");
       $("#newUsageStatus").innerHTML = optionHtml(usageStatuses, "사용중");
       $("#newAssetType").innerHTML = optionHtml(assetTypes, "장비");
