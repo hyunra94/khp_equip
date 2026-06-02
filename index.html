@@ -1268,14 +1268,28 @@ SN번호복사 / 텍스트
 
       $("#equipmentList").innerHTML = `<div class="notice">장비 원장을 불러오는 중입니다.</div>`;
 
-      const data = await api(`/api/equipment?${qs.toString()}`);
-      equipmentRows = data.rows || [];
+      try {
+        const data = await api(`/api/equipment?${qs.toString()}`);
+        equipmentRows = data.rows || [];
 
-      if (!selectedEquipmentId && equipmentRows[0]) selectedEquipmentId = equipmentRows[0].id;
+        if (!selectedEquipmentId && equipmentRows[0]) selectedEquipmentId = equipmentRows[0].id;
 
-      renderEquipmentList();
-      renderEquipmentDetail();
-      renderDashboard();
+        renderEquipmentList();
+        renderEquipmentDetail();
+        renderDashboard();
+      } catch (error) {
+        equipmentRows = [];
+        $("#equipmentSummary").textContent = "";
+        $("#equipmentList").innerHTML = `
+          <div class="notice error">
+            장비 원장을 불러오지 못했습니다.<br>
+            ${escapeHtml(error.message)}<br><br>
+            Cloudflare Worker의 NOTION_EQUIPMENT_DATA_SOURCE_ID, NOTION_API_KEY, Notion Integration 연결 여부를 확인하세요.
+          </div>
+        `;
+        $("#equipmentDetail").innerHTML = `<div class="empty">장비 원장 조회 오류가 발생했습니다.</div>`;
+        renderDashboard();
+      }
     }
 
     function renderEquipmentList() {
