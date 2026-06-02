@@ -832,27 +832,26 @@
     }
 
     @media (max-width: 840px) {
-      #equipmentView.detail-open .equipment-list-panel .card-body,
-      #equipmentView.detail-open #equipmentDetail {
-        max-height: none;
-        overflow: visible;
+      #equipmentView .detail-panel {
+        display: none;
       }
 
       #equipmentView.detail-open .layout-2 {
         grid-template-columns: 1fr;
       }
 
-      #equipmentView .detail-panel {
-        display: none;
+      #equipmentView.detail-open .equipment-list-panel .card-body {
+        max-height: none;
+        overflow: visible;
       }
 
       .mobile-inline-detail {
         display: block;
-        border: 1px solid #cbd9ea;
         background: #fff;
+        border: 1px solid #cbd9ea;
         border-radius: 14px;
-        padding: 14px;
         box-shadow: 0 12px 26px rgba(31, 58, 95, 0.08);
+        padding: 14px;
         margin-top: -2px;
       }
 
@@ -1520,7 +1519,74 @@ SN번호복사 / 텍스트
         });
       });
 
-      bindDetailButtons($("#equipmentList"));
+      bindInlineDetailButtons();
+    }
+
+
+    function equipmentInlineDetailHtml(row) {
+      const cover = row.대표사진URL
+        ? `<img class="detail-cover" src="${escapeHtml(row.대표사진URL)}" alt="">`
+        : `<div class="detail-cover">${escapeHtml(row.분류 || "EQ")}</div>`;
+
+      return `
+        <div class="mobile-inline-detail" data-inline-detail-id="${escapeHtml(row.id)}">
+          <div class="detail-close-row">
+            <button class="btn close-inline-detail-btn" type="button">상세 닫기</button>
+          </div>
+          ${cover}
+
+          <div class="kv"><div class="k">① SN번호</div><div class="v">${escapeHtml(row.SN번호 || "-")}</div></div>
+          <div class="kv"><div class="k">② 작성년월일</div><div class="v">${escapeHtml(row.작성년월일 || "-")}</div></div>
+          <div class="kv"><div class="k">③ 장비명</div><div class="v">${escapeHtml(row.장비명 || "-")}</div></div>
+          <div class="kv"><div class="k">④ 제작회사</div><div class="v">${escapeHtml(row.제작회사 || "-")}</div></div>
+          <div class="kv"><div class="k">⑤ 배치장소</div><div class="v">${escapeHtml(row.배치장소 || "-")}${row.세부위치 ? " / " + escapeHtml(row.세부위치) : ""}</div></div>
+          <div class="kv"><div class="k">⑥ 규격</div><div class="v">${escapeHtml(row.규격 || "-")}</div></div>
+          <div class="kv"><div class="k">⑦ 자체일련번호</div><div class="v">${escapeHtml(row.자체일련번호 || "-")}</div></div>
+          <div class="kv"><div class="k">⑧ 장비점검일자</div><div class="v">${escapeHtml(row.장비점검일자 || "-")}</div></div>
+          <div class="kv"><div class="k">⑨ 취득가격</div><div class="v">${money(row.취득가격)}</div></div>
+          <div class="kv"><div class="k">⑩ 취득년월일</div><div class="v">${escapeHtml(row.취득년월일 || "-")}</div></div>
+          <div class="kv"><div class="k">⑪ 내용연수</div><div class="v">${row.내용연수 ?? "-"}</div></div>
+          <div class="kv"><div class="k">⑫ 취득근거</div><div class="v">${escapeHtml(row.취득근거 || "-")}</div></div>
+          <div class="kv"><div class="k">⑬ 장비상태 등</div><div class="v"><span class="badge ${statusClass(row.장비상태등)}">${escapeHtml(row.장비상태등 || "-")}</span></div></div>
+          <div class="kv"><div class="k">⑬ 기타</div><div class="v">${escapeHtml(row.기타 || "-")}</div></div>
+
+          <div class="toolbar" style="margin-top:16px;">
+            <button class="btn primary load-inline-photos-btn" type="button" data-id="${escapeHtml(row.id)}">▼ ⑭ 장비사진 보기</button>
+            ${row.url ? `<a class="btn ghost" href="${escapeHtml(row.url)}" target="_blank" rel="noreferrer">노션에서 열기</a>` : ""}
+          </div>
+          <div class="inline-photos-area"></div>
+        </div>
+      `;
+    }
+
+    function bindInlineDetailButtons() {
+      $$("#equipmentList .close-inline-detail-btn").forEach(button => {
+        button.addEventListener("click", (event) => {
+          event.stopPropagation();
+          selectedEquipmentId = "";
+          renderEquipmentList();
+          renderEquipmentDetail();
+        });
+      });
+
+      $$("#equipmentList .load-inline-photos-btn").forEach(button => {
+        button.addEventListener("click", async (event) => {
+          event.stopPropagation();
+          const rowId = button.dataset.id;
+          const area = button.closest(".mobile-inline-detail").querySelector(".inline-photos-area");
+          area.innerHTML = `<div class="notice">노션 페이지 내부의 ⑭ 장비사진을 불러오는 중입니다.</div>`;
+
+          try {
+            const data = await api(`/api/equipment/${encodeURIComponent(rowId)}/photos`);
+            const photos = data.photos || [];
+            area.innerHTML = photos.length
+              ? `<div class="photos-grid">${photos.map(photo => `<img src="${escapeHtml(photo.url)}" alt="">`).join("")}</div>`
+              : `<div class="notice">조회된 장비사진이 없습니다. 노션 페이지 내부에 “⑭ 장비 사진” 토글이 있는지 확인하세요.</div>`;
+          } catch (error) {
+            area.innerHTML = `<div class="notice error">${escapeHtml(error.message)}</div>`;
+          }
+        });
+      });
     }
 
     function equipmentCardHtml(row, selectable = false) {
@@ -1565,7 +1631,7 @@ SN번호복사 / 텍스트
       `;
 
       const inlineDetail = selectable && row.id === selectedEquipmentId
-        ? `<div class="mobile-inline-detail">${equipmentDetailHtml(row, "Inline")}</div>`
+        ? equipmentInlineDetailHtml(row)
         : "";
 
       return rowHtml + inlineDetail;
@@ -1580,28 +1646,61 @@ SN번호복사 / 텍스트
         return;
       }
 
-      $("#equipmentDetail").innerHTML = equipmentDetailHtml(row, "Desktop");
-      bindDetailButtons($("#equipmentDetail"));
+      const cover = row.대표사진URL
+        ? `<img class="detail-cover" src="${escapeHtml(row.대표사진URL)}" alt="">`
+        : `<div class="detail-cover">${escapeHtml(row.분류 || "EQ")}</div>`;
+
+      $("#equipmentDetail").innerHTML = `
+        <div class="detail-close-row">
+          <button class="btn" id="closeDetailBtn">상세 닫기</button>
+        </div>
+        ${cover}
+
+        <div class="kv"><div class="k">① SN번호</div><div class="v">${escapeHtml(row.SN번호 || "-")}</div></div>
+        <div class="kv"><div class="k">② 작성년월일</div><div class="v">${escapeHtml(row.작성년월일 || "-")}</div></div>
+        <div class="kv"><div class="k">③ 장비명</div><div class="v">${escapeHtml(row.장비명 || "-")}</div></div>
+        <div class="kv"><div class="k">④ 제작회사</div><div class="v">${escapeHtml(row.제작회사 || "-")}</div></div>
+        <div class="kv"><div class="k">⑤ 배치장소</div><div class="v">${escapeHtml(row.배치장소 || "-")}${row.세부위치 ? " / " + escapeHtml(row.세부위치) : ""}</div></div>
+        <div class="kv"><div class="k">⑥ 규격</div><div class="v">${escapeHtml(row.규격 || "-")}</div></div>
+        <div class="kv"><div class="k">⑦ 자체일련번호</div><div class="v">${escapeHtml(row.자체일련번호 || "-")}</div></div>
+        <div class="kv"><div class="k">⑧ 장비점검일자</div><div class="v">${escapeHtml(row.장비점검일자 || "-")}</div></div>
+        <div class="kv"><div class="k">⑨ 취득가격</div><div class="v">${money(row.취득가격)}</div></div>
+        <div class="kv"><div class="k">⑩ 취득년월일</div><div class="v">${escapeHtml(row.취득년월일 || "-")}</div></div>
+        <div class="kv"><div class="k">⑪ 내용연수</div><div class="v">${row.내용연수 ?? "-"}</div></div>
+        <div class="kv"><div class="k">⑫ 취득근거</div><div class="v">${escapeHtml(row.취득근거 || "-")}</div></div>
+        <div class="kv"><div class="k">⑬ 장비상태 등</div><div class="v"><span class="badge ${statusClass(row.장비상태등)}">${escapeHtml(row.장비상태등 || "-")}</span></div></div>
+        <div class="kv"><div class="k">⑬ 기타</div><div class="v">${escapeHtml(row.기타 || "-")}</div></div>
+
+        <div class="toolbar" style="margin-top:16px;">
+          <button class="btn primary" id="loadPhotosBtn">▼ ⑭ 장비사진 보기</button>
+          ${row.url ? `<a class="btn ghost" href="${escapeHtml(row.url)}" target="_blank" rel="noreferrer">노션에서 열기</a>` : ""}
+        </div>
+        <div id="photosArea"></div>
+      `;
+
+      $("#loadPhotosBtn").addEventListener("click", loadPhotos);
+      $("#closeDetailBtn").addEventListener("click", () => {
+        selectedEquipmentId = "";
+        renderEquipmentList();
+        renderEquipmentDetail();
+      });
     }
 
-    async function loadPhotos(targetArea = null) {
+    async function loadPhotos() {
       const row = equipmentRows.find(item => item.id === selectedEquipmentId);
       if (!row) return;
 
-      const area = targetArea || $("#photosArea") || document.querySelector(".photos-area");
-      if (!area) return;
-
-      area.innerHTML = `<div class="notice">노션 페이지 내부의 ⑭ 장비사진을 불러오는 중입니다.</div>`;
+      $("#photosArea").innerHTML = `<div class="notice">노션 페이지 내부의 ⑭ 장비사진을 불러오는 중입니다.</div>`;
 
       try {
         const data = await api(`/api/equipment/${encodeURIComponent(row.id)}/photos`);
         const photos = data.photos || [];
 
-        area.innerHTML = photos.length
+        $("#photosArea").innerHTML = photos.length
           ? `<div class="photos-grid">${photos.map(photo => `<img src="${escapeHtml(photo.url)}" alt="">`).join("")}</div>`
           : `<div class="notice">조회된 장비사진이 없습니다. 노션 페이지 내부에 “⑭ 장비 사진” 토글이 있는지 확인하세요.</div>`;
       } catch (error) {
-        area.innerHTML = `<div class="notice error">${escapeHtml(error.message)}</div>`;
+        $("#photosArea").innerHTML = `<div class="notice error">${escapeHtml(error.message)}</div>`;
       }
     }
 
