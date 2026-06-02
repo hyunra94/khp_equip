@@ -885,6 +885,84 @@
       }
     }
 
+
+
+    .sync-note {
+      color: var(--sub);
+      font-size: 12px;
+      font-weight: 750;
+      margin: -4px 0 12px;
+    }
+
+    .toolbar .btn.refresh {
+      background: #fff;
+      color: var(--primary);
+      border-color: #cbd9ea;
+    }
+
+    /* 장비 원장 / 상세 패널 크기 조절 */
+    #equipmentView {
+      --equipment-left: 50%;
+      --equipment-right: 50%;
+    }
+
+    #equipmentView.detail-open .layout-2 {
+      grid-template-columns: minmax(360px, var(--equipment-left)) 10px minmax(360px, var(--equipment-right));
+      gap: 8px;
+    }
+
+    .pane-resizer {
+      display: none;
+      width: 10px;
+      align-self: stretch;
+      min-height: 420px;
+      border-radius: 999px;
+      position: relative;
+      cursor: col-resize;
+      user-select: none;
+      touch-action: none;
+    }
+
+    #equipmentView.detail-open .pane-resizer {
+      display: block;
+    }
+
+    .pane-resizer::before {
+      content: "";
+      position: absolute;
+      top: 14px;
+      bottom: 14px;
+      left: 50%;
+      width: 3px;
+      transform: translateX(-50%);
+      border-radius: 999px;
+      background: #d6dde8;
+      transition: background .12s ease-out, width .12s ease-out;
+    }
+
+    .pane-resizer:hover::before,
+    .pane-resizer.dragging::before {
+      background: var(--primary);
+      width: 4px;
+    }
+
+    body.resizing-pane {
+      cursor: col-resize;
+      user-select: none;
+    }
+
+    @media (max-width: 840px) {
+      #equipmentView.detail-open .layout-2 {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .pane-resizer,
+      #equipmentView.detail-open .pane-resizer {
+        display: none;
+      }
+    }
+
     @media (max-width: 1120px) {
       .stats { grid-template-columns: repeat(3, minmax(0,1fr)); }
       .layout-2 { grid-template-columns: 1fr; }
@@ -1085,12 +1163,15 @@
                   <input class="input" id="equipmentSearch" placeholder="장비명, SN번호, 자체일련번호 검색" />
                   <select class="select" id="equipmentLocationFilter"></select>
                   <select class="select" id="equipmentStatusFilter"></select>
-                  <button class="btn" id="equipmentReloadBtn">조회</button>
+                  <button class="btn refresh" id="equipmentReloadBtn">새로고침</button>
                 </div>
                 <div class="list-summary" id="equipmentSummary"></div>
+                <div class="sync-note" id="equipmentSyncNote"></div>
                 <div class="equipment-list" id="equipmentList"></div>
               </div>
             </div>
+
+            <div class="pane-resizer" id="equipmentPaneResizer" title="좌우 폭 조절"></div>
 
             <aside class="card detail-panel">
               <div class="card-header">
@@ -1344,6 +1425,7 @@ SN번호복사 / 텍스트
 
     let currentUser = null;
     let equipmentRows = [];
+    let equipmentLastLoadedAt = '';
     let monthlyRows = [];
     let selectedEquipmentId = "";
 
@@ -1464,29 +1546,49 @@ SN번호복사 / 텍스트
       $("#monthlyMonth").value = monthNow();
       $("#monthChip").textContent = formatMonth(monthNow());
 
-      await Promise.allSettled([
-        loadEquipment(),
-        loadMonthly(false)
-      ]);
-
+      await loadEquipment();
+      monthlyRows = [];
       renderDashboard();
     }
 
-    async function loadEquipment() {
-      const q = $("#equipmentSearch").value.trim();
+
+    function uniqueSorted(values) {
+      return [...new Set(values.map(v => String(v || "").trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b, "ko"));
+    }
+
+    function refreshEquipmentLocationOptions() {
+      const select = $("#equipmentLocationFilter");
+      const current = select.value;
+      const actualLocations = uniqueSorted(equipmentRows.map(row => row.배치장소 || "미지정"));
+      select.innerHTML = optionHtml(actualLocations, current, "배치장소 전체");
+
+      if (current && !actualLocations.includes(current)) {
+        select.value = "";
+      }
+    }
+
+    function filteredEquipmentRows() {
+      const q = $("#equipmentSearch").value.trim().toLowerCase();
       const location = $("#equipmentLocationFilter").value;
       const status = $("#equipmentStatusFilter").value;
 
-      const qs = new URLSearchParams();
-      if (q) qs.set("q", q);
-      if (location) qs.set("location", location);
-      if (status) qs.set("status", status);
+      return equipmentRows.filter(row => {
+        const matchQ = !q || `${row.장비명 || ""} ${row.SN번호 || ""} ${row.자체일련번호 || ""}`.toLowerCase().includes(q);
+        const matchLocation = !location || (row.배치장소 || "미지정") === location;
+        const matchStatus = !status || row.장비상태등 === status;
+        return matchQ && matchLocation && matchStatus;
+      });
+    }
 
-      $("#equipmentList").innerHTML = `<div class="notice">장비 원장을 불러오는 중입니다.</div>`;
+    async function loadEquipment() {
+      $("#equipmentList").innerHTML = `<div class="notice">장비 원장을 불러오는 중입니다. 최초 1회만 전체 데이터를 가져오고, 이후 필터는 화면 안에서 바로 적용됩니다.</div>`;
 
       try {
-        const data = await api(`/api/equipment?${qs.toString()}`);
+        const data = await api(`/api/equipment`);
         equipmentRows = data.rows || [];
+        equipmentLastLoadedAt = new Date().toLocaleString("ko-KR");
+
+        refreshEquipmentLocationOptions();
 
         if (selectedEquipmentId && !equipmentRows.some(row => row.id === selectedEquipmentId)) {
           selectedEquipmentId = "";
@@ -1498,6 +1600,7 @@ SN번호복사 / 텍스트
       } catch (error) {
         equipmentRows = [];
         $("#equipmentSummary").textContent = "";
+        $("#equipmentSyncNote").textContent = "";
         $("#equipmentList").innerHTML = `
           <div class="notice error">
             장비 원장을 불러오지 못했습니다.<br>
@@ -1511,15 +1614,25 @@ SN번호복사 / 텍스트
     }
 
     function renderEquipmentList() {
-      const includeCount = equipmentRows.filter(row => row.월별현황포함).length;
+      const rows = filteredEquipmentRows();
+
+      if (selectedEquipmentId && !rows.some(row => row.id === selectedEquipmentId)) {
+        selectedEquipmentId = "";
+      }
+
+      const includeCount = rows.filter(row => row.월별현황포함).length;
       $("#equipmentSummary").textContent = selectedEquipmentId
-        ? `조회 결과 ${equipmentRows.length}건 · 월별현황 포함 ${includeCount}건 · 상세 열림`
-        : `조회 결과 ${equipmentRows.length}건 · 월별현황 포함 ${includeCount}건 · 장비를 클릭하면 상세가 열립니다`;
+        ? `조회 결과 ${rows.length}건 · 월별현황 포함 ${includeCount}건 · 상세 열림`
+        : `조회 결과 ${rows.length}건 · 월별현황 포함 ${includeCount}건 · 장비를 클릭하면 상세가 열립니다`;
+
+      $("#equipmentSyncNote").textContent = equipmentLastLoadedAt
+        ? `마지막 동기화: ${equipmentLastLoadedAt} · 필터/검색은 저장된 목록 안에서 즉시 적용됩니다. Notion 변경사항은 새로고침 버튼을 눌러 반영하세요.`
+        : "";
 
       $("#equipmentView").classList.toggle("detail-open", Boolean(selectedEquipmentId));
 
-      $("#equipmentList").innerHTML = equipmentRows.length
-        ? equipmentRows.map(row => equipmentCardHtml(row, true)).join("")
+      $("#equipmentList").innerHTML = rows.length
+        ? rows.map(row => equipmentCardHtml(row, true)).join("")
         : `<div class="empty">조회된 장비가 없습니다.</div>`;
 
       $$("#equipmentList .equipment-card").forEach(card => {
@@ -1534,9 +1647,10 @@ SN번호복사 / 텍스트
         });
       });
 
-      bindInlineDetailButtons();
+      if (typeof bindInlineDetailButtons === "function") {
+        bindInlineDetailButtons();
+      }
     }
-
 
     function equipmentInlineDetailHtml(row) {
       const cover = row.대표사진URL
@@ -1929,6 +2043,63 @@ SN번호복사 / 텍스트
       }
     }
 
+
+    function applyEquipmentPaneWidth(percent) {
+      const clamped = Math.max(34, Math.min(66, Number(percent) || 50));
+      const view = $("#equipmentView");
+      view.style.setProperty("--equipment-left", `${clamped}%`);
+      view.style.setProperty("--equipment-right", `${100 - clamped}%`);
+      localStorage.setItem("equipment_pane_left", String(clamped));
+    }
+
+    function initEquipmentPaneResize() {
+      const saved = localStorage.getItem("equipment_pane_left");
+      if (saved) applyEquipmentPaneWidth(saved);
+
+      const resizer = $("#equipmentPaneResizer");
+      const view = $("#equipmentView");
+      if (!resizer || !view) return;
+
+      let dragging = false;
+
+      const onMove = (event) => {
+        if (!dragging) return;
+        const layout = view.querySelector(".layout-2");
+        if (!layout) return;
+
+        const rect = layout.getBoundingClientRect();
+        const x = (event.touches?.[0]?.clientX ?? event.clientX) - rect.left;
+        const percent = (x / rect.width) * 100;
+        applyEquipmentPaneWidth(percent);
+      };
+
+      const stop = () => {
+        if (!dragging) return;
+        dragging = false;
+        resizer.classList.remove("dragging");
+        document.body.classList.remove("resizing-pane");
+        window.removeEventListener("mousemove", onMove);
+        window.removeEventListener("mouseup", stop);
+        window.removeEventListener("touchmove", onMove);
+        window.removeEventListener("touchend", stop);
+      };
+
+      const start = (event) => {
+        if (window.innerWidth <= 840) return;
+        event.preventDefault();
+        dragging = true;
+        resizer.classList.add("dragging");
+        document.body.classList.add("resizing-pane");
+        window.addEventListener("mousemove", onMove);
+        window.addEventListener("mouseup", stop);
+        window.addEventListener("touchmove", onMove, { passive: false });
+        window.addEventListener("touchend", stop);
+      };
+
+      resizer.addEventListener("mousedown", start);
+      resizer.addEventListener("touchstart", start, { passive: false });
+    }
+
     function bindEvents() {
       $("#loginForm").addEventListener("submit", async (event) => {
         event.preventDefault();
@@ -1967,15 +2138,23 @@ SN번호복사 / 텍스트
       $("#dashReloadBtn").addEventListener("click", async () => {
         $("#monthlyMonth").value = $("#dashMonth").value || monthNow();
         $("#monthChip").textContent = formatMonth($("#monthlyMonth").value);
-        await Promise.allSettled([loadEquipment(), loadMonthly(false)]);
+        await loadEquipment();
+        renderDashboard();
       });
 
       $("#equipmentReloadBtn").addEventListener("click", loadEquipment);
-      $("#equipmentSearch").addEventListener("keydown", (e) => {
-        if (e.key === "Enter") loadEquipment();
+      $("#equipmentSearch").addEventListener("input", () => {
+        renderEquipmentList();
+        renderEquipmentDetail();
       });
-      $("#equipmentLocationFilter").addEventListener("change", loadEquipment);
-      $("#equipmentStatusFilter").addEventListener("change", loadEquipment);
+      $("#equipmentLocationFilter").addEventListener("change", () => {
+        renderEquipmentList();
+        renderEquipmentDetail();
+      });
+      $("#equipmentStatusFilter").addEventListener("change", () => {
+        renderEquipmentList();
+        renderEquipmentDetail();
+      });
 
       $("#monthlyReloadBtn").addEventListener("click", () => loadMonthly(true));
       $("#monthlyLocationFilter").addEventListener("change", renderMonthlyList);
@@ -1986,7 +2165,7 @@ SN번호복사 / 텍스트
     }
 
     function initSelects() {
-      $("#equipmentLocationFilter").innerHTML = optionHtml(locations, "", "배치장소 전체");
+      $("#equipmentLocationFilter").innerHTML = optionHtml([], "", "배치장소 전체");
       $("#equipmentStatusFilter").innerHTML = optionHtml(statuses, "", "상태 전체");
       $("#monthlyLocationFilter").innerHTML = optionHtml(locations, "", "위치 전체");
       $("#newLocation").innerHTML = optionHtml(locations, "XR실");
@@ -2003,6 +2182,7 @@ SN번호복사 / 텍스트
     async function boot() {
       initSelects();
       bindEvents();
+      initEquipmentPaneResize();
 
       await loadLoginUsers();
 
