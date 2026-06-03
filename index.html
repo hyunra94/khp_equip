@@ -1218,7 +1218,7 @@
 
       <form id="loginForm">
         <label class="label">이름</label>
-        <select id="loginName" class="select" style="width:100%;margin-bottom:12px;"></select>
+        <input id="loginName" class="input" type="text" placeholder="예: 관리자" autocomplete="username" style="width:100%;margin-bottom:12px;" />
 
         <label class="label">보안코드</label>
         <input id="loginCode" class="input" type="password" inputmode="numeric" placeholder="4자리 또는 6자리" style="width:100%;margin-bottom:16px;" />
@@ -1714,16 +1714,16 @@ SN번호복사 / 텍스트
     }
 
     async function loadLoginUsers() {
+      // 이름은 드롭다운이 아니라 직접 입력 방식입니다.
+      // Cloudflare ACCESS_USERS_JSON에 등록된 name과 입력한 이름이 일치하면 로그인됩니다.
       try {
         const data = await api("/api/users");
-        if (!data.users || data.users.length === 0) {
-          $("#loginName").innerHTML = "";
-          showNotice($("#loginMsg"), "Cloudflare Worker의 ACCESS_USERS_JSON 값이 비어 있습니다.", true);
-          return;
+        const names = (data.users || []).map(user => user.name).filter(Boolean);
+        if (names.length) {
+          $("#loginName").placeholder = `예: ${names[0]}`;
         }
-        $("#loginName").innerHTML = data.users.map(user => `<option value="${escapeHtml(user.name)}">${escapeHtml(user.name)} (${escapeHtml(user.role || "staff")})</option>`).join("");
-      } catch (error) {
-        showNotice($("#loginMsg"), `사용자 목록을 불러오지 못했습니다. Worker 주소 또는 CORS 설정을 확인하세요. (${error.message})`, true);
+      } catch {
+        // 사용자 목록 조회 실패는 로그인 입력 화면 표시를 막지 않습니다.
       }
     }
 
