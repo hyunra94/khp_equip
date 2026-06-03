@@ -8,7 +8,7 @@
     :root {
       --bg: #f4f6f9;
       --panel: #ffffff;
-      --panel-2: #f9fafb;
+      --panel-2: #f8fafc;
       --line: #e5e7eb;
       --line-dark: #d1d5db;
       --text: #1f2937;
@@ -26,7 +26,7 @@
       --info: #2563eb;
       --info-soft: #eaf1ff;
       --gray-soft: #f3f4f6;
-      --radius: 14px;
+      --radius: 16px;
       --shadow: 0 14px 34px rgba(31, 41, 55, 0.07);
     }
 
@@ -50,6 +50,65 @@
       border: 0;
     }
 
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .hidden { display: none !important; }
+
+    .login-page {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(31, 58, 95, 0.10), transparent 34%),
+        radial-gradient(circle at 80% 70%, rgba(37, 99, 235, 0.08), transparent 34%),
+        var(--bg);
+    }
+
+    .login-card {
+      width: min(440px, 100%);
+      background: rgba(255,255,255,0.94);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 34px;
+      box-shadow: 0 24px 60px rgba(31, 41, 55, .10);
+    }
+
+    .login-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .brand-mark {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--primary), #315d93);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+    }
+
+    .login-card h1 {
+      margin: 0;
+      font-size: 28px;
+      letter-spacing: -0.06em;
+      color: #0f2238;
+    }
+
+    .login-card p {
+      margin: 6px 0 0;
+      color: var(--sub);
+      font-weight: 650;
+    }
+
     .app {
       display: grid;
       grid-template-columns: 248px minmax(0, 1fr);
@@ -63,9 +122,10 @@
       position: sticky;
       top: 0;
       height: 100vh;
+      z-index: 50;
     }
 
-    .brand {
+    .side-brand {
       display: flex;
       align-items: center;
       gap: 12px;
@@ -74,25 +134,13 @@
       margin-bottom: 18px;
     }
 
-    .brand-mark {
-      width: 40px;
-      height: 40px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #ffffff 0%, #dbeafe 100%);
-      color: var(--primary);
-      display: grid;
-      place-items: center;
-      font-weight: 800;
-      letter-spacing: -0.04em;
-    }
-
-    .brand-title {
-      font-weight: 800;
+    .side-title {
+      font-weight: 900;
       letter-spacing: -0.04em;
       font-size: 18px;
     }
 
-    .brand-sub {
+    .side-sub {
       font-size: 12px;
       color: rgba(255,255,255,0.68);
       margin-top: 3px;
@@ -113,6 +161,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
+      font-weight: 750;
     }
 
     .nav button:hover,
@@ -121,13 +170,21 @@
       color: #fff;
     }
 
-    .main {
-      min-width: 0;
+    .side-user {
+      margin-top: 26px;
+      padding: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 14px;
+      background: rgba(255,255,255,.07);
+      color: rgba(255,255,255,.82);
+      font-size: 13px;
     }
+
+    .main { min-width: 0; }
 
     .topbar {
       height: 70px;
-      background: rgba(255,255,255,0.86);
+      background: rgba(255,255,255,0.88);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--line);
       display: flex;
@@ -141,8 +198,8 @@
 
     .page-title {
       font-size: 20px;
-      font-weight: 800;
-      letter-spacing: -0.04em;
+      font-weight: 900;
+      letter-spacing: -0.05em;
     }
 
     .top-actions {
@@ -151,28 +208,26 @@
       gap: 10px;
     }
 
-    .month-chip {
+    .chip {
       background: var(--primary-soft);
       color: var(--primary);
       border: 1px solid #d8e5f4;
       padding: 8px 12px;
       border-radius: 999px;
-      font-weight: 700;
+      font-weight: 850;
       font-size: 13px;
+      white-space: nowrap;
     }
 
-    .role-chip {
+    .chip.dark {
       background: #111827;
       color: #fff;
-      padding: 8px 12px;
-      border-radius: 999px;
-      font-weight: 700;
-      font-size: 13px;
+      border-color: #111827;
     }
 
     .content {
       padding: 28px;
-      max-width: 1440px;
+      max-width: 1460px;
       margin: 0 auto;
     }
 
@@ -199,22 +254,20 @@
     .section-head h1 {
       margin: 0;
       font-size: 26px;
-      letter-spacing: -0.05em;
+      letter-spacing: -0.06em;
     }
 
     .section-head p {
       margin: 6px 0 0;
       color: var(--sub);
       font-size: 14px;
+      font-weight: 600;
     }
 
-    .grid {
-      display: grid;
-      gap: 16px;
-    }
+    .grid { display: grid; gap: 16px; }
 
     .stats {
-      grid-template-columns: repeat(6, minmax(120px, 1fr));
+      grid-template-columns: repeat(5, minmax(120px, 1fr));
     }
 
     .stat {
@@ -229,13 +282,13 @@
     .stat-label {
       color: var(--sub);
       font-size: 13px;
-      font-weight: 700;
+      font-weight: 800;
     }
 
     .stat-value {
       font-size: 30px;
-      font-weight: 850;
-      letter-spacing: -0.05em;
+      font-weight: 900;
+      letter-spacing: -0.06em;
       margin-top: 10px;
     }
 
@@ -243,6 +296,13 @@
       color: var(--muted);
       font-size: 12px;
       margin-top: 5px;
+    }
+
+    .layout-2 {
+      display: grid;
+      grid-template-columns: minmax(0, 1.42fr) minmax(360px, 0.88fr);
+      gap: 18px;
+      align-items: start;
     }
 
     .card {
@@ -265,7 +325,7 @@
     .card-title {
       margin: 0;
       font-size: 17px;
-      font-weight: 800;
+      font-weight: 900;
       letter-spacing: -0.04em;
     }
 
@@ -273,11 +333,10 @@
       color: var(--sub);
       font-size: 13px;
       margin-top: 4px;
+      font-weight: 600;
     }
 
-    .card-body {
-      padding: 20px;
-    }
+    .card-body { padding: 20px; }
 
     .toolbar {
       display: flex;
@@ -290,7 +349,7 @@
       border: 1px solid var(--line-dark);
       border-radius: 10px;
       background: #fff;
-      padding: 10px 11px;
+      padding: 10px 12px;
       color: var(--text);
       outline: none;
       min-height: 42px;
@@ -311,7 +370,7 @@
       padding: 10px 14px;
       min-height: 42px;
       border-radius: 10px;
-      font-weight: 800;
+      font-weight: 900;
       background: var(--gray-soft);
       color: var(--text);
       border: 1px solid var(--line-dark);
@@ -336,73 +395,124 @@
       border-color: var(--success);
     }
 
-    .btn.danger {
-      background: var(--danger);
-      color: #fff;
-      border-color: var(--danger);
-    }
-
     .btn.ghost {
       background: #fff;
       color: var(--primary);
       border-color: #cad7e6;
     }
 
-    .layout-2 {
-      display: grid;
-      grid-template-columns: minmax(0, 1.5fr) minmax(320px, 0.8fr);
-      gap: 18px;
-      align-items: start;
+    .btn.danger {
+      background: var(--danger);
+      color: #fff;
+      border-color: var(--danger);
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 14px;
+    .btn:disabled {
+      opacity: .6;
+      cursor: not-allowed;
     }
 
-    th {
-      text-align: left;
-      font-size: 12px;
+    .list-summary {
       color: var(--sub);
-      background: #f8fafc;
-      padding: 12px 14px;
-      border-bottom: 1px solid var(--line);
-      white-space: nowrap;
+      font-size: 13px;
+      font-weight: 800;
+      margin: -2px 0 12px;
     }
 
-    td {
-      padding: 13px 14px;
-      border-bottom: 1px solid var(--line);
-      vertical-align: middle;
+    .equipment-list, .monthly-list {
+      display: grid;
+      gap: 12px;
     }
 
-    tbody tr:hover { background: #fbfdff; }
+    .equipment-card, .monthly-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+      transition: .12s ease-out;
+    }
 
-    .table-wrap {
-      overflow: auto;
-      max-width: 100%;
+    .equipment-card:hover,
+    .equipment-card.active {
+      border-color: #c6d6eb;
+      box-shadow: 0 10px 24px rgba(31,58,95,.08);
+      background: #fbfdff;
+    }
+
+    .equipment-top {
+      display: grid;
+      grid-template-columns: 58px minmax(0,1fr);
+      gap: 12px;
+      align-items: center;
     }
 
     .thumb {
-      width: 54px;
-      height: 42px;
-      border-radius: 9px;
-      object-fit: cover;
+      width: 58px;
+      height: 48px;
+      border-radius: 10px;
       border: 1px solid var(--line);
-      background: #f3f4f6;
+      object-fit: cover;
+      background: #edf3fa;
+      display: grid;
+      place-items: center;
+      color: var(--primary);
+      font-weight: 900;
+      font-size: 12px;
+    }
+
+    .equipment-title {
+      min-width: 0;
+    }
+
+    .equipment-title strong {
       display: block;
+      font-size: 15px;
+      line-height: 1.25;
+      letter-spacing: -0.04em;
+      word-break: keep-all;
     }
 
-    .equip-name {
-      font-weight: 800;
-      letter-spacing: -0.03em;
-    }
-
-    .equip-code {
+    .equipment-title span {
+      display: block;
+      margin-top: 4px;
       color: var(--sub);
       font-size: 12px;
-      margin-top: 3px;
+      font-weight: 650;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .meta-box {
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 9px 10px;
+      min-width: 0;
+    }
+
+    .meta-box .k {
+      color: var(--sub);
+      font-size: 11px;
+      font-weight: 900;
+      margin-bottom: 3px;
+    }
+
+    .meta-box .v {
+      font-weight: 850;
+      word-break: keep-all;
+    }
+
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
     }
 
     .badge {
@@ -413,7 +523,7 @@
       padding: 3px 8px;
       border-radius: 999px;
       font-size: 12px;
-      font-weight: 800;
+      font-weight: 900;
       white-space: nowrap;
     }
 
@@ -429,19 +539,25 @@
       top: 94px;
     }
 
-    .detail-img {
+    .detail-cover {
       width: 100%;
-      aspect-ratio: 16/10;
+      aspect-ratio: 16/9;
       object-fit: cover;
-      background: #eef2f7;
+      background: #eef4fb;
       border-radius: 14px;
       border: 1px solid var(--line);
       margin-bottom: 16px;
+      display: grid;
+      place-items: center;
+      color: var(--primary);
+      font-size: 34px;
+      font-weight: 900;
+      letter-spacing: -0.06em;
     }
 
     .kv {
       display: grid;
-      grid-template-columns: 110px 1fr;
+      grid-template-columns: 132px 1fr;
       gap: 10px;
       padding: 10px 0;
       border-bottom: 1px solid var(--line);
@@ -450,16 +566,33 @@
 
     .kv .k {
       color: var(--sub);
-      font-weight: 700;
+      font-weight: 900;
     }
 
     .kv .v {
-      font-weight: 650;
+      font-weight: 750;
+      word-break: break-word;
+    }
+
+    .photos-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .photos-grid img {
+      width: 100%;
+      aspect-ratio: 4/3;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: #f3f4f6;
     }
 
     .form-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0,1fr));
       gap: 14px;
     }
 
@@ -469,7 +602,7 @@
       display: block;
       color: #374151;
       font-size: 13px;
-      font-weight: 800;
+      font-weight: 900;
       margin-bottom: 7px;
     }
 
@@ -479,355 +612,646 @@
       width: 100%;
     }
 
-    .help {
-      color: var(--muted);
-      font-size: 12px;
+    .section-divider {
+      grid-column: 1/-1;
+      padding: 12px 0 4px;
+      border-top: 1px solid var(--line);
+      color: var(--primary);
+      font-weight: 900;
+      letter-spacing: -0.04em;
       margin-top: 6px;
     }
 
-    .checkline {
+    .monthly-head {
       display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .monthly-edit {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
       gap: 8px;
-      align-items: center;
-      font-size: 14px;
-      font-weight: 700;
-      color: #374151;
-      padding: 10px 0;
+      align-items: end;
     }
 
-    .result-box {
-      display: none;
-      margin-top: 16px;
-      border: 1px solid #cfe1f5;
-      background: #f0f6ff;
-      color: #1f3a5f;
-      border-radius: 12px;
-      padding: 14px 16px;
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    .result-box.show { display: block; }
-
-    .report-paper {
-      background: #fff;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 28px;
-      min-height: 720px;
-    }
-
-    .report-paper h2 {
-      margin: 0 0 8px;
-      font-size: 24px;
-      letter-spacing: -0.05em;
-      text-align: center;
-    }
-
-    .report-paper .report-date {
-      text-align: center;
+    .monthly-edit label {
+      display: grid;
+      gap: 5px;
       color: var(--sub);
-      margin-bottom: 28px;
+      font-size: 12px;
+      font-weight: 900;
     }
 
-    .report-paper h3 {
-      margin: 28px 0 12px;
-      font-size: 17px;
-      padding-bottom: 8px;
-      border-bottom: 2px solid #1f2937;
+    .monthly-edit .full {
+      grid-column: 1 / -1;
+    }
+
+    .monthly-edit .select,
+    .monthly-edit .input {
+      width: 100%;
+      min-height: 40px;
+    }
+
+    .notice {
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-weight: 850;
+      font-size: 14px;
+      margin-top: 12px;
+    }
+
+    .notice.error {
+      background: var(--danger-soft);
+      color: var(--danger);
     }
 
     .empty {
       padding: 32px;
       color: var(--sub);
       text-align: center;
+      font-weight: 700;
     }
 
     .mobile-menu {
       display: none;
     }
 
-    .inline-edit {
-      min-width: 116px;
-      width: 100%;
-      max-width: 180px;
-      border: 1px solid var(--line-dark);
-      border-radius: 8px;
-      padding: 7px 8px;
-      background: #fff;
-    }
-
-    .memo-input {
-      min-width: 180px;
-      border: 1px solid var(--line-dark);
-      border-radius: 8px;
-      padding: 8px;
-      background: #fff;
-    }
-
-    .checkbox {
-      width: 18px;
-      height: 18px;
-      accent-color: var(--primary);
-    }
-
-
-    .mobile-card-list {
-      display: none;
-    }
-
-    .mobile-equipment-card {
-      background: #fff;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 14px;
-      display: grid;
-      gap: 12px;
-      box-shadow: 0 8px 22px rgba(31, 41, 55, 0.05);
-    }
-
-    .mobile-card-top {
-      display: grid;
-      grid-template-columns: 58px minmax(0, 1fr);
-      gap: 12px;
-      align-items: center;
-    }
-
-    .mobile-card-title {
-      min-width: 0;
-    }
-
-    .mobile-card-title strong {
-      display: block;
-      font-size: 15px;
-      line-height: 1.25;
-      letter-spacing: -0.04em;
-      word-break: keep-all;
-    }
-
-    .mobile-card-title span {
-      display: block;
-      margin-top: 4px;
-      color: var(--sub);
-      font-size: 12px;
-    }
-
-    .mobile-card-meta {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px;
-      font-size: 13px;
-    }
-
-    .mobile-meta-box {
+    .schema-box {
       background: #f8fafc;
       border: 1px solid var(--line);
-      border-radius: 10px;
-      padding: 9px 10px;
-      min-width: 0;
+      border-radius: 14px;
+      padding: 16px;
+      overflow: auto;
+      white-space: pre-wrap;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #374151;
     }
 
-    .mobile-meta-box .k {
-      color: var(--sub);
-      font-size: 11px;
-      font-weight: 800;
-      margin-bottom: 3px;
-    }
 
-    .mobile-meta-box .v {
-      font-weight: 800;
-      word-break: keep-all;
-    }
 
-    .mobile-card-badges {
-      display: flex;
-      flex-wrap: wrap;
+    .mode-toggle {
+      display: inline-flex;
       gap: 6px;
+      background: #eef2f7;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 4px;
     }
 
-    .mobile-card-actions {
-      display: flex;
-      gap: 8px;
-      justify-content: flex-end;
-      padding-top: 2px;
+    .mode-toggle button {
+      min-height: 34px;
+      padding: 7px 11px;
+      border-radius: 9px;
+      background: transparent;
+      border: 0;
+      font-weight: 900;
+      color: var(--sub);
     }
 
-    .mobile-monthly-card {
+    .mode-toggle button.active {
+      background: #fff;
+      color: var(--primary);
+      box-shadow: 0 4px 12px rgba(31,41,55,.08);
+    }
+
+    .model-group-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .model-group-card {
       background: #fff;
       border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 13px;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 8px 22px rgba(31, 41, 55, 0.04);
+    }
+
+    .model-group-head {
       display: grid;
-      gap: 10px;
-      box-shadow: 0 8px 22px rgba(31, 41, 55, 0.05);
+      grid-template-columns: 64px minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      padding: 16px;
+      background: #fbfdff;
+      border-bottom: 1px solid var(--line);
     }
 
-    .mobile-check-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-    }
-
-    .mobile-check-row label {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-weight: 850;
+    .model-photo {
+      width: 64px;
+      height: 54px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: #edf3fa;
+      object-fit: cover;
+      display: grid;
+      place-items: center;
       color: var(--primary);
+      font-size: 12px;
+      font-weight: 900;
     }
 
-    .mobile-edit-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px;
-      align-items: end;
+    .model-title strong {
+      display: block;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      line-height: 1.25;
     }
 
-    .mobile-edit-grid .inline-edit,
-    .mobile-edit-grid .memo-input {
-      width: 100%;
-      max-width: none;
-      min-width: 0;
-      min-height: 38px;
-      padding: 7px 9px;
-      font-size: 13px;
-    }
-
-    .mobile-edit-grid label {
-      display: grid;
-      gap: 4px;
-      color: var(--sub);
-      font-size: 11px;
-      font-weight: 800;
-    }
-
-    .mobile-edit-grid label.memo-field {
-      grid-column: 1 / -1;
-    }
-
-    .list-summary {
-      color: var(--sub);
-      font-size: 13px;
-      font-weight: 700;
-      margin: -2px 0 12px;
-    }
-
-    .mobile-filter-note {
-      display: none;
+    .model-title span {
+      display: block;
       color: var(--sub);
       font-size: 12px;
+      font-weight: 750;
+      margin-top: 4px;
+      line-height: 1.35;
+    }
+
+    .model-summary {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .model-equipment-table {
+      display: grid;
+    }
+
+    .model-equipment-row {
+      display: grid;
+      grid-template-columns: minmax(160px, 1.4fr) minmax(105px, .9fr) minmax(105px, .9fr) minmax(90px, .75fr) 74px;
+      gap: 10px;
+      align-items: center;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--line);
+      cursor: pointer;
+      transition: .12s ease-out;
+    }
+
+    .model-equipment-row:last-child {
+      border-bottom: 0;
+    }
+
+    .model-equipment-row:hover,
+    .model-equipment-row.active {
+      background: #eef6ff;
+    }
+
+    .model-equipment-row .cell-label {
+      display: none;
+      color: var(--sub);
+      font-size: 11px;
+      font-weight: 900;
+      margin-right: 4px;
+    }
+
+    .model-equipment-row .cell-main {
+      font-weight: 850;
+      font-size: 13px;
+      line-height: 1.3;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+
+    .model-equipment-row .cell-sub {
+      display: block;
+      color: var(--sub);
+      font-size: 11px;
+      font-weight: 700;
+      margin-top: 3px;
+    }
+
+    @media (max-width: 840px) {
+      .mode-toggle {
+        width: 100%;
+      }
+
+      .mode-toggle button {
+        flex: 1;
+      }
+
+      .model-group-head {
+        grid-template-columns: 54px minmax(0, 1fr);
+      }
+
+      .model-summary {
+        grid-column: 1 / -1;
+        justify-content: flex-start;
+      }
+
+      .model-equipment-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+        padding: 13px 14px;
+      }
+
+      .model-equipment-row .cell-label {
+        display: inline;
+      }
+    }
+
+    /* 장비관리대장 목록/상세 레이아웃 개선 */
+    #equipmentView:not(.detail-open) .layout-2 {
+      grid-template-columns: 1fr;
+    }
+
+    #equipmentView:not(.detail-open) .detail-panel {
+      display: none;
+    }
+
+    #equipmentView.detail-open .layout-2 {
+      grid-template-columns: minmax(420px, .98fr) minmax(390px, 1.02fr);
+    }
+
+    #equipmentView.detail-open .equipment-list-panel .card-body,
+    #equipmentView.detail-open #equipmentDetail {
+      max-height: calc(100vh - 196px);
+      overflow: auto;
+      scrollbar-gutter: stable;
+    }
+
+    .equipment-row {
+      grid-template-columns: 76px minmax(190px, 1.55fr) minmax(130px, .95fr) minmax(150px, 1.1fr) minmax(110px, .85fr) minmax(86px, .65fr);
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+    }
+
+    .equipment-row .equipment-top {
+      display: contents;
+    }
+
+    .equipment-row .eq-photo {
+      width: 68px;
+      height: 56px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      object-fit: cover;
+      background: #edf3fa;
+      display: grid;
+      place-items: center;
+      color: var(--primary);
+      font-weight: 900;
+      font-size: 12px;
+    }
+
+    .equipment-row .eq-cell {
+      min-width: 0;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+
+    .equipment-row .eq-label {
+      display: block;
+      color: var(--sub);
+      font-size: 11px;
+      font-weight: 900;
+      margin-bottom: 4px;
+    }
+
+    .equipment-row .eq-value {
+      display: block;
+      font-size: 14px;
+      font-weight: 850;
+      line-height: 1.35;
+    }
+
+    .equipment-row .eq-name .eq-value {
+      font-size: 15px;
+      letter-spacing: -0.04em;
+    }
+
+    .equipment-row .eq-sub {
+      display: block;
+      color: var(--sub);
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 4px;
+      line-height: 1.25;
+    }
+
+    #equipmentView:not(.detail-open) .equipment-row {
+      min-height: 92px;
+    }
+
+    #equipmentView.detail-open .equipment-row {
+      grid-template-columns: 48px minmax(110px, 1.5fr) minmax(74px, .85fr) minmax(92px, 1fr) minmax(82px, .8fr) 66px;
+      gap: 10px;
+      padding: 10px 12px;
+      min-height: 66px;
+    }
+
+    #equipmentView.detail-open .equipment-row .eq-photo {
+      width: 42px;
+      height: 36px;
+      border-radius: 9px;
+      font-size: 10px;
+    }
+
+    #equipmentView.detail-open .equipment-row .eq-label {
+      display: none;
+    }
+
+    #equipmentView.detail-open .equipment-row .eq-value {
+      font-size: 12px;
+      line-height: 1.25;
+    }
+
+    #equipmentView.detail-open .equipment-row .eq-name .eq-value {
+      font-size: 13px;
+    }
+
+    #equipmentView.detail-open .equipment-row .eq-sub {
+      font-size: 11px;
+      margin-top: 2px;
+    }
+
+    #equipmentView.detail-open .equipment-row .badge {
+      font-size: 11px;
+      min-height: 22px;
+      padding: 2px 7px;
+    }
+
+    #equipmentView.detail-open .equipment-card.active {
+      background: #eef6ff;
+      border-color: #acc6e7;
+    }
+
+    .detail-close-row {
+      display: flex;
+      justify-content: flex-end;
+      margin: -4px 0 10px;
+    }
+
+
+    .mobile-inline-detail {
+      display: none;
+    }
+
+    @media (max-width: 840px) {
+      #equipmentView .detail-panel {
+        display: none;
+      }
+
+      #equipmentView.detail-open .layout-2 {
+        grid-template-columns: 1fr;
+      }
+
+      #equipmentView.detail-open .equipment-list-panel .card-body {
+        max-height: none;
+        overflow: visible;
+      }
+
+      .mobile-inline-detail {
+        display: block;
+        background: #fff;
+        border: 1px solid #cbd9ea;
+        border-radius: 14px;
+        box-shadow: 0 12px 26px rgba(31, 58, 95, 0.08);
+        padding: 14px;
+        margin-top: -2px;
+      }
+
+      .mobile-inline-detail .detail-cover {
+        margin-top: 4px;
+      }
+
+      .mobile-inline-detail .kv {
+        grid-template-columns: 112px 1fr;
+      }
+    }
+
+
+    /* 목록/상세 간격 및 분류 배지 */
+    #equipmentView .layout-2 {
+      gap: 12px;
+    }
+
+    #equipmentView.detail-open .layout-2 {
+      gap: 12px;
+    }
+
+    @media (max-width: 840px) {
+      #equipmentView .layout-2,
+      #equipmentView.detail-open .layout-2 {
+        gap: 10px;
+      }
+
+      .mobile-inline-detail {
+        margin-top: -6px;
+      }
+    }
+
+
+
+    .sync-note {
+      color: var(--sub);
+      font-size: 12px;
+      font-weight: 750;
       margin: -4px 0 12px;
     }
 
-    .print-only { display: none; }
+    .toolbar .btn.refresh {
+      background: #fff;
+      color: var(--primary);
+      border-color: #cbd9ea;
+    }
 
-    @media print {
-      body { background: #fff; }
-      .sidebar, .topbar, .no-print, .toolbar, .section-head, .card-header button { display: none !important; }
-      .app { display: block; }
-      .content { padding: 0; max-width: none; }
-      .view { display: none !important; }
-      #reportView { display: block !important; }
-      .card { box-shadow: none; border: 0; }
-      .card-body { padding: 0; }
-      .report-paper { border: 0; border-radius: 0; padding: 0; }
-      .print-only { display: block; }
+    /* 장비 원장 / 상세 패널 크기 조절 */
+    #equipmentView {
+      --equipment-left-fr: 7fr;
+      --equipment-right-fr: 3fr;
+      --equipment-left-percent: 70;
+    }
+
+    #equipmentView.detail-open .layout-2 {
+      grid-template-columns:
+        minmax(420px, var(--equipment-left-fr, 7fr))
+        12px
+        minmax(320px, var(--equipment-right-fr, 3fr));
+      gap: 8px;
+    }
+
+    .pane-resizer {
+      display: none;
+      width: 12px;
+      align-self: stretch;
+      min-height: 420px;
+      border-radius: 999px;
+      position: relative;
+      cursor: col-resize;
+      user-select: none;
+      touch-action: none;
+      z-index: 5;
+    }
+
+    #equipmentView.detail-open .pane-resizer {
+      display: block;
+    }
+
+    .pane-resizer::before {
+      content: "";
+      position: absolute;
+      top: 14px;
+      bottom: 14px;
+      left: 50%;
+      width: 3px;
+      transform: translateX(-50%);
+      border-radius: 999px;
+      background: #d6dde8;
+      transition: background .12s ease-out, width .12s ease-out;
+    }
+
+    .pane-resizer:hover::before,
+    .pane-resizer.dragging::before {
+      background: var(--primary);
+      width: 4px;
+    }
+
+    body.resizing-pane {
+      cursor: col-resize;
+      user-select: none;
+    }
+
+    @media (max-width: 840px) {
+      #equipmentView.detail-open .layout-2 {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .pane-resizer,
+      #equipmentView.detail-open .pane-resizer {
+        display: none;
+      }
     }
 
     @media (max-width: 1120px) {
-      .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .stats { grid-template-columns: repeat(3, minmax(0,1fr)); }
       .layout-2 { grid-template-columns: 1fr; }
       .detail-panel { position: static; }
     }
 
-    @media (max-width: 820px) {
+    @media (max-width: 840px) {
       .app { grid-template-columns: 1fr; }
       .sidebar {
         display: none;
         position: fixed;
-        z-index: 40;
         inset: 0 auto 0 0;
         width: 280px;
       }
       .sidebar.open { display: block; }
-      .mobile-menu {
-        display: inline-flex;
-      }
-      .topbar {
-        padding: 0 16px;
-      }
-      .content {
-        padding: 18px;
-      }
-      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .form-grid { grid-template-columns: 1fr; }
-      .section-head {
-        align-items: flex-start;
-        flex-direction: column;
-      }
-
-      .table-wrap.responsive-table {
-        display: none;
-      }
-      .mobile-card-list {
-        display: grid;
-        gap: 12px;
-      }
-      .mobile-filter-note {
-        display: block;
-      }
-      .toolbar {
-        gap: 8px;
-      }
-      .toolbar .input,
-      .toolbar .select,
-      .toolbar .btn {
+      .mobile-menu { display: inline-flex; }
+      .topbar { padding: 0 16px; }
+      .content { padding: 18px; }
+      .section-head { align-items: flex-start; flex-direction: column; }
+      .toolbar .input, .toolbar .select, .toolbar .btn {
         flex: 1 1 calc(50% - 8px);
         min-width: 0;
       }
-      .toolbar .input:first-child {
-        flex-basis: 100%;
-      }
-      .card-header {
-        padding: 16px;
-      }
-      .card-body {
-        padding: 16px;
-      }
-      .detail-panel {
-        display: none;
-      }
-
-      .top-actions .role-chip { display: none; }
+      .toolbar .input:first-child { flex-basis: 100%; }
+      .stats { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .form-grid { grid-template-columns: 1fr; }
+      .monthly-edit { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .photos-grid { grid-template-columns: 1fr; }
+      .top-actions .chip.dark { display: none; }
     }
 
-    @media (max-width: 520px) {
+    @media (max-width: 560px) {
+      .login-card { padding: 26px 22px; }
       .stats { grid-template-columns: 1fr; }
       .page-title { font-size: 17px; }
-      .month-chip { display: none; }
+      .chip { display: none; }
+      .meta-grid { grid-template-columns: 1fr; }
+      .equipment-row,
+      #equipmentView.detail-open .equipment-row {
+        grid-template-columns: 54px minmax(0, 1fr);
+        gap: 12px;
+      }
+      .equipment-row .eq-photo,
+      #equipmentView.detail-open .equipment-row .eq-photo {
+        grid-row: span 5;
+        width: 48px;
+        height: 42px;
+      }
+      .equipment-row .eq-label,
+      #equipmentView.detail-open .equipment-row .eq-label {
+        display: inline;
+        margin-right: 6px;
+      }
+      .equipment-row .eq-value,
+      #equipmentView.detail-open .equipment-row .eq-value {
+        display: inline;
+        font-size: 13px;
+      }
+      .equipment-row .eq-name .eq-value,
+      #equipmentView.detail-open .equipment-row .eq-name .eq-value {
+        display: block;
+        font-size: 14px;
+      }
+      .equipment-row .eq-sub {
+        display: block;
+      }
+      .monthly-edit { grid-template-columns: 1fr; }
+      .kv { grid-template-columns: 112px 1fr; }
+      .card-body { padding: 16px; }
+      .toolbar .input, .toolbar .select, .toolbar .btn { flex-basis: 100%; }
     }
   </style>
 </head>
 <body>
-  <div class="app">
-    <aside class="sidebar" id="sidebar">
-      <div class="brand">
+  <section class="login-page" id="loginPage">
+    <div class="login-card">
+      <div class="login-brand">
         <div class="brand-mark">EQ</div>
         <div>
-          <div class="brand-title">장비 현황 관리</div>
-          <div class="brand-sub">Monthly Equipment Status</div>
+          <h1>장비 현황 관리</h1>
+          <p>이름과 보안코드를 입력해 접속하세요.</p>
+        </div>
+      </div>
+
+      <form id="loginForm">
+        <label class="label">이름</label>
+        <select id="loginName" class="select" style="width:100%;margin-bottom:12px;"></select>
+
+        <label class="label">보안코드</label>
+        <input id="loginCode" class="input" type="password" inputmode="numeric" placeholder="4자리 또는 6자리" style="width:100%;margin-bottom:16px;" />
+
+        <button class="btn primary" type="submit" style="width:100%;">접속</button>
+      </form>
+
+      <div id="loginMsg" class="notice hidden"></div>
+    </div>
+  </section>
+
+  <section class="app hidden" id="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="side-brand">
+        <div class="brand-mark">EQ</div>
+        <div>
+          <div class="side-title">장비 현황 관리</div>
+          <div class="side-sub">Equipment Register</div>
         </div>
       </div>
 
       <nav class="nav">
         <button class="active" data-view="dashboardView">대시보드</button>
-        <button data-view="equipmentView">장비 목록</button>
-        <button data-view="monthlyView">월별 현황 확인</button>
-        <button data-view="addView">신규 장비 등록</button>
-        <button data-view="generateView">월별 현황 생성</button>
-        <button data-view="reportView">보고서 생성</button>
+        <button data-view="equipmentView">장비관리대장</button>
+        <button data-view="monthlyView">월별 위치·상태 확인</button>
+        <button data-view="addView" id="addNavBtn">신규 장비 등록</button>
+        <button data-view="schemaView">DB 속성표</button>
       </nav>
+
+      <div class="side-user">
+        <div style="font-weight:900;margin-bottom:4px;">접속 사용자</div>
+        <div id="sideUserText">-</div>
+      </div>
     </aside>
 
     <main class="main">
@@ -837,8 +1261,9 @@
           <div class="page-title" id="pageTitle">대시보드</div>
         </div>
         <div class="top-actions">
-          <span class="month-chip" id="topMonthChip">2026년 06월</span>
-          <span class="role-chip">관리자</span>
+          <span class="chip" id="monthChip"></span>
+          <span class="chip dark" id="roleChip">사용자</span>
+          <button class="btn" id="logoutBtn">로그아웃</button>
         </div>
       </header>
 
@@ -847,11 +1272,11 @@
           <div class="section-head">
             <div>
               <h1>장비 현황 대시보드</h1>
-              <p>기준월별 장비 확인 현황과 조치 필요 항목을 확인합니다.</p>
+              <p>장비 원장과 월별 위치·상태 확인 현황을 요약합니다.</p>
             </div>
-            <div class="toolbar no-print" style="margin:0;">
-              <select class="select" id="dashMonth"></select>
-              <button class="btn primary" data-move="monthlyView">월별 확인 바로가기</button>
+            <div class="toolbar" style="margin:0;">
+              <input class="input" type="month" id="dashMonth" />
+              <button class="btn primary" id="dashReloadBtn">새로고침</button>
             </div>
           </div>
 
@@ -861,37 +1286,26 @@
             <div class="card">
               <div class="card-header">
                 <div>
-                  <h2 class="card-title">위치별 현황</h2>
-                  <div class="card-sub">선택한 기준월의 위치별 장비 수량입니다.</div>
+                  <h2 class="card-title">최근 장비 목록</h2>
+                  <div class="card-sub">장비관리대장에서 선택하면 상세 정보를 확인할 수 있습니다.</div>
                 </div>
+                <button class="btn ghost" data-move="equipmentView">전체 보기</button>
               </div>
               <div class="card-body">
-                <div class="table-wrap">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>위치</th>
-                        <th>전체</th>
-                        <th>확인완료</th>
-                        <th>미확인</th>
-                        <th>대여중</th>
-                        <th>이상</th>
-                      </tr>
-                    </thead>
-                    <tbody id="locationSummaryBody"></tbody>
-                  </table>
-                </div>
+                <div class="equipment-list" id="dashboardEquipmentList"></div>
               </div>
             </div>
 
             <div class="card">
               <div class="card-header">
                 <div>
-                  <h2 class="card-title">조치 필요 장비</h2>
-                  <div class="card-sub">고장, 위치확인필요, 분실의심, 메모 항목입니다.</div>
+                  <h2 class="card-title">조치 필요 항목</h2>
+                  <div class="card-sub">미확인, 위치변경, 상태 이상, 메모가 있는 항목입니다.</div>
                 </div>
               </div>
-              <div class="card-body" id="issueList"></div>
+              <div class="card-body">
+                <div id="dashboardIssueList"></div>
+              </div>
             </div>
           </div>
         </section>
@@ -899,61 +1313,43 @@
         <section class="view" id="equipmentView">
           <div class="section-head">
             <div>
-              <h1>장비 목록</h1>
-              <p>장비 원장 기준으로 사진, 위치, 상태, 관리대상 여부를 확인합니다.</p>
+              <h1>장비관리대장</h1>
+              <p>①~⑬ 원장 정보를 조회하고, 필요 시 ⑭ 장비사진을 펼쳐봅니다.</p>
             </div>
-            <button class="btn primary no-print" data-move="addView">신규 장비 등록</button>
+            <button class="btn primary admin-only" data-move="addView">신규 장비 등록</button>
           </div>
 
           <div class="layout-2">
-            <div class="card">
+            <div class="card equipment-list-panel">
               <div class="card-header">
                 <div>
                   <h2 class="card-title">장비 원장</h2>
-                  <div class="card-sub">소프트웨어·유지보수 등 제외 대상도 함께 관리할 수 있습니다.</div>
+                  <div class="card-sub">대표사진은 URL, 내부 사진은 노션 페이지 내부 ⑭ 영역에서 불러옵니다.</div>
                 </div>
               </div>
               <div class="card-body">
                 <div class="toolbar">
-                  <input class="input" id="equipmentSearch" placeholder="장비명, 장비번호 검색" />
+                  <input class="input" id="equipmentSearch" placeholder="장비명, SN번호, 자체일련번호 검색" />
                   <select class="select" id="equipmentLocationFilter"></select>
-                  <select class="select" id="equipmentTypeFilter"></select>
                   <select class="select" id="equipmentStatusFilter"></select>
-                  <select class="select" id="equipmentIncludeFilter">
-                    <option value="">관리대상 전체</option>
-                    <option value="include">월별현황 포함</option>
-                    <option value="exclude">월별현황 제외</option>
-                  </select>
+                  <button class="btn refresh" id="equipmentReloadBtn">새로고침</button>
                 </div>
-                <div class="list-summary" id="equipmentListSummary"></div>
-                <div class="mobile-filter-note">모바일에서는 장비를 카드형으로 표시합니다. 상세 정보는 각 카드의 “상세 보기”를 누르면 확인할 수 있습니다.</div>
-                <div class="table-wrap responsive-table">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>사진</th>
-                        <th>장비</th>
-                        <th>분류</th>
-                        <th>위치</th>
-                        <th>상태</th>
-                        <th>관리대상</th>
-                      </tr>
-                    </thead>
-                    <tbody id="equipmentTableBody"></tbody>
-                  </table>
-                </div>
-                <div class="mobile-card-list" id="equipmentCardList"></div>
+                <div class="list-summary" id="equipmentSummary"></div>
+                <div class="sync-note" id="equipmentSyncNote"></div>
+                <div class="equipment-list" id="equipmentList"></div>
               </div>
             </div>
 
-            <aside class="card detail-panel" id="equipmentDetail">
+            <div class="pane-resizer" id="equipmentPaneResizer" title="좌우 폭 조절"></div>
+
+            <aside class="card detail-panel">
               <div class="card-header">
                 <div>
-                  <h2 class="card-title">장비 상세</h2>
+                  <h2 class="card-title">장비관리대장 상세</h2>
                   <div class="card-sub">목록에서 장비를 선택하세요.</div>
                 </div>
               </div>
-              <div class="card-body" id="equipmentDetailBody">
+              <div class="card-body" id="equipmentDetail">
                 <div class="empty">선택된 장비가 없습니다.</div>
               </div>
             </aside>
@@ -963,68 +1359,34 @@
         <section class="view" id="monthlyView">
           <div class="section-head">
             <div>
-              <h1>월별 현황 확인</h1>
-              <p>위치별로 장비를 확인하고, 변경 사항이 있는 항목만 수정합니다.</p>
+              <h1>월별 위치·상태 확인</h1>
+              <p>위치와 상태만 확인하고, 확인 완료 시 로그인 사용자가 자동 기록됩니다.</p>
             </div>
-            <div class="toolbar no-print" style="margin:0;">
-              <button class="btn ghost" data-move="generateView">현황 생성</button>
-              <button class="btn primary" id="saveMonthlyBtn">변경사항 저장</button>
-            </div>
+            <button class="btn primary admin-only" id="generateMonthlyBtn">월별 현황 생성</button>
           </div>
 
           <div class="card">
             <div class="card-header">
               <div>
                 <h2 class="card-title">확인 목록</h2>
-                <div class="card-sub">정상 장비는 확인 체크만 처리하고, 변경 사항이 있는 장비만 위치·상태·메모를 작성합니다.</div>
+                <div class="card-sub">정상 장비는 확인 완료만 누르고, 변경 항목만 위치·상태·메모를 수정합니다.</div>
               </div>
             </div>
             <div class="card-body">
               <div class="toolbar">
-                <select class="select" id="monthlyMonth"></select>
+                <input class="input" type="month" id="monthlyMonth" />
                 <select class="select" id="monthlyLocationFilter"></select>
-                <select class="select" id="monthlyStatusFilter">
-                  <option value="">상태 전체</option>
-                  <option value="정상">정상</option>
-                  <option value="대여중">대여중</option>
-                  <option value="위치확인필요">위치확인필요</option>
-                  <option value="분실의심">분실의심</option>
-                  <option value="고장/수리중">고장/수리중</option>
-                  <option value="폐기">폐기</option>
-                </select>
                 <select class="select" id="monthlyCheckedFilter">
                   <option value="">확인 여부 전체</option>
                   <option value="unchecked">미확인만</option>
-                  <option value="checked">확인완료만</option>
-                  <option value="issue">이상 장비만</option>
+                  <option value="checked">확인 완료만</option>
+                  <option value="issue">조치 필요만</option>
                 </select>
-                <input class="input" id="monthlySearch" placeholder="장비명, 장비번호 검색" />
+                <button class="btn" id="monthlyReloadBtn">조회</button>
               </div>
-
-              <div class="toolbar">
-                <button class="btn success" id="checkVisibleBtn">현재 목록 전체 확인 처리</button>
-                <button class="btn" id="resetMonthlyFiltersBtn">필터 초기화</button>
-              </div>
-
-              <div class="list-summary" id="monthlyListSummary"></div>
-              <div class="mobile-filter-note">모바일에서는 월별 확인 항목을 카드형으로 표시합니다. 위치와 상태를 한 줄에서 빠르게 수정할 수 있습니다.</div>
-              <div class="table-wrap responsive-table">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>확인</th>
-                      <th>사진</th>
-                      <th>장비</th>
-                      <th>원장 위치</th>
-                      <th>이번달 위치</th>
-                      <th>상태</th>
-                      <th>메모</th>
-                    </tr>
-                  </thead>
-                  <tbody id="monthlyTableBody"></tbody>
-                </table>
-              </div>
-              <div class="mobile-card-list" id="monthlyCardList"></div>
+              <div class="list-summary" id="monthlySummary"></div>
+              <div id="monthlyMsg" class="notice hidden"></div>
+              <div class="monthly-list" id="monthlyList"></div>
             </div>
           </div>
         </section>
@@ -1033,219 +1395,230 @@
           <div class="section-head">
             <div>
               <h1>신규 장비 등록</h1>
-              <p>웹 화면에서 장비를 등록하면 장비 원장에 추가됩니다.</p>
+              <p>대표사진은 URL로 저장하고, 내부 장비사진은 노션 페이지 내부 ⑭ 영역에 첨부합니다.</p>
             </div>
           </div>
 
           <div class="card">
             <div class="card-header">
               <div>
-                <h2 class="card-title">장비 정보 입력</h2>
-                <div class="card-sub">월별 현황 포함 여부를 체크하면 다음 현황 생성 시 자동 포함됩니다.</div>
+                <h2 class="card-title">장비관리대장 정보 입력</h2>
+                <div class="card-sub">감가상각 관련 입력은 현재 버전에서 제외했습니다.</div>
               </div>
             </div>
             <div class="card-body">
-              <form id="addEquipmentForm">
+              <form id="addForm">
                 <div class="form-grid">
+                  <div class="section-divider">장비관리대장 ①~⑬</div>
+
+                  <div class="form-field full">
+                    <label class="label">장비모델</label>
+                    <select class="select" name="장비모델" id="newModel">
+                      <option value="">장비모델 선택 안 함</option>
+                    </select>
+                  </div>
+
                   <div class="form-field">
-                    <label class="label">장비번호</label>
-                    <input class="input" id="newCode" placeholder="예: EQ-601" required />
+                    <label class="label">③ 장비명</label>
+                    <input class="input" name="장비명" required />
                   </div>
                   <div class="form-field">
-                    <label class="label">장비명</label>
-                    <input class="input" id="newName" placeholder="예: Meta Quest 3" required />
+                    <label class="label">① SN번호</label>
+                    <input class="input" name="SN번호" />
                   </div>
+                  <div class="form-field">
+                    <label class="label">② 작성년월일</label>
+                    <input class="input" type="date" name="작성년월일" />
+                  </div>
+                  <div class="form-field">
+                    <label class="label">④ 제작회사</label>
+                    <input class="input" name="제작회사" />
+                  </div>
+                  <div class="form-field">
+                    <label class="label">⑤ 배치장소</label>
+                    <select class="select" name="배치장소" id="newLocation"></select>
+                  </div>
+                  <div class="form-field">
+                    <label class="label">세부위치</label>
+                    <input class="input" name="세부위치" placeholder="예: 보관함 A-1" />
+                  </div>
+                  <div class="form-field full">
+                    <label class="label">⑥ 규격</label>
+                    <input class="input" name="규격" />
+                  </div>
+                  <div class="form-field">
+                    <label class="label">⑦ 자체일련번호</label>
+                    <input class="input" name="자체일련번호" />
+                  </div>
+                  <div class="form-field">
+                    <label class="label">⑧ 장비점검일자</label>
+                    <input class="input" type="date" name="장비점검일자" />
+                  </div>
+                  <div class="form-field">
+                    <label class="label">⑨ 취득가격</label>
+                    <input class="input" type="number" name="취득가격" />
+                  </div>
+                  <div class="form-field">
+                    <label class="label">⑩ 취득년월일</label>
+                    <input class="input" type="date" name="취득년월일" />
+                  </div>
+                  <div class="form-field">
+                    <label class="label">⑪ 내용연수</label>
+                    <input class="input" type="number" name="내용연수" />
+                  </div>
+<div class="form-field full">
+                    <label class="label">⑫ 취득근거</label>
+                    <input class="input" name="취득근거" />
+                  </div>
+                  <div class="form-field">
+                    <label class="label">⑬ 장비상태 등</label>
+                    <select class="select" name="장비상태등" id="newStatus"></select>
+                  </div>
+                  <div class="form-field">
+                    <label class="label">사용상태</label>
+                    <select class="select" name="사용상태" id="newUsageStatus"></select>
+                  </div>
+                  <div class="form-field full">
+                    <label class="label">⑬ 기타</label>
+                    <input class="input" name="기타" />
+                  </div>
+
+                  <div class="section-divider">사진 정보</div>
+
+                  <div class="form-field full">
+                    <label class="label">대표사진URL</label>
+                    <input class="input" type="url" name="대표사진URL" placeholder="https://..." />
+                  </div>
+                  <div class="form-field full">
+                    <label class="label">⑭ 장비사진 첨부</label>
+                    <input class="input" type="file" name="photos" multiple accept="image/*" />
+                  </div>
+
+                  <div class="section-divider">운영 정보</div>
+
                   <div class="form-field">
                     <label class="label">자산유형</label>
-                    <select class="select" id="newAssetType">
-                      <option>장비</option>
-                      <option>소프트웨어</option>
-                      <option>유지보수</option>
-                      <option>소모품</option>
-                    </select>
+                    <select class="select" name="자산유형" id="newAssetType"></select>
                   </div>
                   <div class="form-field">
-                    <label class="label">분류</label>
-                    <select class="select" id="newCategory">
-                      <option>HMD</option>
-                      <option>카메라</option>
-                      <option>노트북</option>
-                      <option>태블릿</option>
-                      <option>촬영장비</option>
-                      <option>음향장비</option>
-                      <option>충전기/부속</option>
-                      <option>소프트웨어</option>
-                      <option>유지보수</option>
-                      <option>기타</option>
-                    </select>
-                  </div>
-                  <div class="form-field">
-                    <label class="label">현재 위치</label>
-                    <select class="select" id="newLocation"></select>
-                  </div>
-                  <div class="form-field">
-                    <label class="label">현재 상태</label>
-                    <select class="select" id="newStatus">
-                      <option>정상</option>
-                      <option>대여중</option>
-                      <option>위치확인필요</option>
-                      <option>분실의심</option>
-                      <option>고장/수리중</option>
-                      <option>폐기</option>
-                    </select>
-                  </div>
-<div class="form-field">
-                    <label class="label">사용 상태</label>
-                    <select class="select" id="newUsageStatus">
-                      <option>사용중</option>
-                      <option>보관</option>
-                      <option>제외</option>
-                      <option>폐기</option>
-                    </select>
-                  </div>
-                  <div class="form-field full">
-                    <label class="label">장비 사진</label>
-                    <input class="input" type="file" id="newPhoto" accept="image/*" />
-                    <div class="help">프로토타입에서는 브라우저 저장소에 임시 저장됩니다. 실제 연동 시에는 R2, Supabase Storage, Notion 파일 업로드 등으로 연결할 수 있습니다.</div>
-                  </div>
-                  <div class="form-field full">
-                    <label class="label">구성품</label>
-                    <input class="input" id="newComponents" placeholder="예: 본체 1, 컨트롤러 2, 충전기 1" />
+                    <label class="label">월별 현황 포함</label>
+                    <label style="display:flex;align-items:center;gap:8px;font-weight:900;min-height:42px;">
+                      <input type="checkbox" name="월별현황포함" checked />
+                      포함
+                    </label>
                   </div>
                   <div class="form-field full">
                     <label class="label">비고</label>
-                    <textarea class="textarea" id="newNote" placeholder="관리 참고사항을 입력하세요."></textarea>
-                  </div>
-                  <div class="form-field full">
-                    <label class="checkline">
-                      <input class="checkbox" type="checkbox" id="newIncludeMonthly" checked />
-                      월별 현황 생성 대상에 포함
-                    </label>
+                    <textarea class="textarea" name="비고"></textarea>
                   </div>
                 </div>
 
                 <div class="toolbar" style="margin-top:18px;">
                   <button class="btn primary" type="submit">등록하기</button>
-                  <button class="btn" type="reset">입력 초기화</button>
+                  <button class="btn" type="reset">초기화</button>
                 </div>
               </form>
-              <div class="result-box" id="addResultBox"></div>
+              <div id="addMsg" class="notice hidden"></div>
             </div>
           </div>
         </section>
 
-        <section class="view" id="generateView">
+        <section class="view" id="schemaView">
           <div class="section-head">
             <div>
-              <h1>월별 현황 생성</h1>
-              <p>장비 원장에서 관리 대상 장비만 선별하여 해당 월의 확인 데이터를 생성합니다.</p>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="card-header">
-              <div>
-                <h2 class="card-title">생성 조건</h2>
-                <div class="card-sub">동일 기준월·동일 장비번호는 중복 생성하지 않습니다.</div>
-              </div>
-            </div>
-            <div class="card-body">
-              <div class="form-grid">
-                <div class="form-field">
-                  <label class="label">기준월</label>
-                  <input class="input" type="month" id="generateMonth" />
-                </div>
-                <div class="form-field">
-                  <label class="label">생성 기준</label>
-                  <select class="select" id="generateMode">
-                    <option value="master">장비 원장 기준 생성</option>
-                    <option value="previous" disabled>전월 데이터 기준 생성 - 추후 연동</option>
-                  </select>
-                </div>
-                <div class="form-field full">
-                  <label class="checkline">
-                    <input class="checkbox" type="checkbox" checked disabled />
-                    월별 현황 포함 장비만 생성
-                  </label>
-                  <label class="checkline">
-                    <input class="checkbox" type="checkbox" checked disabled />
-                    자산유형이 “장비”인 항목만 생성
-                  </label>
-                  <label class="checkline">
-                    <input class="checkbox" type="checkbox" checked disabled />
-                    사용상태가 “폐기” 또는 “제외”인 항목은 생성하지 않음
-                  </label>
-                  <label class="checkline">
-                    <input class="checkbox" type="checkbox" checked disabled />
-                    이미 생성된 장비는 중복 생성하지 않음
-                  </label>
-                </div>
-              </div>
-              <div class="toolbar" style="margin-top:18px;">
-                <button class="btn primary" id="generateMonthlyBtn">월별 현황 생성</button>
-                <button class="btn" id="previewGenerateBtn">생성 대상 미리보기</button>
-              </div>
-              <div class="result-box" id="generateResultBox"></div>
-
-              <div class="table-wrap" style="margin-top:18px;">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>구분</th>
-                      <th>수량</th>
-                      <th>설명</th>
-                    </tr>
-                  </thead>
-                  <tbody id="generatePreviewBody"></tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section class="view" id="reportView">
-          <div class="section-head no-print">
-            <div>
-              <h1>보고서 생성</h1>
-              <p>월별 현황 데이터를 기준으로 내부 보고용 문서를 미리봅니다.</p>
-            </div>
-            <div class="toolbar" style="margin:0;">
-              <select class="select" id="reportMonth"></select>
-              <button class="btn primary" id="refreshReportBtn">보고서 미리보기</button>
-              <button class="btn" onclick="window.print()">PDF 저장/인쇄</button>
+              <h1>DB 속성표</h1>
+              <p>Notion DB 속성명은 아래와 동일해야 합니다.</p>
             </div>
           </div>
 
           <div class="card">
             <div class="card-body">
-              <div class="report-paper" id="reportPaper"></div>
+              <div class="schema-box">[장비 원장 DB]
+장비명 / 제목
+장비모델 / 관계형 → 장비 모델
+SN번호 / 텍스트
+작성년월일 / 날짜
+제작회사 / 텍스트
+배치장소 / 선택
+세부위치 / 텍스트
+규격 / 텍스트
+자체일련번호 / 텍스트
+장비점검일자 / 날짜
+취득가격 / 숫자
+취득년월일 / 날짜
+내용연수 / 숫자
+취득근거 / 텍스트
+장비상태등 / 선택
+기타 / 텍스트
+대표사진URL / URL
+자산유형 / 선택
+월별현황포함 / 체크박스
+사용상태 / 선택
+비고 / 텍스트
+
+[장비 모델 DB]
+모델명 / 제목
+제작회사 / 텍스트
+규격 / 텍스트
+대표사진URL / URL
+비고 / 텍스트
+
+[월별 장비 현황 DB]
+현황명 / 제목
+기준월 / 텍스트
+중복방지키 / 텍스트
+장비 / 관계형 → 장비 원장
+자체일련번호복사 / 텍스트
+SN번호복사 / 텍스트
+장비명복사 / 텍스트
+원장기준배치장소 / 선택
+이번달위치 / 선택
+원장기준상태 / 선택
+이번달상태 / 선택
+확인여부 / 체크박스
+확인자 / 관계형 → 사용자 관리
+확인자명복사 / 텍스트
+확인일 / 날짜
+메모 / 텍스트
+이슈여부 / 체크박스
+마지막수정자 / 관계형 → 사용자 관리
+마지막수정일 / 날짜
+
+[사용자 관리 DB]
+사용자명 / 제목
+사용자코드 / 텍스트
+권한 / 선택
+사용여부 / 체크박스
+기본담당위치 / 다중선택
+마지막접속일 / 날짜
+비고 / 텍스트</div>
             </div>
           </div>
         </section>
       </div>
     </main>
-  </div>
+  </section>
 
   <script>
-    const STORAGE_KEY = "equipment-management-prototype-v1";
-    const locations = ["XR실", "장비보관실", "VR체험버스", "스튜디오", "교육장", "외부대여", "수리업체", "확인필요"];
-    const categories = ["HMD", "카메라", "노트북", "태블릿", "촬영장비", "음향장비", "충전기/부속", "소프트웨어", "유지보수", "기타"];
-    const statuses = ["정상", "대여중", "위치확인필요", "분실의심", "고장/수리중", "폐기"];
-    const operations = ["정상", "이상", "미확인"];
+    const API_BASE = "https://equip.hyunra94.workers.dev";
 
-    const imageMap = {
-      "HMD": "data:image/svg+xml;utf8," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="320" height="220"><rect width="320" height="220" fill="#eef4fb"/><rect x="62" y="70" rx="28" ry="28" width="196" height="82" fill="#1f3a5f"/><rect x="82" y="88" rx="16" width="156" height="46" fill="#dbeafe"/><circle cx="117" cy="111" r="13" fill="#4b5563"/><circle cx="203" cy="111" r="13" fill="#4b5563"/><text x="160" y="190" text-anchor="middle" font-family="Arial" font-size="20" fill="#1f3a5f" font-weight="700">HMD</text></svg>`),
-      "카메라": "data:image/svg+xml;utf8," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="320" height="220"><rect width="320" height="220" fill="#f4f6f9"/><rect x="76" y="72" rx="18" width="168" height="92" fill="#263238"/><rect x="108" y="52" rx="8" width="58" height="30" fill="#455a64"/><circle cx="160" cy="118" r="34" fill="#90caf9"/><circle cx="160" cy="118" r="20" fill="#1f3a5f"/><text x="160" y="190" text-anchor="middle" font-family="Arial" font-size="20" fill="#1f3a5f" font-weight="700">CAMERA</text></svg>`),
-      "노트북": "data:image/svg+xml;utf8," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="320" height="220"><rect width="320" height="220" fill="#eef4fb"/><rect x="86" y="54" rx="10" width="148" height="92" fill="#374151"/><rect x="98" y="66" width="124" height="68" fill="#dbeafe"/><path d="M62 158h196l-18 24H80z" fill="#6b7280"/><text x="160" y="204" text-anchor="middle" font-family="Arial" font-size="18" fill="#1f3a5f" font-weight="700">LAPTOP</text></svg>`),
-      "촬영장비": "data:image/svg+xml;utf8," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="320" height="220"><rect width="320" height="220" fill="#f8fafc"/><rect x="111" y="54" rx="10" width="98" height="58" fill="#1f3a5f"/><circle cx="160" cy="83" r="19" fill="#bfdbfe"/><path d="M160 112v72M120 184h80M160 132l-52 52M160 132l52 52" stroke="#4b5563" stroke-width="9" stroke-linecap="round"/><text x="160" y="204" text-anchor="middle" font-family="Arial" font-size="18" fill="#1f3a5f" font-weight="700">TRIPOD</text></svg>`),
-      "소프트웨어": "data:image/svg+xml;utf8," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="320" height="220"><rect width="320" height="220" fill="#f3f4f6"/><rect x="92" y="50" rx="14" width="136" height="120" fill="#e5e7eb" stroke="#9ca3af" stroke-width="3"/><text x="160" y="120" text-anchor="middle" font-family="Arial" font-size="34" fill="#6b7280" font-weight="800">SW</text><text x="160" y="194" text-anchor="middle" font-family="Arial" font-size="18" fill="#4b5563" font-weight="700">SOFTWARE</text></svg>`),
-      "default": "data:image/svg+xml;utf8," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="320" height="220"><rect width="320" height="220" fill="#f3f4f6"/><rect x="82" y="62" rx="18" width="156" height="96" fill="#d1d5db"/><text x="160" y="118" text-anchor="middle" font-family="Arial" font-size="28" fill="#4b5563" font-weight="800">EQ</text><text x="160" y="190" text-anchor="middle" font-family="Arial" font-size="18" fill="#4b5563" font-weight="700">EQUIPMENT</text></svg>`)
-    };
+    const locations = ["XR실", "장비보관실", "VR체험버스", "지하1층 스튜디오", "스튜디오", "교육장", "외부대여", "수리업체", "확인필요", "미지정"];
+    const statuses = ["정상", "대여중", "위치확인필요", "분실의심", "고장/수리중", "폐기", "기타"];
+    const assetTypes = ["장비", "소프트웨어", "유지보수", "소모품", "기타"];
+    const usageStatuses = ["사용중", "보관", "제외", "폐기"];
 
-    let state = loadState();
-    let selectedEquipmentId = null;
+    let currentUser = null;
+    let equipmentRows = [];
+    let equipmentLastLoadedAt = '';
+    let modelRows = [];
+    let equipmentViewMode = localStorage.getItem('equipment_view_mode') || 'list';
+    let monthlyRows = [];
+    let selectedEquipmentId = "";
 
-    function nowMonth() {
+    const $ = (selector) => document.querySelector(selector);
+    const $$ = (selector) => [...document.querySelectorAll(selector)];
+
+    function monthNow() {
       const d = new Date();
       return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
     }
@@ -1254,142 +1627,6 @@
       if (!month) return "";
       const [y, m] = month.split("-");
       return `${y}년 ${m}월`;
-    }
-
-    function uid(prefix = "id") {
-      return `${prefix}_${Date.now()}_${Math.random().toString(16).slice(2)}`;
-    }
-
-    function saveState() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    }
-
-    function loadState() {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) return JSON.parse(saved);
-
-      const sample = createSampleData();
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(sample));
-      return sample;
-    }
-
-    function createSampleData() {
-      const equipment = [
-        makeEq("EQ-001", "Meta Quest 3 01", "장비", "HMD", "XR실", "정상", "정상", true, "사용중", "본체 1, 컨트롤러 2, 충전기 1"),
-        makeEq("EQ-002", "Meta Quest 3 02", "장비", "HMD", "XR실", "정상", "정상", true, "사용중", "본체 1, 컨트롤러 2, 충전기 1"),
-        makeEq("EQ-003", "Pico 4 01", "장비", "HMD", "장비보관실", "정상", "정상", true, "보관", "본체 1, 컨트롤러 2"),
-        makeEq("EQ-004", "Insta360 Pro2", "장비", "카메라", "스튜디오", "정상", "정상", true, "사용중", "카메라 본체, 배터리, 케이스"),
-        makeEq("EQ-005", "Canon EOS R5", "장비", "카메라", "스튜디오", "대여중", "미확인", true, "사용중", "외부 촬영용"),
-        makeEq("EQ-006", "교육용 노트북 01", "장비", "노트북", "교육장", "정상", "정상", true, "사용중", "교육 운영용"),
-        makeEq("EQ-007", "교육용 노트북 02", "장비", "노트북", "교육장", "고장/수리중", "이상", true, "사용중", "부팅 불량 확인 필요"),
-        makeEq("EQ-008", "촬영용 삼각대 A", "장비", "촬영장비", "장비보관실", "정상", "정상", true, "보관", ""),
-        makeEq("EQ-009", "무선 마이크 세트", "장비", "음향장비", "장비보관실", "위치확인필요", "미확인", true, "사용중", "수신기 확인 필요"),
-        makeEq("EQ-010", "VR체험버스 HMD 세트", "장비", "HMD", "VR체험버스", "정상", "정상", true, "사용중", "버스 상시 탑재"),
-        makeEq("SW-001", "Adobe 라이선스", "소프트웨어", "소프트웨어", "-", "정상", "미확인", false, "사용중", "월별 장비 현황 제외"),
-        makeEq("MT-001", "XR 장비 유지보수 계약", "유지보수", "유지보수", "-", "정상", "미확인", false, "제외", "비용성 항목")
-      ];
-
-      const month = nowMonth();
-      const monthly = equipment
-        .filter(isMonthlyTarget)
-        .slice(0, 8)
-        .map(eq => makeMonthly(eq, month));
-
-      if (monthly[1]) {
-        monthly[1].checked = true;
-      }
-      if (monthly[4]) {
-        monthly[4].checked = true;
-        monthly[4].monthLocation = "외부대여";
-        monthly[4].monthStatus = "대여중";
-        monthly[4].operation = "미확인";
-        monthly[4].memo = "외부 행사 지원용 대여";
-      }
-      if (monthly[6]) {
-        monthly[6].checked = false;
-        monthly[6].monthStatus = "고장/수리중";
-        monthly[6].operation = "이상";
-        monthly[6].memo = "부팅 불량";
-      }
-
-      return {
-        equipment,
-        monthly,
-        activeMonth: month
-      };
-    }
-
-    function makeEq(code, name, assetType, category, location, status, operation, includeMonthly, usageStatus, components) {
-      return {
-        id: uid("eq"),
-        code,
-        name,
-        assetType,
-        category,
-        location,
-        status,
-        operation,
-        includeMonthly,
-        usageStatus,
-        components,
-        note: "",
-        photo: imageMap[category] || imageMap.default,
-        createdAt: new Date().toISOString()
-      };
-    }
-
-    function makeMonthly(eq, month) {
-      return {
-        id: uid("mo"),
-        month,
-        equipmentId: eq.id,
-        uniqueKey: `${month}_${eq.code}`,
-        code: eq.code,
-        name: eq.name,
-        photo: eq.photo,
-        category: eq.category,
-        masterLocation: eq.location,
-        monthLocation: eq.location,
-        masterStatus: eq.status,
-        monthStatus: eq.status,
-        operation: eq.operation,
-        checked: false,
-        memo: ""
-      };
-    }
-
-    function isMonthlyTarget(eq) {
-      return eq.includeMonthly === true
-        && eq.assetType === "장비"
-        && eq.usageStatus !== "폐기"
-        && eq.usageStatus !== "제외"
-        && eq.status !== "폐기";
-    }
-
-    function getMonths() {
-      const set = new Set(state.monthly.map(row => row.month));
-      set.add(state.activeMonth || nowMonth());
-      set.add(nowMonth());
-      return [...set].sort().reverse();
-    }
-
-    function getMonthlyRows(month) {
-      return state.monthly.filter(row => row.month === month);
-    }
-
-    function isIssueRow(row) {
-      return row.monthStatus !== "정상"
-        || row.monthLocation !== row.masterLocation
-        || !row.checked
-        || Boolean(row.memo && row.memo.trim());
-    }
-
-    function statusBadgeClass(status) {
-      if (status === "정상") return "normal";
-      if (status === "대여중") return "loan";
-      if (status === "위치확인필요" || status === "분실의심") return "need";
-      if (status === "고장/수리중" || status === "폐기") return "repair";
-      return "gray";
     }
 
     function escapeHtml(value) {
@@ -1401,711 +1638,987 @@
         .replaceAll("'", "&#039;");
     }
 
-    function optionHtml(values, selected, includeAllText = null) {
-      let html = includeAllText ? `<option value="">${includeAllText}</option>` : "";
+    function money(value) {
+      if (value === null || value === undefined || value === "") return "-";
+      const number = Number(value);
+      return Number.isFinite(number) ? `${number.toLocaleString("ko-KR")}원` : "-";
+    }
+
+    function statusClass(status) {
+      if (status === "정상") return "normal";
+      if (status === "대여중") return "loan";
+      if (status === "위치확인필요" || status === "분실의심") return "need";
+      if (status === "고장/수리중" || status === "폐기") return "repair";
+      return "gray";
+    }
+
+    function optionHtml(values, selected = "", allText = "") {
+      let html = allText ? `<option value="">${escapeHtml(allText)}</option>` : "";
       html += values.map(v => `<option value="${escapeHtml(v)}" ${v === selected ? "selected" : ""}>${escapeHtml(v)}</option>`).join("");
       return html;
     }
 
-    function setSelectOptions(select, values, selected, allText) {
-      select.innerHTML = optionHtml(values, selected, allText);
+    function showNotice(element, message, isError = false) {
+      element.classList.remove("hidden");
+      element.classList.toggle("error", isError);
+      element.textContent = message;
     }
 
-    function fillMonthSelect(select, selected) {
-      const months = getMonths();
-      select.innerHTML = months.map(m => `<option value="${m}" ${m === selected ? "selected" : ""}>${formatMonth(m)}</option>`).join("");
+    async function api(path, options = {}) {
+      const token = localStorage.getItem("eq_token") || "";
+      const response = await fetch(`${API_BASE}${path}`, {
+        ...options,
+        headers: {
+          ...(options.body instanceof FormData ? {} : { "Content-Type": "application/json" }),
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          ...(options.headers || {})
+        }
+      });
+
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(data.error || "요청 처리 중 오류가 발생했습니다.");
+      }
+      return data;
     }
 
-    function renderAll() {
-      document.getElementById("topMonthChip").textContent = formatMonth(state.activeMonth);
-      fillMonthSelect(document.getElementById("dashMonth"), state.activeMonth);
-      fillMonthSelect(document.getElementById("monthlyMonth"), state.activeMonth);
-      fillMonthSelect(document.getElementById("reportMonth"), state.activeMonth);
-      document.getElementById("generateMonth").value = state.activeMonth || nowMonth();
-      setSelectOptions(document.getElementById("newLocation"), locations, "XR실");
+    function showView(viewId) {
+      $$(".view").forEach(view => view.classList.remove("active"));
+      $("#" + viewId).classList.add("active");
+
+      $$(".nav button").forEach(btn => btn.classList.toggle("active", btn.dataset.view === viewId));
+
+      const labels = {
+        dashboardView: "대시보드",
+        equipmentView: "장비관리대장",
+        monthlyView: "월별 위치·상태 확인",
+        addView: "신규 장비 등록",
+        schemaView: "DB 속성표"
+      };
+
+      $("#pageTitle").textContent = labels[viewId] || "장비 현황 관리";
+      $("#sidebar").classList.remove("open");
+    }
+
+    function setLoggedIn(user) {
+      currentUser = user;
+      $("#loginPage").classList.add("hidden");
+      $("#app").classList.remove("hidden");
+      $("#roleChip").textContent = user.role === "admin" ? "관리자" : "직원";
+      $("#sideUserText").textContent = `${user.name} · ${user.role === "admin" ? "관리자" : "직원"}`;
+
+      $$(".admin-only").forEach(el => el.classList.toggle("hidden", user.role !== "admin"));
+      $("#addNavBtn").classList.toggle("hidden", user.role !== "admin");
+
+      loadInitialData();
+    }
+
+    async function loadLoginUsers() {
+      try {
+        const data = await api("/api/users");
+        if (!data.users || data.users.length === 0) {
+          $("#loginName").innerHTML = "";
+          showNotice($("#loginMsg"), "Cloudflare Worker의 ACCESS_USERS_JSON 값이 비어 있습니다.", true);
+          return;
+        }
+        $("#loginName").innerHTML = data.users.map(user => `<option value="${escapeHtml(user.name)}">${escapeHtml(user.name)} (${escapeHtml(user.role || "staff")})</option>`).join("");
+      } catch (error) {
+        showNotice($("#loginMsg"), `사용자 목록을 불러오지 못했습니다. Worker 주소 또는 CORS 설정을 확인하세요. (${error.message})`, true);
+      }
+    }
+
+    async function loadInitialData() {
+      $("#dashMonth").value = monthNow();
+      $("#monthlyMonth").value = monthNow();
+      $("#monthChip").textContent = formatMonth(monthNow());
+
+      await loadModels();
+      await loadEquipment();
+      monthlyRows = [];
       renderDashboard();
-      renderEquipmentFilters();
-      renderEquipmentTable();
-      renderMonthlyFilters();
-      renderMonthlyTable();
-      renderGeneratePreview();
-      renderReport();
     }
 
-    function renderDashboard() {
-      const month = document.getElementById("dashMonth").value || state.activeMonth;
-      const rows = getMonthlyRows(month);
-      const total = rows.length;
-      const checked = rows.filter(r => r.checked).length;
-      const unchecked = total - checked;
-      const loan = rows.filter(r => r.monthStatus === "대여중").length;
-      const repair = rows.filter(r => r.monthStatus === "고장/수리중").length;
-      const need = rows.filter(r => r.monthStatus === "위치확인필요" || r.monthStatus === "분실의심").length;
 
-      const stats = [
-        ["전체 장비", total, "월별 현황 생성 기준"],
-        ["확인 완료", checked, "확인 체크 처리"],
-        ["미확인", unchecked, "확인 필요"],
-        ["대여중", loan, "외부 또는 내부 대여"],
-        ["고장/수리중", repair, "조치 필요"],
-        ["위치 확인 필요", need, "위치 불일치 포함"]
-      ];
+    function uniqueSorted(values) {
+      return [...new Set(values.map(v => String(v || "").trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b, "ko"));
+    }
 
-      document.getElementById("statsGrid").innerHTML = stats.map(([label, value, help]) => `
-        <div class="stat">
-          <div class="stat-label">${label}</div>
-          <div class="stat-value">${value}</div>
-          <div class="stat-help">${help}</div>
-        </div>
+    function refreshEquipmentLocationOptions() {
+      const select = $("#equipmentLocationFilter");
+      const current = select.value;
+      const actualLocations = uniqueSorted(equipmentRows.map(row => row.배치장소 || "미지정"));
+      select.innerHTML = optionHtml(actualLocations, current, "배치장소 전체");
+
+      if (current && !actualLocations.includes(current)) {
+        select.value = "";
+      }
+    }
+
+
+    function refreshEquipmentModelOptions() {
+      const select = $("#equipmentModelFilter");
+      if (!select) return;
+
+      const current = select.value;
+      const modelMap = new Map();
+
+      equipmentRows.forEach(row => {
+        const id = row.장비모델 || "";
+        const name = modelName(row) || "모델 미지정";
+        if (!modelMap.has(id)) modelMap.set(id, name);
+      });
+
+      const options = [...modelMap.entries()].sort((a, b) => a[1].localeCompare(b[1], "ko"));
+      select.innerHTML = `<option value="">장비모델 전체</option>` + options.map(([id, name]) => `
+        <option value="${escapeHtml(id)}">${escapeHtml(name)}</option>
       `).join("");
 
-      const byLocation = {};
-      rows.forEach(row => {
-        const loc = row.monthLocation || "미지정";
-        if (!byLocation[loc]) {
-          byLocation[loc] = { total: 0, checked: 0, unchecked: 0, loan: 0, issue: 0 };
+      if ([...modelMap.keys()].includes(current)) {
+        select.value = current;
+      } else {
+        select.value = "";
+      }
+    }
+
+    function filteredEquipmentRows() {
+      const q = $("#equipmentSearch").value.trim().toLowerCase();
+      const location = $("#equipmentLocationFilter").value;
+      const modelId = $("#equipmentModelFilter")?.value || "";
+      const status = $("#equipmentStatusFilter").value;
+
+      return equipmentRows.filter(row => {
+        const matchQ = !q || `${row.장비명 || ""} ${row.SN번호 || ""} ${row.자체일련번호 || ""} ${row.규격 || ""} ${modelName(row) || ""}`.toLowerCase().includes(q);
+        const matchLocation = !location || (row.배치장소 || "미지정") === location;
+        const matchModel = !modelId || (row.장비모델 || "") === modelId;
+        const matchStatus = !status || row.장비상태등 === status;
+        return matchQ && matchLocation && matchModel && matchStatus;
+      });
+    }
+
+    async function loadEquipment() {
+      $("#equipmentList").innerHTML = `<div class="notice">장비 원장을 불러오는 중입니다. 최초 1회만 전체 데이터를 가져오고, 이후 필터는 화면 안에서 바로 적용됩니다.</div>`;
+
+      try {
+        const data = await api(`/api/equipment`);
+        equipmentRows = data.rows || [];
+        equipmentLastLoadedAt = new Date().toLocaleString("ko-KR");
+
+        refreshEquipmentLocationOptions();
+        refreshEquipmentModelOptions();
+
+        if (selectedEquipmentId && !equipmentRows.some(row => row.id === selectedEquipmentId)) {
+          selectedEquipmentId = "";
         }
-        byLocation[loc].total += 1;
-        byLocation[loc].checked += row.checked ? 1 : 0;
-        byLocation[loc].unchecked += row.checked ? 0 : 1;
-        byLocation[loc].loan += row.monthStatus === "대여중" ? 1 : 0;
-        byLocation[loc].issue += isIssueRow(row) ? 1 : 0;
-      });
 
-      const locationRows = Object.entries(byLocation);
-      document.getElementById("locationSummaryBody").innerHTML = locationRows.length
-        ? locationRows.map(([loc, data]) => `
-          <tr>
-            <td><strong>${escapeHtml(loc)}</strong></td>
-            <td>${data.total}</td>
-            <td>${data.checked}</td>
-            <td>${data.unchecked}</td>
-            <td>${data.loan}</td>
-            <td>${data.issue}</td>
-          </tr>
-        `).join("")
-        : `<tr><td colspan="6" class="empty">해당 월의 현황 데이터가 없습니다. 먼저 월별 현황을 생성하세요.</td></tr>`;
-
-      const issues = rows.filter(isIssueRow).slice(0, 8);
-      document.getElementById("issueList").innerHTML = issues.length
-        ? issues.map(row => `
-          <div style="padding:12px 0;border-bottom:1px solid var(--line);">
-            <div style="display:flex;justify-content:space-between;gap:10px;">
-              <strong>${escapeHtml(row.code)} · ${escapeHtml(row.name)}</strong>
-              <span class="badge ${statusBadgeClass(row.monthStatus)}">${escapeHtml(row.monthStatus)}</span>
-            </div>
-            <div style="font-size:13px;color:var(--sub);margin-top:5px;">
-              위치: ${escapeHtml(row.monthLocation)}
-            </div>
-            ${row.memo ? `<div style="font-size:13px;margin-top:5px;">${escapeHtml(row.memo)}</div>` : ""}
+        renderEquipmentList();
+        renderEquipmentDetail();
+        renderDashboard();
+      } catch (error) {
+        equipmentRows = [];
+        $("#equipmentSummary").textContent = "";
+        $("#equipmentSyncNote").textContent = "";
+        $("#equipmentList").innerHTML = `
+          <div class="notice error">
+            장비 원장을 불러오지 못했습니다.<br>
+            ${escapeHtml(error.message)}<br><br>
+            Cloudflare Worker의 NOTION_EQUIPMENT_DATA_SOURCE_ID, NOTION_API_KEY, Notion Integration 연결 여부를 확인하세요.
           </div>
-        `).join("")
-        : `<div class="empty">조치 필요 장비가 없습니다.</div>`;
+        `;
+        $("#equipmentDetail").innerHTML = `<div class="empty">장비 원장 조회 오류가 발생했습니다.</div>`;
+        renderDashboard();
+      }
     }
 
-    function renderEquipmentFilters() {
-      setSelectOptions(document.getElementById("equipmentLocationFilter"), locations, "", "위치 전체");
-      setSelectOptions(document.getElementById("equipmentTypeFilter"), categories, "", "분류 전체");
-      setSelectOptions(document.getElementById("equipmentStatusFilter"), statuses, "", "상태 전체");
-    }
 
-    function renderEquipmentTable() {
-      const q = document.getElementById("equipmentSearch")?.value.trim().toLowerCase() || "";
-      const loc = document.getElementById("equipmentLocationFilter")?.value || "";
-      const cat = document.getElementById("equipmentTypeFilter")?.value || "";
-      const status = document.getElementById("equipmentStatusFilter")?.value || "";
-      const include = document.getElementById("equipmentIncludeFilter")?.value || "";
+    function setEquipmentViewMode(mode) {
+      equipmentViewMode = mode === "model" ? "model" : "list";
+      localStorage.setItem("equipment_view_mode", equipmentViewMode);
 
-      const rows = state.equipment.filter(eq => {
-        const matchQ = !q || `${eq.code} ${eq.name}`.toLowerCase().includes(q);
-        const matchLoc = !loc || eq.location === loc;
-        const matchCat = !cat || eq.category === cat;
-        const matchStatus = !status || eq.status === status;
-        const matchInclude = !include || (include === "include" ? eq.includeMonthly : !eq.includeMonthly);
-        return matchQ && matchLoc && matchCat && matchStatus && matchInclude;
+      $$("#equipmentModeToggle button").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.mode === equipmentViewMode);
       });
 
-      const summary = document.getElementById("equipmentListSummary");
-      if (summary) {
-        const includeCount = rows.filter(eq => eq.includeMonthly).length;
-        const excludeCount = rows.length - includeCount;
-        summary.textContent = `검색 결과 ${rows.length}건 · 월별현황 포함 ${includeCount}건 · 제외 ${excludeCount}건`;
+      selectedEquipmentId = "";
+      renderEquipmentList();
+      renderEquipmentDetail();
+    }
+
+    function groupRowsByModel(rows) {
+      const groups = new Map();
+
+      rows.forEach(row => {
+        const key = row.장비모델 || "__none__";
+        if (!groups.has(key)) {
+          groups.set(key, {
+            id: key,
+            model: modelOf(row),
+            name: modelName(row) || "모델 미지정",
+            rows: []
+          });
+        }
+        groups.get(key).rows.push(row);
+      });
+
+      return [...groups.values()].sort((a, b) => a.name.localeCompare(b.name, "ko"));
+    }
+
+    function summarizeBy(rows, field, fallback = "미지정") {
+      const map = new Map();
+      rows.forEach(row => {
+        const key = row[field] || fallback;
+        map.set(key, (map.get(key) || 0) + 1);
+      });
+      return [...map.entries()].sort((a, b) => b[1] - a[1]);
+    }
+
+    function modelGroupHtml(group) {
+      const model = group.model;
+      const rows = group.rows;
+      const photoUrl = model?.대표사진URL || effectivePhotoUrl(rows[0]);
+      const photo = photoUrl
+        ? `<img class="model-photo" src="${escapeHtml(photoUrl)}" alt="">`
+        : `<div class="model-photo">MODEL</div>`;
+
+      const locations = summarizeBy(rows, "배치장소").slice(0, 3);
+      const statuses = summarizeBy(rows, "장비상태등", "상태없음").slice(0, 3);
+
+      return `
+        <section class="model-group-card">
+          <div class="model-group-head">
+            ${photo}
+            <div class="model-title">
+              <strong>${escapeHtml(group.name)}</strong>
+              <span>${escapeHtml(model?.제작회사 || "-")} · ${escapeHtml(model?.규격 || "-")}</span>
+            </div>
+            <div class="model-summary">
+              <span class="badge dark">전체 ${rows.length}개</span>
+              ${locations.map(([name, count]) => `<span class="badge gray">${escapeHtml(name)} ${count}</span>`).join("")}
+              ${statuses.map(([name, count]) => `<span class="badge ${statusClass(name)}">${escapeHtml(name)} ${count}</span>`).join("")}
+            </div>
+          </div>
+
+          <div class="model-equipment-table">
+            ${rows.map(row => `
+              <div class="model-equipment-row ${row.id === selectedEquipmentId ? "active" : ""}" data-id="${escapeHtml(row.id)}">
+                <div>
+                  <span class="cell-label">장비명</span>
+                  <span class="cell-main">${escapeHtml(row.장비명 || "-")}</span>
+                  <span class="cell-sub">SN ${escapeHtml(row.SN번호 || "-")}</span>
+                </div>
+                <div>
+                  <span class="cell-label">위치</span>
+                  <span class="cell-main">${escapeHtml(row.배치장소 || "미지정")}</span>
+                  ${row.세부위치 ? `<span class="cell-sub">${escapeHtml(row.세부위치)}</span>` : ""}
+                </div>
+                <div>
+                  <span class="cell-label">자체일련번호</span>
+                  <span class="cell-main">${escapeHtml(row.자체일련번호 || "-")}</span>
+                </div>
+                <div>
+                  <span class="cell-label">취득일</span>
+                  <span class="cell-main">${escapeHtml(row.취득년월일 || "-")}</span>
+                  <span class="cell-sub">${money(row.취득가격)}</span>
+                </div>
+                <div>
+                  <span class="badge ${statusClass(row.장비상태등)}">${escapeHtml(row.장비상태등 || "-")}</span>
+                </div>
+              </div>
+              ${row.id === selectedEquipmentId ? equipmentInlineDetailHtml(row) : ""}
+            `).join("")}
+          </div>
+        </section>
+      `;
+    }
+
+    function renderEquipmentList() {
+      const rows = filteredEquipmentRows();
+
+      if (selectedEquipmentId && !rows.some(row => row.id === selectedEquipmentId)) {
+        selectedEquipmentId = "";
       }
 
-      document.getElementById("equipmentTableBody").innerHTML = rows.length
-        ? rows.map(eq => `
-          <tr data-equipment-id="${eq.id}" style="cursor:pointer;">
-            <td><img class="thumb" src="${eq.photo || imageMap.default}" alt=""></td>
-            <td>
-              <div class="equip-name">${escapeHtml(eq.name)}</div>
-              <div class="equip-code">${escapeHtml(eq.code)}</div>
-            </td>
-            <td>${escapeHtml(eq.category)}</td>
-            <td>${escapeHtml(eq.location)}</td>
-            <td><span class="badge ${statusBadgeClass(eq.status)}">${escapeHtml(eq.status)}</span></td>
-            <td>${eq.includeMonthly ? `<span class="badge normal">포함</span>` : `<span class="badge gray">제외</span>`}</td>
-          </tr>
-        `).join("")
-        : `<tr><td colspan="6" class="empty">검색 결과가 없습니다.</td></tr>`;
+      const includeCount = rows.filter(row => row.월별현황포함).length;
+      const modelCount = groupRowsByModel(rows).length;
+      $("#equipmentSummary").textContent = selectedEquipmentId
+        ? `조회 결과 ${rows.length}건 · 모델 ${modelCount}개 · 월별현황 포함 ${includeCount}건 · 상세 열림`
+        : `조회 결과 ${rows.length}건 · 모델 ${modelCount}개 · 월별현황 포함 ${includeCount}건`;
 
-      const mobileList = document.getElementById("equipmentCardList");
-      if (mobileList) {
-        mobileList.innerHTML = rows.length
-          ? rows.map(eq => `
-            <article class="mobile-equipment-card" data-mobile-equipment-id="${eq.id}">
-              <div class="mobile-card-top">
-                <img class="thumb" src="${eq.photo || imageMap.default}" alt="">
-                <div class="mobile-card-title">
-                  <strong>${escapeHtml(eq.name)}</strong>
-                  <span>${escapeHtml(eq.code)} · ${escapeHtml(eq.category)}</span>
-                </div>
-              </div>
-              <div class="mobile-card-badges">
-                <span class="badge ${statusBadgeClass(eq.status)}">${escapeHtml(eq.status)}</span>
-                ${eq.includeMonthly ? `<span class="badge normal">월별 포함</span>` : `<span class="badge gray">월별 제외</span>`}
-              </div>
-              <div class="mobile-card-meta">
-                <div class="mobile-meta-box">
-                  <div class="k">현재 위치</div>
-                  <div class="v">${escapeHtml(eq.location)}</div>
-                </div>
-                <div class="mobile-meta-box">
-                  <div class="k">자산유형</div>
-                  <div class="v">${escapeHtml(eq.assetType)}</div>
-                </div>
-              </div>
-              <div class="mobile-card-actions">
-                <button class="btn ghost" type="button" onclick="selectEquipmentAndScroll('${eq.id}')">상세 보기</button>
-                <button class="btn" type="button" onclick="toggleMonthlyInclude('${eq.id}')">${eq.includeMonthly ? "제외" : "포함"}</button>
-              </div>
-            </article>
-          `).join("")
-          : `<div class="empty">검색 결과가 없습니다.</div>`;
+      $("#equipmentSyncNote").textContent = equipmentLastLoadedAt
+        ? `마지막 동기화: ${equipmentLastLoadedAt} · 필터/검색은 저장된 목록 안에서 즉시 적용됩니다. Notion 변경사항은 새로고침 버튼을 눌러 반영하세요.`
+        : "";
+
+      $("#equipmentView").classList.toggle("detail-open", Boolean(selectedEquipmentId));
+      $$("#equipmentModeToggle button").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.mode === equipmentViewMode);
+      });
+
+      if (!rows.length) {
+        $("#equipmentList").innerHTML = `<div class="empty">조회된 장비가 없습니다.</div>`;
+        return;
       }
 
-      document.querySelectorAll("[data-equipment-id]").forEach(row => {
-        row.addEventListener("click", () => {
-          selectedEquipmentId = row.dataset.equipmentId;
+      if (equipmentViewMode === "model") {
+        $("#equipmentList").innerHTML = `<div class="model-group-list">${groupRowsByModel(rows).map(modelGroupHtml).join("")}</div>`;
+
+        $$("#equipmentList .model-equipment-row").forEach(rowEl => {
+          rowEl.addEventListener("click", () => {
+            selectedEquipmentId = selectedEquipmentId === rowEl.dataset.id ? "" : rowEl.dataset.id;
+            renderEquipmentList();
+            renderEquipmentDetail();
+          });
+        });
+      } else {
+        $("#equipmentList").innerHTML = rows.map(row => equipmentCardHtml(row, true)).join("");
+
+        $$("#equipmentList .equipment-card").forEach(card => {
+          card.addEventListener("click", () => {
+            if (selectedEquipmentId === card.dataset.id) {
+              selectedEquipmentId = "";
+            } else {
+              selectedEquipmentId = card.dataset.id;
+            }
+            renderEquipmentList();
+            renderEquipmentDetail();
+          });
+        });
+      }
+
+      bindInlineDetailButtons();
+    }
+
+    function modelOf(row) {
+      return row?.장비모델정보 || null;
+    }
+
+    function effectivePhotoUrl(row) {
+      return row?.대표사진URL || modelOf(row)?.대표사진URL || "";
+    }
+
+    function effectiveMaker(row) {
+      return row?.제작회사 || modelOf(row)?.제작회사 || "";
+    }
+
+    function effectiveSpec(row) {
+      return row?.규격 || modelOf(row)?.규격 || "";
+    }
+
+    function modelName(row) {
+      return modelOf(row)?.모델명 || "";
+    }
+
+    function equipmentInlineDetailHtml(row) {
+      const model = modelOf(row);
+      const photoUrl = effectivePhotoUrl(row);
+      const cover = photoUrl
+        ? `<img class="detail-cover" src="${escapeHtml(photoUrl)}" alt="">`
+        : `<div class="detail-cover">EQ</div>`;
+
+      return `
+        <div class="mobile-inline-detail" data-inline-detail-id="${escapeHtml(row.id)}">
+          <div class="detail-close-row">
+            <button class="btn close-inline-detail-btn" type="button">상세 닫기</button>
+          </div>
+          ${cover}
+
+          ${model ? `<div class="notice" style="margin-top:0;margin-bottom:12px;">연결 모델: ${escapeHtml(model.모델명 || "-")}</div>` : ""}
+
+          <div class="kv"><div class="k">① SN번호</div><div class="v">${escapeHtml(row.SN번호 || "-")}</div></div>
+          <div class="kv"><div class="k">② 작성년월일</div><div class="v">${escapeHtml(row.작성년월일 || "-")}</div></div>
+          <div class="kv"><div class="k">③ 장비명</div><div class="v">${escapeHtml(row.장비명 || "-")}</div></div>
+          <div class="kv"><div class="k">장비모델</div><div class="v">${escapeHtml(modelName(row) || "-")}</div></div>
+          <div class="kv"><div class="k">④ 제작회사</div><div class="v">${escapeHtml(effectiveMaker(row) || "-")}</div></div>
+          <div class="kv"><div class="k">⑤ 배치장소</div><div class="v">${escapeHtml(row.배치장소 || "-")}${row.세부위치 ? " / " + escapeHtml(row.세부위치) : ""}</div></div>
+          <div class="kv"><div class="k">⑥ 규격</div><div class="v">${escapeHtml(effectiveSpec(row) || "-")}</div></div>
+          <div class="kv"><div class="k">⑦ 자체일련번호</div><div class="v">${escapeHtml(row.자체일련번호 || "-")}</div></div>
+          <div class="kv"><div class="k">⑧ 장비점검일자</div><div class="v">${escapeHtml(row.장비점검일자 || "-")}</div></div>
+          <div class="kv"><div class="k">⑨ 취득가격</div><div class="v">${money(row.취득가격)}</div></div>
+          <div class="kv"><div class="k">⑩ 취득년월일</div><div class="v">${escapeHtml(row.취득년월일 || "-")}</div></div>
+          <div class="kv"><div class="k">⑪ 내용연수</div><div class="v">${row.내용연수 ?? "-"}</div></div>
+          <div class="kv"><div class="k">⑫ 취득근거</div><div class="v">${escapeHtml(row.취득근거 || "-")}</div></div>
+          <div class="kv"><div class="k">⑬ 장비상태 등</div><div class="v"><span class="badge ${statusClass(row.장비상태등)}">${escapeHtml(row.장비상태등 || "-")}</span></div></div>
+          <div class="kv"><div class="k">⑬ 기타</div><div class="v">${escapeHtml(row.기타 || "-")}</div></div>
+
+          <div class="toolbar" style="margin-top:16px;">
+            <button class="btn primary load-inline-photos-btn" type="button" data-id="${escapeHtml(row.id)}">▼ ⑭ 장비사진 보기</button>
+            ${model ? `<button class="btn ghost load-inline-model-photos-btn" type="button" data-id="${escapeHtml(model.id)}">▼ 모델 공통사진 보기</button>` : ""}
+            ${row.url ? `<a class="btn ghost" href="${escapeHtml(row.url)}" target="_blank" rel="noreferrer">노션에서 열기</a>` : ""}
+          </div>
+          <div class="inline-photos-area"></div>
+          <div class="inline-model-photos-area"></div>
+        </div>
+      `;
+    }
+
+    function bindInlineDetailButtons() {
+      $$("#equipmentList .close-inline-detail-btn").forEach(button => {
+        button.addEventListener("click", (event) => {
+          event.stopPropagation();
+          selectedEquipmentId = "";
+          renderEquipmentList();
           renderEquipmentDetail();
         });
       });
 
-      if (!selectedEquipmentId && rows[0]) selectedEquipmentId = rows[0].id;
-      renderEquipmentDetail();
+      $$("#equipmentList .load-inline-photos-btn").forEach(button => {
+        button.addEventListener("click", async (event) => {
+          event.stopPropagation();
+          const rowId = button.dataset.id;
+          const area = button.closest(".mobile-inline-detail").querySelector(".inline-photos-area");
+          area.innerHTML = `<div class="notice">노션 페이지 내부의 ⑭ 장비사진을 불러오는 중입니다.</div>`;
+
+          try {
+            const data = await api(`/api/equipment/${encodeURIComponent(rowId)}/photos`);
+            const photos = data.photos || [];
+            area.innerHTML = photos.length
+              ? `<div class="photos-grid">${photos.map(photo => `<img src="${escapeHtml(photo.url)}" alt="">`).join("")}</div>`
+              : `<div class="notice">조회된 장비사진이 없습니다. 노션 페이지 내부에 “⑭ 장비 사진” 토글이 있는지 확인하세요.</div>`;
+          } catch (error) {
+            area.innerHTML = `<div class="notice error">${escapeHtml(error.message)}</div>`;
+          }
+        });
+      });
+
+      $$("#equipmentList .load-inline-model-photos-btn").forEach(button => {
+        button.addEventListener("click", async (event) => {
+          event.stopPropagation();
+          const modelId = button.dataset.id;
+          const area = button.closest(".mobile-inline-detail").querySelector(".inline-model-photos-area");
+          area.innerHTML = `<div class="notice">모델 공통사진을 불러오는 중입니다.</div>`;
+
+          try {
+            const data = await api(`/api/models/${encodeURIComponent(modelId)}/photos`);
+            const photos = data.photos || [];
+            area.innerHTML = photos.length
+              ? `<div class="photos-grid">${photos.map(photo => `<img src="${escapeHtml(photo.url)}" alt="">`).join("")}</div>`
+              : `<div class="notice">조회된 모델 공통사진이 없습니다. 모델 페이지 내부에 “모델 공통사진” 토글이 있는지 확인하세요.</div>`;
+          } catch (error) {
+            area.innerHTML = `<div class="notice error">${escapeHtml(error.message)}</div>`;
+          }
+        });
+      });
+    }
+
+
+
+    function equipmentCardHtml(row, selectable = false) {
+      const active = selectable && row.id === selectedEquipmentId ? " active" : "";
+      const photoUrl = effectivePhotoUrl(row);
+      const photo = photoUrl
+        ? `<img class="eq-photo" src="${escapeHtml(photoUrl)}" alt="">`
+        : `<div class="eq-photo">EQ</div>`;
+
+      const rowHtml = `
+        <article class="equipment-card equipment-row${active}" data-id="${escapeHtml(row.id)}">
+          <div class="equipment-top">
+            ${photo}
+            <div class="eq-cell eq-name">
+              <span class="eq-label">장비명</span>
+              <span class="eq-value">${escapeHtml(row.장비명 || "-")}</span>
+              <span class="eq-sub">${modelName(row) ? "모델 " + escapeHtml(modelName(row)) + " · " : ""}SN ${escapeHtml(row.SN번호 || "-")}</span>
+            </div>
+          </div>
+
+          <div class="eq-cell">
+            <span class="eq-label">위치</span>
+            <span class="eq-value">${escapeHtml(row.배치장소 || "미지정")}</span>
+            ${row.세부위치 ? `<span class="eq-sub">${escapeHtml(row.세부위치)}</span>` : ""}
+          </div>
+
+          <div class="eq-cell">
+            <span class="eq-label">자체일련번호</span>
+            <span class="eq-value">${escapeHtml(row.자체일련번호 || "-")}</span>
+          </div>
+
+          <div class="eq-cell">
+            <span class="eq-label">취득년월일</span>
+            <span class="eq-value">${escapeHtml(row.취득년월일 || "-")}</span>
+            <span class="eq-sub">${money(row.취득가격)}</span>
+          </div>
+
+          <div class="eq-cell">
+            <span class="eq-label">상태</span>
+            <span class="badge ${statusClass(row.장비상태등)}">${escapeHtml(row.장비상태등 || "-")}</span>
+          </div>
+        </article>
+      `;
+
+      const inlineDetail = selectable && row.id === selectedEquipmentId
+        ? equipmentInlineDetailHtml(row)
+        : "";
+
+      return rowHtml + inlineDetail;
     }
 
     function renderEquipmentDetail() {
-      const body = document.getElementById("equipmentDetailBody");
-      const eq = state.equipment.find(item => item.id === selectedEquipmentId);
-      if (!eq) {
-        body.innerHTML = `<div class="empty">선택된 장비가 없습니다.</div>`;
+      const row = equipmentRows.find(item => item.id === selectedEquipmentId);
+      $("#equipmentView").classList.toggle("detail-open", Boolean(row));
+
+      if (!row) {
+        $("#equipmentDetail").innerHTML = `<div class="empty">장비를 클릭하면 상세 정보가 열립니다.</div>`;
         return;
       }
 
-      body.innerHTML = `
-        <img class="detail-img" src="${eq.photo || imageMap.default}" alt="">
-        <div class="kv"><div class="k">장비번호</div><div class="v">${escapeHtml(eq.code)}</div></div>
-        <div class="kv"><div class="k">장비명</div><div class="v">${escapeHtml(eq.name)}</div></div>
-        <div class="kv"><div class="k">자산유형</div><div class="v">${escapeHtml(eq.assetType)}</div></div>
-        <div class="kv"><div class="k">분류</div><div class="v">${escapeHtml(eq.category)}</div></div>
-        <div class="kv"><div class="k">현재 위치</div><div class="v">${escapeHtml(eq.location)}</div></div>
-        <div class="kv"><div class="k">현재 상태</div><div class="v"><span class="badge ${statusBadgeClass(eq.status)}">${escapeHtml(eq.status)}</span></div></div>
-        <div class="kv"><div class="k">관리대상</div><div class="v">${eq.includeMonthly ? "월별 현황 포함" : "월별 현황 제외"}</div></div>
-        <div class="kv"><div class="k">구성품</div><div class="v">${escapeHtml(eq.components || "-")}</div></div>
-        <div class="kv"><div class="k">비고</div><div class="v">${escapeHtml(eq.note || "-")}</div></div>
-        <div class="toolbar" style="margin-top:16px;">
-          <button class="btn ghost" onclick="showEquipmentInMonthly('${eq.id}')">월별 현황 보기</button>
-          <button class="btn" onclick="toggleMonthlyInclude('${eq.id}')">${eq.includeMonthly ? "현황 제외" : "현황 포함"}</button>
+      const model = modelOf(row);
+      const photoUrl = effectivePhotoUrl(row);
+      const cover = photoUrl
+        ? `<img class="detail-cover" src="${escapeHtml(photoUrl)}" alt="">`
+        : `<div class="detail-cover">EQ</div>`;
+
+      $("#equipmentDetail").innerHTML = `
+        <div class="detail-close-row">
+          <button class="btn" id="closeDetailBtn">상세 닫기</button>
         </div>
+        ${cover}
+
+        <div class="kv"><div class="k">① SN번호</div><div class="v">${escapeHtml(row.SN번호 || "-")}</div></div>
+        <div class="kv"><div class="k">② 작성년월일</div><div class="v">${escapeHtml(row.작성년월일 || "-")}</div></div>
+        <div class="kv"><div class="k">③ 장비명</div><div class="v">${escapeHtml(row.장비명 || "-")}</div></div>
+        <div class="kv"><div class="k">장비모델</div><div class="v">${escapeHtml(modelName(row) || "-")}</div></div>
+        <div class="kv"><div class="k">④ 제작회사</div><div class="v">${escapeHtml(effectiveMaker(row) || "-")}</div></div>
+        <div class="kv"><div class="k">⑤ 배치장소</div><div class="v">${escapeHtml(row.배치장소 || "-")}${row.세부위치 ? " / " + escapeHtml(row.세부위치) : ""}</div></div>
+        <div class="kv"><div class="k">⑥ 규격</div><div class="v">${escapeHtml(effectiveSpec(row) || "-")}</div></div>
+        <div class="kv"><div class="k">⑦ 자체일련번호</div><div class="v">${escapeHtml(row.자체일련번호 || "-")}</div></div>
+        <div class="kv"><div class="k">⑧ 장비점검일자</div><div class="v">${escapeHtml(row.장비점검일자 || "-")}</div></div>
+        <div class="kv"><div class="k">⑨ 취득가격</div><div class="v">${money(row.취득가격)}</div></div>
+        <div class="kv"><div class="k">⑩ 취득년월일</div><div class="v">${escapeHtml(row.취득년월일 || "-")}</div></div>
+        <div class="kv"><div class="k">⑪ 내용연수</div><div class="v">${row.내용연수 ?? "-"}</div></div>
+        <div class="kv"><div class="k">⑫ 취득근거</div><div class="v">${escapeHtml(row.취득근거 || "-")}</div></div>
+        <div class="kv"><div class="k">⑬ 장비상태 등</div><div class="v"><span class="badge ${statusClass(row.장비상태등)}">${escapeHtml(row.장비상태등 || "-")}</span></div></div>
+        <div class="kv"><div class="k">⑬ 기타</div><div class="v">${escapeHtml(row.기타 || "-")}</div></div>
+
+        <div class="toolbar" style="margin-top:16px;">
+          <button class="btn primary" id="loadPhotosBtn">▼ ⑭ 장비사진 보기</button>
+          ${model ? `<button class="btn ghost" id="loadModelPhotosBtn">▼ 모델 공통사진 보기</button>` : ""}
+          ${row.url ? `<a class="btn ghost" href="${escapeHtml(row.url)}" target="_blank" rel="noreferrer">노션에서 열기</a>` : ""}
+        </div>
+        <div id="photosArea"></div>
+        <div id="modelPhotosArea"></div>
       `;
-    }
 
-    function renderMonthlyFilters() {
-      setSelectOptions(document.getElementById("monthlyLocationFilter"), locations, "", "위치 전체");
-    }
-
-    function renderMonthlyTable() {
-      const month = document.getElementById("monthlyMonth")?.value || state.activeMonth;
-      const loc = document.getElementById("monthlyLocationFilter")?.value || "";
-      const status = document.getElementById("monthlyStatusFilter")?.value || "";
-      const checked = document.getElementById("monthlyCheckedFilter")?.value || "";
-      const q = document.getElementById("monthlySearch")?.value.trim().toLowerCase() || "";
-
-      let rows = getMonthlyRows(month).filter(row => {
-        const matchQ = !q || `${row.code} ${row.name}`.toLowerCase().includes(q);
-        const matchLoc = !loc || row.monthLocation === loc;
-        const matchStatus = !status || row.monthStatus === status;
-        const matchChecked = !checked
-          || (checked === "checked" && row.checked)
-          || (checked === "unchecked" && !row.checked)
-          || (checked === "issue" && isIssueRow(row));
-        return matchQ && matchLoc && matchStatus && matchChecked;
-      });
-
-      const summary = document.getElementById("monthlyListSummary");
-      if (summary) {
-        const done = rows.filter(row => row.checked).length;
-        const issue = rows.filter(isIssueRow).length;
-        summary.textContent = `${formatMonth(month)} 검색 결과 ${rows.length}건 · 확인완료 ${done}건 · 미확인 ${rows.length - done}건 · 이슈 ${issue}건`;
-      }
-
-      document.getElementById("monthlyTableBody").innerHTML = rows.length
-        ? rows.map(row => `
-          <tr data-monthly-id="${row.id}">
-            <td style="text-align:center;">
-              <input class="checkbox monthly-field" data-field="checked" type="checkbox" ${row.checked ? "checked" : ""}>
-            </td>
-            <td><img class="thumb" src="${row.photo || imageMap.default}" alt=""></td>
-            <td>
-              <div class="equip-name">${escapeHtml(row.name)}</div>
-              <div class="equip-code">${escapeHtml(row.code)} · ${escapeHtml(row.category)}</div>
-            </td>
-            <td>${escapeHtml(row.masterLocation)}</td>
-            <td>
-              <select class="inline-edit monthly-field" data-field="monthLocation">
-                ${optionHtml(locations, row.monthLocation)}
-              </select>
-            </td>
-            <td>
-              <select class="inline-edit monthly-field" data-field="monthStatus">
-                ${optionHtml(statuses, row.monthStatus)}
-              </select>
-            </td>
-            <td>
-              <input class="memo-input monthly-field" data-field="memo" value="${escapeHtml(row.memo)}" placeholder="메모">
-            </td>
-          </tr>
-        `).join("")
-        : `<tr><td colspan="7" class="empty">해당 조건의 월별 현황 데이터가 없습니다.</td></tr>`;
-
-      const mobileList = document.getElementById("monthlyCardList");
-      if (mobileList) {
-        mobileList.innerHTML = rows.length
-          ? rows.map(row => `
-            <article class="mobile-monthly-card" data-mobile-monthly-id="${row.id}">
-              <div class="mobile-check-row">
-                <label>
-                  <input class="checkbox monthly-field" data-field="checked" type="checkbox" ${row.checked ? "checked" : ""}>
-                  확인 완료
-                </label>
-                <span class="badge ${isIssueRow(row) ? "need" : "normal"}">${isIssueRow(row) ? "확인 필요" : "정상"}</span>
-              </div>
-
-              <div class="mobile-card-top">
-                <img class="thumb" src="${row.photo || imageMap.default}" alt="">
-                <div class="mobile-card-title">
-                  <strong>${escapeHtml(row.name)}</strong>
-                  <span>${escapeHtml(row.code)} · ${escapeHtml(row.category)}</span>
-                </div>
-              </div>
-
-              <div class="mobile-card-meta">
-                <div class="mobile-meta-box">
-                  <div class="k">원장 위치</div>
-                  <div class="v">${escapeHtml(row.masterLocation)}</div>
-                </div>
-                <div class="mobile-meta-box">
-                  <div class="k">확인 위치</div>
-                  <div class="v">${escapeHtml(row.monthLocation)}</div>
-                </div>
-              </div>
-
-              <div class="mobile-edit-grid">
-                <label>이번달 위치
-                  <select class="inline-edit monthly-field" data-field="monthLocation">
-                    ${optionHtml(locations, row.monthLocation)}
-                  </select>
-                </label>
-                <label>상태
-                  <select class="inline-edit monthly-field" data-field="monthStatus">
-                    ${optionHtml(statuses, row.monthStatus)}
-                  </select>
-                </label>
-                <label class="memo-field">메모
-                  <input class="memo-input monthly-field" data-field="memo" value="${escapeHtml(row.memo)}" placeholder="위치 변경, 대여, 이상 내용 입력">
-                </label>
-              </div>
-            </article>
-          `).join("")
-          : `<div class="empty">해당 조건의 월별 현황 데이터가 없습니다.</div>`;
-      }
-
-      document.querySelectorAll(".monthly-field").forEach(input => {
-        input.addEventListener("change", handleMonthlyInlineChange);
-        input.addEventListener("input", handleMonthlyInlineChange);
+      $("#loadPhotosBtn").addEventListener("click", loadPhotos);
+      const modelPhotosBtn = $("#loadModelPhotosBtn");
+      if (modelPhotosBtn) modelPhotosBtn.addEventListener("click", loadModelPhotos);
+      $("#closeDetailBtn").addEventListener("click", () => {
+        selectedEquipmentId = "";
+        renderEquipmentList();
+        renderEquipmentDetail();
       });
     }
 
-    function handleMonthlyInlineChange(e) {
-      const container = e.target.closest("tr") || e.target.closest("[data-mobile-monthly-id]");
-      if (!container) return;
-      const id = container.dataset.monthlyId || container.dataset.mobileMonthlyId;
-      const row = state.monthly.find(item => item.id === id);
+    async function loadPhotos() {
+      const row = equipmentRows.find(item => item.id === selectedEquipmentId);
       if (!row) return;
 
-      const field = e.target.dataset.field;
-      if (field === "checked") {
-        row[field] = e.target.checked;
-      } else {
-        row[field] = e.target.value;
+      $("#photosArea").innerHTML = `<div class="notice">노션 페이지 내부의 ⑭ 장비사진을 불러오는 중입니다.</div>`;
+
+      try {
+        const data = await api(`/api/equipment/${encodeURIComponent(row.id)}/photos`);
+        const photos = data.photos || [];
+
+        $("#photosArea").innerHTML = photos.length
+          ? `<div class="photos-grid">${photos.map(photo => `<img src="${escapeHtml(photo.url)}" alt="">`).join("")}</div>`
+          : `<div class="notice">조회된 장비사진이 없습니다. 노션 페이지 내부에 “⑭ 장비 사진” 토글이 있는지 확인하세요.</div>`;
+      } catch (error) {
+        $("#photosArea").innerHTML = `<div class="notice error">${escapeHtml(error.message)}</div>`;
       }
-
-      saveState();
-      renderDashboard();
     }
 
-    function renderGeneratePreview() {
-      const month = document.getElementById("generateMonth")?.value || state.activeMonth;
-      const targets = state.equipment.filter(isMonthlyTarget);
-      const existingKeys = new Set(state.monthly.filter(row => row.month === month).map(row => row.uniqueKey));
-      const newTargets = targets.filter(eq => !existingKeys.has(`${month}_${eq.code}`));
-      const existing = targets.length - newTargets.length;
-      const excluded = state.equipment.length - targets.length;
 
-      document.getElementById("generatePreviewBody").innerHTML = `
-        <tr>
-          <td><strong>생성 대상</strong></td>
-          <td>${newTargets.length}</td>
-          <td>조건에 맞고 아직 ${formatMonth(month)} 현황이 생성되지 않은 장비</td>
-        </tr>
-        <tr>
-          <td><strong>이미 존재</strong></td>
-          <td>${existing}</td>
-          <td>중복방지키가 이미 존재하여 생성하지 않을 장비</td>
-        </tr>
-        <tr>
-          <td><strong>제외 항목</strong></td>
-          <td>${excluded}</td>
-          <td>소프트웨어, 유지보수, 제외, 폐기, 월별현황 미포함 항목</td>
-        </tr>
-      `;
+    async function loadModelPhotos() {
+      const row = equipmentRows.find(item => item.id === selectedEquipmentId);
+      const model = modelOf(row);
+      if (!model) return;
+
+      $("#modelPhotosArea").innerHTML = `<div class="notice">모델 공통사진을 불러오는 중입니다.</div>`;
+
+      try {
+        const data = await api(`/api/models/${encodeURIComponent(model.id)}/photos`);
+        const photos = data.photos || [];
+
+        $("#modelPhotosArea").innerHTML = photos.length
+          ? `<div class="photos-grid">${photos.map(photo => `<img src="${escapeHtml(photo.url)}" alt="">`).join("")}</div>`
+          : `<div class="notice">조회된 모델 공통사진이 없습니다. 모델 페이지 내부에 “모델 공통사진” 토글이 있는지 확인하세요.</div>`;
+      } catch (error) {
+        $("#modelPhotosArea").innerHTML = `<div class="notice error">${escapeHtml(error.message)}</div>`;
+      }
     }
 
-    function generateMonthly() {
-      const month = document.getElementById("generateMonth").value || nowMonth();
-      const targets = state.equipment.filter(isMonthlyTarget);
-      const existingKeys = new Set(state.monthly.filter(row => row.month === month).map(row => row.uniqueKey));
+    async function loadMonthly(showMessage = true) {
+      const month = $("#monthlyMonth").value || monthNow();
+      if (showMessage) $("#monthlyList").innerHTML = `<div class="notice">월별 현황을 불러오는 중입니다.</div>`;
 
-      let created = 0;
-      let skipped = 0;
-
-      targets.forEach(eq => {
-        const key = `${month}_${eq.code}`;
-        if (existingKeys.has(key)) {
-          skipped += 1;
-          return;
-        }
-        state.monthly.push(makeMonthly(eq, month));
-        existingKeys.add(key);
-        created += 1;
-      });
-
-      const excluded = state.equipment.length - targets.length;
-      state.activeMonth = month;
-      saveState();
-
-      document.getElementById("generateResultBox").classList.add("show");
-      document.getElementById("generateResultBox").innerHTML = `
-        ${formatMonth(month)} 현황 생성 결과<br>
-        생성 완료 ${created}건 · 이미 존재 ${skipped}건 · 제외 항목 ${excluded}건<br>
-        중복 생성된 데이터는 없습니다.
-      `;
-
-      renderAll();
-      document.getElementById("generateResultBox").classList.add("show");
+      try {
+        const data = await api(`/api/monthly?month=${encodeURIComponent(month)}`);
+        monthlyRows = data.rows || [];
+        renderMonthlyList();
+        renderDashboard();
+      } catch (error) {
+        if (showMessage) $("#monthlyList").innerHTML = `<div class="notice error">${escapeHtml(error.message)}</div>`;
+      }
     }
 
-    function renderReport() {
-      const month = document.getElementById("reportMonth")?.value || state.activeMonth;
-      const rows = getMonthlyRows(month);
-      const total = rows.length;
-      const checked = rows.filter(r => r.checked).length;
-      const unchecked = total - checked;
-      const normal = rows.filter(r => r.monthStatus === "정상").length;
-      const loan = rows.filter(r => r.monthStatus === "대여중").length;
-      const repair = rows.filter(r => r.monthStatus === "고장/수리중").length;
-      const need = rows.filter(r => r.monthStatus === "위치확인필요").length;
-      const lost = rows.filter(r => r.monthStatus === "분실의심").length;
-
-      const byLocation = {};
-      rows.forEach(row => {
-        const loc = row.monthLocation || "미지정";
-        if (!byLocation[loc]) byLocation[loc] = { total: 0, checked: 0, unchecked: 0, normal: 0, loan: 0, issue: 0 };
-        byLocation[loc].total += 1;
-        byLocation[loc].checked += row.checked ? 1 : 0;
-        byLocation[loc].unchecked += row.checked ? 0 : 1;
-        byLocation[loc].normal += row.monthStatus === "정상" ? 1 : 0;
-        byLocation[loc].loan += row.monthStatus === "대여중" ? 1 : 0;
-        byLocation[loc].issue += isIssueRow(row) ? 1 : 0;
-      });
-
-      const issueRows = rows.filter(isIssueRow);
-
-      document.getElementById("reportPaper").innerHTML = `
-        <h2>${formatMonth(month)} 장비 현황 보고서</h2>
-        <div class="report-date">생성일: ${new Date().toLocaleDateString("ko-KR")}</div>
-
-        <h3>1. 총괄 현황</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>구분</th><th>수량</th><th>비고</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td>전체 관리 대상 장비</td><td>${total}</td><td>월별 현황 생성 기준</td></tr>
-            <tr><td>확인 완료</td><td>${checked}</td><td>확인 여부 체크</td></tr>
-            <tr><td>미확인</td><td>${unchecked}</td><td>추가 확인 필요</td></tr>
-            <tr><td>정상</td><td>${normal}</td><td>해당 월 상태 기준</td></tr>
-            <tr><td>대여중</td><td>${loan}</td><td>대여 또는 외부 사용</td></tr>
-            <tr><td>위치확인필요</td><td>${need}</td><td>기존 위치와 불일치 또는 확인 필요</td></tr>
-            <tr><td>분실의심</td><td>${lost}</td><td>사용 이력 확인 필요</td></tr>
-            <tr><td>고장/수리중</td><td>${repair}</td><td>조치 필요</td></tr>
-          </tbody>
-        </table>
-
-        <h3>2. 위치별 현황</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>위치</th><th>전체</th><th>확인완료</th><th>미확인</th><th>정상</th><th>대여중</th><th>이슈</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${Object.entries(byLocation).map(([loc, data]) => `
-              <tr>
-                <td>${escapeHtml(loc)}</td>
-                <td>${data.total}</td>
-                <td>${data.checked}</td>
-                <td>${data.unchecked}</td>
-                <td>${data.normal}</td>
-                <td>${data.loan}</td>
-                <td>${data.issue}</td>
-              </tr>
-            `).join("") || `<tr><td colspan="7" class="empty">현황 데이터가 없습니다.</td></tr>`}
-          </tbody>
-        </table>
-
-        <h3>3. 조치 필요 및 변경 장비</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>장비번호</th><th>장비명</th><th>원장 위치</th><th>확인 위치</th><th>상태</th><th>메모</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${issueRows.map(row => `
-              <tr>
-                <td>${escapeHtml(row.code)}</td>
-                <td>${escapeHtml(row.name)}</td>
-                <td>${escapeHtml(row.masterLocation)}</td>
-                <td>${escapeHtml(row.monthLocation)}</td>
-                <td>${escapeHtml(row.monthStatus)}</td>
-                <td>${escapeHtml(row.memo || "-")}</td>
-              </tr>
-            `).join("") || `<tr><td colspan="6" class="empty">조치 필요 장비가 없습니다.</td></tr>`}
-          </tbody>
-        </table>
-
-        <h3>4. 검토 의견</h3>
-        <p>
-          ${formatMonth(month)} 기준 전체 관리 대상 장비는 ${total}개이며,
-          확인 완료 장비는 ${checked}개, 미확인 장비는 ${unchecked}개입니다.
-          대여중 장비 ${loan}개, 고장/수리중 장비 ${repair}개,
-          위치 확인 필요 장비 ${need}개, 분실 의심 장비 ${lost}개에 대해서는
-          추가 확인 및 조치가 필요합니다.
-        </p>
-      `;
+    function monthlyIsIssue(row) {
+      return !row.확인여부 || row.이번달위치 !== row.원장기준배치장소 || row.이번달상태 !== "정상" || Boolean((row.메모 || "").trim());
     }
 
-    function showEquipmentInMonthly(equipmentId) {
-      const eq = state.equipment.find(item => item.id === equipmentId);
-      if (!eq) return;
-      showView("monthlyView");
-      document.getElementById("monthlySearch").value = eq.code;
-      renderMonthlyTable();
-    }
+    function renderMonthlyList() {
+      const location = $("#monthlyLocationFilter").value;
+      const checkedFilter = $("#monthlyCheckedFilter").value;
 
-    function toggleMonthlyInclude(equipmentId) {
-      const eq = state.equipment.find(item => item.id === equipmentId);
-      if (!eq) return;
-      eq.includeMonthly = !eq.includeMonthly;
-      saveState();
-      renderEquipmentTable();
-      renderGeneratePreview();
-    }
+      let rows = [...monthlyRows];
 
-    async function fileToDataUrl(file) {
-      if (!file) return null;
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
+      if (location) rows = rows.filter(row => row.이번달위치 === location);
+      if (checkedFilter === "checked") rows = rows.filter(row => row.확인여부);
+      if (checkedFilter === "unchecked") rows = rows.filter(row => !row.확인여부);
+      if (checkedFilter === "issue") rows = rows.filter(monthlyIsIssue);
+
+      const checkedCount = rows.filter(row => row.확인여부).length;
+      $("#monthlySummary").textContent = `조회 결과 ${rows.length}건 · 확인완료 ${checkedCount}건 · 미확인 ${rows.length - checkedCount}건`;
+
+      $("#monthlyList").innerHTML = rows.length
+        ? rows.map(row => monthlyCardHtml(row)).join("")
+        : `<div class="empty">조회된 월별 현황이 없습니다. 관리자 계정으로 월별 현황을 생성하세요.</div>`;
+
+      $$(".save-monthly-btn").forEach(button => {
+        button.addEventListener("click", () => saveMonthly(button.closest(".monthly-card")));
       });
     }
 
-    async function handleAddEquipment(e) {
-      e.preventDefault();
+    function monthlyCardHtml(row) {
+      return `
+        <article class="monthly-card" data-id="${escapeHtml(row.id)}">
+          <div class="monthly-head">
+            <div>
+              <div style="font-weight:900;letter-spacing:-.04em;">${escapeHtml(row.장비명복사 || "-")}</div>
+              <div class="small" style="color:var(--sub);font-size:13px;margin-top:4px;">자체일련번호 ${escapeHtml(row.자체일련번호복사 || "-")} · 원장 위치 ${escapeHtml(row.원장기준배치장소 || "-")}</div>
+            </div>
+            <span class="badge ${row.확인여부 ? "normal" : "need"}">${row.확인여부 ? "확인완료" : "미확인"}</span>
+          </div>
 
-      const code = document.getElementById("newCode").value.trim();
-      const name = document.getElementById("newName").value.trim();
+          <div class="monthly-edit">
+            <label>이번달 위치
+              <select class="select monthly-location">
+                ${optionHtml(locations, row.이번달위치)}
+              </select>
+            </label>
+            <label>이번달 상태
+              <select class="select monthly-status">
+                ${optionHtml(statuses, row.이번달상태)}
+              </select>
+            </label>
+            <label class="full">메모
+              <input class="input monthly-memo" value="${escapeHtml(row.메모 || "")}" placeholder="위치 변경, 대여, 이상 내용 입력" />
+            </label>
+          </div>
 
-      if (!code || !name) {
-        alert("장비번호와 장비명을 입력하세요.");
-        return;
+          <div class="small" style="color:var(--sub);font-size:13px;">확인자: ${escapeHtml(row.확인자명복사 || "-")} · 확인일: ${escapeHtml(row.확인일 || "-")}</div>
+
+          <div class="toolbar" style="margin:0;">
+            <button class="btn primary save-monthly-btn">확인 완료 저장</button>
+          </div>
+        </article>
+      `;
+    }
+
+    async function saveMonthly(card) {
+      const id = card.dataset.id;
+      const button = card.querySelector(".save-monthly-btn");
+
+      button.disabled = true;
+      button.textContent = "저장 중";
+
+      try {
+        await api(`/api/monthly/${encodeURIComponent(id)}`, {
+          method: "PATCH",
+          body: JSON.stringify({
+            이번달위치: card.querySelector(".monthly-location").value,
+            이번달상태: card.querySelector(".monthly-status").value,
+            메모: card.querySelector(".monthly-memo").value,
+            확인여부: true
+          })
+        });
+
+        await loadMonthly(false);
+      } catch (error) {
+        alert(error.message);
+      } finally {
+        button.disabled = false;
+        button.textContent = "확인 완료 저장";
       }
+    }
 
-      if (state.equipment.some(eq => eq.code === code)) {
-        alert("이미 등록된 장비번호입니다.");
-        return;
+    async function generateMonthly() {
+      const month = $("#monthlyMonth").value || monthNow();
+      const button = $("#generateMonthlyBtn");
+
+      button.disabled = true;
+      showNotice($("#monthlyMsg"), `${formatMonth(month)} 현황을 생성하는 중입니다. 장비 수가 많으면 시간이 걸릴 수 있습니다.`);
+
+      try {
+        const data = await api("/api/monthly/generate", {
+          method: "POST",
+          body: JSON.stringify({ month })
+        });
+
+        showNotice($("#monthlyMsg"), `${formatMonth(month)} 생성 완료 · 신규 ${data.created}건 · 기존 ${data.skipped}건`);
+        await loadMonthly(false);
+      } catch (error) {
+        showNotice($("#monthlyMsg"), error.message, true);
+      } finally {
+        button.disabled = false;
       }
+    }
 
-      const category = document.getElementById("newCategory").value;
-      const file = document.getElementById("newPhoto").files[0];
-      const photo = await fileToDataUrl(file);
+    function renderDashboard() {
+      const total = equipmentRows.length;
+      const include = equipmentRows.filter(row => row.월별현황포함).length;
+      const normal = equipmentRows.filter(row => row.장비상태등 === "정상").length;
+      const loan = equipmentRows.filter(row => row.장비상태등 === "대여중").length;
+      const repair = equipmentRows.filter(row => row.장비상태등 === "고장/수리중").length;
 
-      const eq = {
-        id: uid("eq"),
-        code,
-        name,
-        assetType: document.getElementById("newAssetType").value,
-        category,
-        location: document.getElementById("newLocation").value,
-        status: document.getElementById("newStatus").value,
-        operation: "미확인",
-        usageStatus: document.getElementById("newUsageStatus").value,
-        includeMonthly: document.getElementById("newIncludeMonthly").checked,
-        components: document.getElementById("newComponents").value.trim(),
-        note: document.getElementById("newNote").value.trim(),
-        photo: photo || imageMap[category] || imageMap.default,
-        createdAt: new Date().toISOString()
+      const mTotal = monthlyRows.length;
+      const checked = monthlyRows.filter(row => row.확인여부).length;
+      const issue = monthlyRows.filter(monthlyIsIssue).length;
+
+      const stats = [
+        ["원장 장비", total, "조회된 장비 원장 수"],
+        ["월별 포함", include, "월별 현황 생성 대상"],
+        ["정상", normal, "장비 원장 기준"],
+        ["대여중", loan, "장비 원장 기준"],
+        ["고장/수리중", repair, "장비 원장 기준"],
+      ];
+
+      $("#statsGrid").innerHTML = stats.map(([label, value, help]) => `
+        <div class="stat">
+          <div class="stat-label">${escapeHtml(label)}</div>
+          <div class="stat-value">${escapeHtml(value)}</div>
+          <div class="stat-help">${escapeHtml(help)}</div>
+        </div>
+      `).join("");
+
+      $("#dashboardEquipmentList").innerHTML = equipmentRows.slice(0, 5).length
+        ? equipmentRows.slice(0, 5).map(row => equipmentCardHtml(row)).join("")
+        : `<div class="empty">장비 원장 데이터가 없습니다.</div>`;
+
+      const issues = monthlyRows.filter(monthlyIsIssue).slice(0, 8);
+      $("#dashboardIssueList").innerHTML = monthlyRows.length
+        ? `
+          <div class="notice" style="margin-top:0;">월별 현황 ${mTotal}건 · 확인완료 ${checked}건 · 조치 필요 ${issue}건</div>
+          <div style="display:grid;gap:10px;margin-top:12px;">
+            ${issues.length ? issues.map(row => `
+              <div style="border-bottom:1px solid var(--line);padding:10px 0;">
+                <div style="display:flex;justify-content:space-between;gap:8px;">
+                  <strong>${escapeHtml(row.장비명복사 || "-")}</strong>
+                  <span class="badge ${statusClass(row.이번달상태)}">${escapeHtml(row.이번달상태 || "-")}</span>
+                </div>
+                <div style="color:var(--sub);font-size:13px;margin-top:4px;">${escapeHtml(row.이번달위치 || "-")} · ${escapeHtml(row.메모 || "메모 없음")}</div>
+              </div>
+            `).join("") : `<div class="empty">조치 필요 항목이 없습니다.</div>`}
+          </div>
+        `
+        : `<div class="empty">월별 현황 데이터가 없습니다.</div>`;
+    }
+
+    async function submitAddForm(event) {
+      event.preventDefault();
+
+      const form = event.currentTarget;
+      const formData = new FormData(form);
+      const token = localStorage.getItem("eq_token") || "";
+
+      $("#addMsg").classList.remove("hidden");
+      $("#addMsg").classList.remove("error");
+      $("#addMsg").textContent = "장비를 등록하는 중입니다.";
+
+      try {
+        const response = await fetch(`${API_BASE}/api/equipment`, {
+          method: "POST",
+          headers: {
+            ...(token ? { Authorization: `Bearer ${token}` } : {})
+          },
+          body: formData
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error || "등록 중 오류가 발생했습니다.");
+
+        $("#addMsg").innerHTML = `등록 완료 · ${data.url ? `<a href="${escapeHtml(data.url)}" target="_blank" rel="noreferrer" style="text-decoration:underline;">노션에서 보기</a>` : ""}`;
+        form.reset();
+        form.querySelector('[name="월별현황포함"]').checked = true;
+        await loadEquipment();
+      } catch (error) {
+        showNotice($("#addMsg"), error.message, true);
+      }
+    }
+
+
+    function applyEquipmentPaneWidth(percent) {
+      const clamped = Math.max(45, Math.min(82, Number(percent) || 70));
+      const view = $("#equipmentView");
+      view.style.setProperty("--equipment-left-fr", `${clamped}fr`);
+      view.style.setProperty("--equipment-right-fr", `${100 - clamped}fr`);
+      view.style.setProperty("--equipment-left-percent", String(clamped));
+      localStorage.setItem("equipment_pane_left_v2", String(clamped));
+    }
+
+    function initEquipmentPaneResize() {
+      const saved = localStorage.getItem("equipment_pane_left_v2");
+      applyEquipmentPaneWidth(saved || 70);
+
+      const resizer = $("#equipmentPaneResizer");
+      const view = $("#equipmentView");
+      if (!resizer || !view) return;
+
+      let dragging = false;
+
+      const onMove = (event) => {
+        if (!dragging) return;
+        const layout = view.querySelector(".layout-2");
+        if (!layout) return;
+
+        const rect = layout.getBoundingClientRect();
+        const clientX = event.touches?.[0]?.clientX ?? event.clientX;
+        const x = clientX - rect.left;
+        const percent = (x / rect.width) * 100;
+        applyEquipmentPaneWidth(percent);
       };
 
-      state.equipment.push(eq);
-      selectedEquipmentId = eq.id;
-      saveState();
-
-      document.getElementById("addResultBox").classList.add("show");
-      document.getElementById("addResultBox").textContent = `${eq.code} · ${eq.name} 장비가 등록되었습니다.`;
-
-      e.target.reset();
-      document.getElementById("newIncludeMonthly").checked = true;
-      renderAll();
-    }
-
-    function showView(viewId) {
-      document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
-      document.getElementById(viewId).classList.add("active");
-
-      document.querySelectorAll(".nav button").forEach(btn => {
-        btn.classList.toggle("active", btn.dataset.view === viewId);
-      });
-
-      const labels = {
-        dashboardView: "대시보드",
-        equipmentView: "장비 목록",
-        monthlyView: "월별 현황 확인",
-        addView: "신규 장비 등록",
-        generateView: "월별 현황 생성",
-        reportView: "보고서 생성"
+      const stop = () => {
+        if (!dragging) return;
+        dragging = false;
+        resizer.classList.remove("dragging");
+        document.body.classList.remove("resizing-pane");
+        window.removeEventListener("mousemove", onMove);
+        window.removeEventListener("mouseup", stop);
+        window.removeEventListener("touchmove", onMove);
+        window.removeEventListener("touchend", stop);
       };
-      document.getElementById("pageTitle").textContent = labels[viewId] || "장비 현황 관리";
-      document.getElementById("sidebar").classList.remove("open");
+
+      const start = (event) => {
+        if (window.innerWidth <= 840) return;
+        event.preventDefault();
+        dragging = true;
+        resizer.classList.add("dragging");
+        document.body.classList.add("resizing-pane");
+        window.addEventListener("mousemove", onMove);
+        window.addEventListener("mouseup", stop);
+        window.addEventListener("touchmove", onMove, { passive: false });
+        window.addEventListener("touchend", stop);
+      };
+
+      resizer.addEventListener("mousedown", start);
+      resizer.addEventListener("touchstart", start, { passive: false });
     }
 
     function bindEvents() {
-      document.querySelectorAll(".nav button").forEach(btn => {
-        btn.addEventListener("click", () => showView(btn.dataset.view));
+      $("#loginForm").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        try {
+          const data = await api("/api/login", {
+            method: "POST",
+            body: JSON.stringify({
+              name: $("#loginName").value,
+              code: $("#loginCode").value
+            })
+          });
+          localStorage.setItem("eq_token", data.token);
+          setLoggedIn(data.user);
+        } catch (error) {
+          showNotice($("#loginMsg"), error.message, true);
+        }
       });
 
-      document.querySelectorAll("[data-move]").forEach(btn => {
-        btn.addEventListener("click", () => showView(btn.dataset.move));
+      $("#logoutBtn").addEventListener("click", () => {
+        localStorage.removeItem("eq_token");
+        location.reload();
       });
 
-      document.getElementById("mobileMenuBtn").addEventListener("click", () => {
-        document.getElementById("sidebar").classList.toggle("open");
+      $("#mobileMenuBtn").addEventListener("click", () => {
+        $("#sidebar").classList.toggle("open");
       });
 
-      document.getElementById("dashMonth").addEventListener("change", e => {
-        state.activeMonth = e.target.value;
-        saveState();
-        renderAll();
+      $$(".nav button").forEach(button => {
+        button.addEventListener("click", () => showView(button.dataset.view));
       });
 
-      ["equipmentSearch", "equipmentLocationFilter", "equipmentTypeFilter", "equipmentStatusFilter", "equipmentIncludeFilter"].forEach(id => {
-        document.getElementById(id).addEventListener("input", renderEquipmentTable);
-        document.getElementById(id).addEventListener("change", renderEquipmentTable);
+      $$("[data-move]").forEach(button => {
+        button.addEventListener("click", () => showView(button.dataset.move));
       });
 
-      document.getElementById("monthlyMonth").addEventListener("change", e => {
-        state.activeMonth = e.target.value;
-        saveState();
-        renderAll();
+      $("#dashReloadBtn").addEventListener("click", async () => {
+        $("#monthlyMonth").value = $("#dashMonth").value || monthNow();
+        $("#monthChip").textContent = formatMonth($("#monthlyMonth").value);
+        await loadEquipment();
+        renderDashboard();
       });
 
-      ["monthlyLocationFilter", "monthlyStatusFilter", "monthlyCheckedFilter", "monthlySearch"].forEach(id => {
-        document.getElementById(id).addEventListener("input", renderMonthlyTable);
-        document.getElementById(id).addEventListener("change", renderMonthlyTable);
+      $("#equipmentReloadBtn").addEventListener("click", loadEquipment);
+      $("#equipmentSearch").addEventListener("input", () => {
+        renderEquipmentList();
+        renderEquipmentDetail();
+      });
+      $("#equipmentLocationFilter").addEventListener("change", () => {
+        renderEquipmentList();
+        renderEquipmentDetail();
+      });
+      $("#equipmentModelFilter").addEventListener("change", () => {
+        renderEquipmentList();
+        renderEquipmentDetail();
+      });
+      $("#equipmentStatusFilter").addEventListener("change", () => {
+        renderEquipmentList();
+        renderEquipmentDetail();
+      });
+      $$("#equipmentModeToggle button").forEach(button => {
+        button.addEventListener("click", () => setEquipmentViewMode(button.dataset.mode));
       });
 
-      document.getElementById("saveMonthlyBtn").addEventListener("click", () => {
-        saveState();
-        alert("변경사항이 저장되었습니다.");
-        renderAll();
-      });
+      $("#monthlyReloadBtn").addEventListener("click", () => loadMonthly(true));
+      $("#monthlyLocationFilter").addEventListener("change", renderMonthlyList);
+      $("#monthlyCheckedFilter").addEventListener("change", renderMonthlyList);
+      $("#generateMonthlyBtn").addEventListener("click", generateMonthly);
 
-      document.getElementById("checkVisibleBtn").addEventListener("click", () => {
-        const ids = [...document.querySelectorAll("#monthlyTableBody tr[data-monthly-id]")].map(tr => tr.dataset.monthlyId);
-        state.monthly.forEach(row => {
-          if (ids.includes(row.id)) row.checked = true;
-        });
-        saveState();
-        renderAll();
-      });
-
-      document.getElementById("resetMonthlyFiltersBtn").addEventListener("click", () => {
-        document.getElementById("monthlyLocationFilter").value = "";
-        document.getElementById("monthlyStatusFilter").value = "";
-        document.getElementById("monthlyCheckedFilter").value = "";
-        document.getElementById("monthlySearch").value = "";
-        renderMonthlyTable();
-      });
-
-      document.getElementById("addEquipmentForm").addEventListener("submit", handleAddEquipment);
-
-      document.getElementById("generateMonth").addEventListener("change", renderGeneratePreview);
-      document.getElementById("previewGenerateBtn").addEventListener("click", renderGeneratePreview);
-      document.getElementById("generateMonthlyBtn").addEventListener("click", generateMonthly);
-
-      document.getElementById("reportMonth").addEventListener("change", e => {
-        state.activeMonth = e.target.value;
-        saveState();
-        renderReport();
-      });
-      document.getElementById("refreshReportBtn").addEventListener("click", renderReport);
+      $("#newModel").addEventListener("change", applySelectedModelToForm);
+      $("#addForm").addEventListener("submit", submitAddForm);
     }
 
-    bindEvents();
-    renderAll();
+    function initSelects() {
+      $("#equipmentLocationFilter").innerHTML = optionHtml([], "", "배치장소 전체");
+      $("#equipmentModelFilter").innerHTML = `<option value="">장비모델 전체</option>`;
+      $("#equipmentStatusFilter").innerHTML = optionHtml(statuses, "", "상태 전체");
+      $("#monthlyLocationFilter").innerHTML = optionHtml(locations, "", "위치 전체");
+      $("#newLocation").innerHTML = optionHtml(locations, "XR실");
+      $("#newStatus").innerHTML = optionHtml(statuses, "정상");
+      $("#newUsageStatus").innerHTML = optionHtml(usageStatuses, "사용중");
+      $("#newAssetType").innerHTML = optionHtml(assetTypes, "장비");
+      refreshModelOptions();
 
-    function selectEquipmentAndScroll(equipmentId) {
-      selectedEquipmentId = equipmentId;
-      renderEquipmentDetail();
+      const now = monthNow();
+      $("#dashMonth").value = now;
+      $("#monthlyMonth").value = now;
+      $("#monthChip").textContent = formatMonth(now);
+    }
 
-      const detail = document.getElementById("equipmentDetail");
-      if (window.innerWidth <= 820) {
-        const eq = state.equipment.find(item => item.id === equipmentId);
-        if (!eq) return;
-        alert(`${eq.code} · ${eq.name}\n\n위치: ${eq.location}\n상태: ${eq.status}\n관리대상: ${eq.includeMonthly ? "월별 현황 포함" : "월별 현황 제외"}\n구성품: ${eq.components || "-"}`);
-      } else if (detail) {
-        detail.scrollIntoView({ behavior: "smooth", block: "start" });
+    async function boot() {
+      initSelects();
+      bindEvents();
+      initEquipmentPaneResize();
+
+      await loadLoginUsers();
+
+      const token = localStorage.getItem("eq_token");
+      if (token) {
+        try {
+          const data = await api("/api/me");
+          setLoggedIn(data.user);
+        } catch {
+          localStorage.removeItem("eq_token");
+          $("#loginPage").classList.remove("hidden");
+        }
       }
     }
 
-    window.showEquipmentInMonthly = showEquipmentInMonthly;
-    window.toggleMonthlyInclude = toggleMonthlyInclude;
-    window.selectEquipmentAndScroll = selectEquipmentAndScroll;
+    boot();
   </script>
 </body>
 </html>
