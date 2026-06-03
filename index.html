@@ -1331,8 +1331,13 @@
                 <div class="toolbar">
                   <input class="input" id="equipmentSearch" placeholder="장비명, SN번호, 자체일련번호 검색" />
                   <select class="select" id="equipmentLocationFilter"></select>
+                  <select class="select" id="equipmentModelFilter"></select>
                   <select class="select" id="equipmentStatusFilter"></select>
                   <button class="btn refresh" id="equipmentReloadBtn">새로고침</button>
+                  <div class="mode-toggle" id="equipmentModeToggle">
+                    <button type="button" data-mode="list" class="active">개별 장비</button>
+                    <button type="button" data-mode="model">모델별</button>
+                  </div>
                 </div>
                 <div class="list-summary" id="equipmentSummary"></div>
                 <div class="sync-note" id="equipmentSyncNote"></div>
@@ -2582,21 +2587,31 @@ SN번호복사 / 텍스트
       $("#addForm").addEventListener("submit", submitAddForm);
     }
 
+    function setHtmlIfExists(selector, html) {
+      const el = $(selector);
+      if (el) el.innerHTML = html;
+    }
+
+    function setValueIfExists(selector, value) {
+      const el = $(selector);
+      if (el) el.value = value;
+    }
+
     function initSelects() {
-      $("#equipmentLocationFilter").innerHTML = optionHtml([], "", "배치장소 전체");
-      $("#equipmentModelFilter").innerHTML = `<option value="">장비모델 전체</option>`;
-      $("#equipmentStatusFilter").innerHTML = optionHtml(statuses, "", "상태 전체");
-      $("#monthlyLocationFilter").innerHTML = optionHtml(locations, "", "위치 전체");
-      $("#newLocation").innerHTML = optionHtml(locations, "XR실");
-      $("#newStatus").innerHTML = optionHtml(statuses, "정상");
-      $("#newUsageStatus").innerHTML = optionHtml(usageStatuses, "사용중");
-      $("#newAssetType").innerHTML = optionHtml(assetTypes, "장비");
+      setHtmlIfExists("#equipmentLocationFilter", optionHtml([], "", "배치장소 전체"));
+      setHtmlIfExists("#equipmentModelFilter", `<option value="">장비모델 전체</option>`);
+      setHtmlIfExists("#equipmentStatusFilter", optionHtml(statuses, "", "상태 전체"));
+      setHtmlIfExists("#monthlyLocationFilter", optionHtml(locations, "", "위치 전체"));
+      setHtmlIfExists("#newLocation", optionHtml(locations, "XR실"));
+      setHtmlIfExists("#newStatus", optionHtml(statuses, "정상"));
+      setHtmlIfExists("#newUsageStatus", optionHtml(usageStatuses, "사용중"));
+      setHtmlIfExists("#newAssetType", optionHtml(assetTypes, "장비"));
       refreshModelOptions();
 
       const now = monthNow();
-      $("#dashMonth").value = now;
-      $("#monthlyMonth").value = now;
-      $("#monthChip").textContent = formatMonth(now);
+      setValueIfExists("#dashMonth", now);
+      setValueIfExists("#monthlyMonth", now);
+      if ($("#monthChip")) $("#monthChip").textContent = formatMonth(now);
     }
 
     async function boot() {
