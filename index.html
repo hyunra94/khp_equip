@@ -1689,7 +1689,8 @@ SN번호복사 / 텍스트
 
     function showView(viewId) {
       $$(".view").forEach(view => view.classList.remove("active"));
-      $("#" + viewId).classList.add("active");
+      const targetView = $("#" + viewId);
+      if (targetView) targetView.classList.add("active");
 
       $$(".nav button").forEach(btn => btn.classList.toggle("active", btn.dataset.view === viewId));
 
@@ -1701,16 +1702,16 @@ SN번호복사 / 텍스트
         schemaView: "DB 속성표"
       };
 
-      $("#pageTitle").textContent = labels[viewId] || "장비 현황 관리";
-      $("#sidebar").classList.remove("open");
+      if ($("#pageTitle")) $("#pageTitle").textContent = labels[viewId] || "장비 현황 관리";
+      $("#sidebar")?.classList.remove("open");
     }
 
     function setLoggedIn(user) {
       currentUser = user;
       $("#loginPage").classList.add("hidden");
       $("#app").classList.remove("hidden");
-      $("#roleChip").textContent = user.role === "admin" ? "관리자" : "직원";
-      $("#sideUserText").textContent = `${user.name} · ${user.role === "admin" ? "관리자" : "직원"}`;
+      if ($("#roleChip")) $("#roleChip").textContent = user.role === "admin" ? "관리자" : "직원";
+      if ($("#sideUserText")) $("#sideUserText").textContent = `${user.name} · ${user.role === "admin" ? "관리자" : "직원"}`;
 
       $$(".admin-only").forEach(el => el.classList.toggle("hidden", user.role !== "admin"));
       $("#addNavBtn").classList.toggle("hidden", user.role !== "admin");
@@ -1732,10 +1733,47 @@ SN번호복사 / 텍스트
       }
     }
 
+    async function loadModels() {
+      try {
+        const data = await api("/api/models");
+        modelRows = data.rows || [];
+        refreshModelOptions();
+      } catch (error) {
+        console.warn("장비모델 목록을 불러오지 못했습니다.", error);
+        modelRows = [];
+        refreshModelOptions();
+      }
+    }
+
+    function refreshModelOptions() {
+      const select = $("#newModel");
+      if (!select) return;
+
+      select.innerHTML = `<option value="">장비모델 선택 안 함</option>` + modelRows.map(model => `
+        <option value="${escapeHtml(model.id)}">${escapeHtml(model.모델명 || "-")}</option>
+      `).join("");
+    }
+
+    function applySelectedModelToForm() {
+      const modelId = $("#newModel")?.value || "";
+      const model = modelRows.find(item => item.id === modelId);
+      if (!model) return;
+
+      const maker = document.querySelector('[name="제작회사"]');
+      const spec = document.querySelector('[name="규격"]');
+      const photo = document.querySelector('[name="대표사진URL"]');
+
+      if (maker && !maker.value && model.제작회사) maker.value = model.제작회사;
+      if (spec && !spec.value && model.규격) spec.value = model.규격;
+      if (photo && !photo.value && model.대표사진URL) photo.value = model.대표사진URL;
+    }
+
+
     async function loadInitialData() {
-      $("#dashMonth").value = monthNow();
-      $("#monthlyMonth").value = monthNow();
-      $("#monthChip").textContent = formatMonth(monthNow());
+      const now = monthNow();
+      if ($("#dashMonth")) $("#dashMonth").value = now;
+      if ($("#monthlyMonth")) $("#monthlyMonth").value = now;
+      if ($("#monthChip")) $("#monthChip").textContent = formatMonth(now);
 
       await loadModels();
       await loadEquipment();
@@ -2515,31 +2553,47 @@ SN번호복사 / 텍스트
       resizer.addEventListener("touchstart", start, { passive: false });
     }
 
+    function onIfExists(selector, eventName, handler) {
+      const el = $(selector);
+      if (el) el.addEventListener(eventName, handler);
+    }
+
     function bindEvents() {
-      $("#loginForm").addEventListener("submit", async (event) => {
+      onIfExists("#loginForm", "submit", async (event) => {
         event.preventDefault();
+        const button = event.target.querySelector("button[type='submit']");
+        if (button) {
+          button.disabled = true;
+          button.textContent = "접속 중";
+        }
+
         try {
           const data = await api("/api/login", {
             method: "POST",
             body: JSON.stringify({
-              name: $("#loginName").value.trim(),
-              code: $("#loginCode").value.trim()
+              name: ($("#loginName")?.value || "").trim(),
+              code: ($("#loginCode")?.value || "").trim()
             })
           });
           localStorage.setItem("eq_token", data.token);
           setLoggedIn(data.user);
         } catch (error) {
           showNotice($("#loginMsg"), error.message, true);
+        } finally {
+          if (button) {
+            button.disabled = false;
+            button.textContent = "접속";
+          }
         }
       });
 
-      $("#logoutBtn").addEventListener("click", () => {
+      onIfExists("#logoutBtn", "click", () => {
         localStorage.removeItem("eq_token");
         location.reload();
       });
 
-      $("#mobileMenuBtn").addEventListener("click", () => {
-        $("#sidebar").classList.toggle("open");
+      onIfExists("#mobileMenuBtn", "click", () => {
+        $("#sidebar")?.classList.toggle("open");
       });
 
       $$(".nav button").forEach(button => {
@@ -2550,41 +2604,50 @@ SN번호복사 / 텍스트
         button.addEventListener("click", () => showView(button.dataset.move));
       });
 
-      $("#dashReloadBtn").addEventListener("click", async () => {
-        $("#monthlyMonth").value = $("#dashMonth").value || monthNow();
-        $("#monthChip").textContent = formatMonth($("#monthlyMonth").value);
+      onIfExists("#dashReloadBtn", "click", async () => {
+        if ($("#monthlyMonth") && $("#dashMonth")) {
+          $("#monthlyMonth").value = $("#dashMonth").value || monthNow();
+        }
+        if ($("#monthChip") && $("#monthlyMonth")) {
+          $("#monthChip").textContent = formatMonth($("#monthlyMonth").value);
+        }
         await loadEquipment();
         renderDashboard();
       });
 
-      $("#equipmentReloadBtn").addEventListener("click", loadEquipment);
-      $("#equipmentSearch").addEventListener("input", () => {
+      onIfExists("#equipmentReloadBtn", "click", loadEquipment);
+
+      onIfExists("#equipmentSearch", "input", () => {
         renderEquipmentList();
         renderEquipmentDetail();
       });
-      $("#equipmentLocationFilter").addEventListener("change", () => {
+
+      onIfExists("#equipmentLocationFilter", "change", () => {
         renderEquipmentList();
         renderEquipmentDetail();
       });
-      $("#equipmentModelFilter").addEventListener("change", () => {
+
+      onIfExists("#equipmentModelFilter", "change", () => {
         renderEquipmentList();
         renderEquipmentDetail();
       });
-      $("#equipmentStatusFilter").addEventListener("change", () => {
+
+      onIfExists("#equipmentStatusFilter", "change", () => {
         renderEquipmentList();
         renderEquipmentDetail();
       });
+
       $$("#equipmentModeToggle button").forEach(button => {
         button.addEventListener("click", () => setEquipmentViewMode(button.dataset.mode));
       });
 
-      $("#monthlyReloadBtn").addEventListener("click", () => loadMonthly(true));
-      $("#monthlyLocationFilter").addEventListener("change", renderMonthlyList);
-      $("#monthlyCheckedFilter").addEventListener("change", renderMonthlyList);
-      $("#generateMonthlyBtn").addEventListener("click", generateMonthly);
+      onIfExists("#monthlyReloadBtn", "click", () => loadMonthly(true));
+      onIfExists("#monthlyLocationFilter", "change", renderMonthlyList);
+      onIfExists("#monthlyCheckedFilter", "change", renderMonthlyList);
+      onIfExists("#generateMonthlyBtn", "click", generateMonthly);
 
-      $("#newModel").addEventListener("change", applySelectedModelToForm);
-      $("#addForm").addEventListener("submit", submitAddForm);
+      onIfExists("#newModel", "change", applySelectedModelToForm);
+      onIfExists("#addForm", "submit", submitAddForm);
     }
 
     function setHtmlIfExists(selector, html) {
@@ -2633,7 +2696,15 @@ SN번호복사 / 텍스트
       }
     }
 
-    boot();
+    boot().catch(error => {
+      console.error(error);
+      const msg = document.getElementById("loginMsg");
+      if (msg) {
+        msg.classList.remove("hidden");
+        msg.classList.add("error");
+        msg.textContent = "초기화 중 오류가 발생했습니다: " + (error.message || error);
+      }
+    });
   </script>
 </body>
 </html>
