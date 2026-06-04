@@ -1435,7 +1435,9 @@
             <div class="card-body">
               <div class="toolbar">
                 <input class="input" type="month" id="monthlyMonth" />
+                <input class="input" id="monthlySearch" placeholder="장비명, 관리번호, SN 검색" />
                 <select class="select" id="monthlyLocationFilter"></select>
+                <select class="select" id="monthlyModelFilter"></select>
                 <select class="select" id="monthlyCheckedFilter">
                   <option value="">확인 여부 전체</option>
                   <option value="unchecked">미확인만</option>
@@ -1443,6 +1445,10 @@
                   <option value="issue">조치 필요만</option>
                 </select>
                 <button class="btn" id="monthlyReloadBtn">조회</button>
+                <div class="mode-toggle" id="monthlyModeToggle">
+                  <button type="button" data-mode="list" class="active">개별 장비</button>
+                  <button type="button" data-mode="model">모델별</button>
+                </div>
               </div>
               <div class="list-summary" id="monthlySummary"></div>
               <div id="monthlyMsg" class="notice hidden"></div>
@@ -1469,6 +1475,7 @@
             <div class="card-body">
               <div class="toolbar">
                 <input class="input" type="month" id="photoReviewMonth" />
+                <input class="input" id="photoReviewSearch" placeholder="장비명, 관리번호, SN 검색" />
                 <select class="select" id="photoReviewLocationFilter"></select>
                 <select class="select" id="photoReviewStatusFilter"></select>
                 <button class="btn primary" id="photoReviewReloadBtn">조회</button>
@@ -1690,7 +1697,7 @@ SN번호복사 / 텍스트
   <script>
     const API_BASE = "https://equip.hyunra94.workers.dev";
 
-    const locations = ["XR실", "장비보관실", "VR체험버스", "지하1층 스튜디오", "스튜디오", "교육장", "외부대여", "수리업체", "확인필요", "미지정"];
+    const locations = ["1층 안내센터", "지하1층 스튜디오", "지하1층 소강의실", "지하1층 창고", "5층 사무실", "7층 강의실", "VR체험버스", "대여중", "기타"];
     const statuses = ["정상", "대여중", "위치확인필요", "분실의심", "고장/수리중", "폐기", "기타"];
     const assetTypes = ["장비", "소프트웨어", "유지보수", "소모품", "기타"];
     const usageStatuses = ["사용중", "보관", "제외", "폐기"];
@@ -1700,6 +1707,7 @@ SN번호복사 / 텍스트
     let equipmentLastLoadedAt = '';
     let modelRows = [];
     let equipmentViewMode = localStorage.getItem('equipment_view_mode') || 'list';
+    let monthlyViewMode = localStorage.getItem('monthly_view_mode') || 'list';
     let monthlyRows = [];
     let selectedEquipmentId = "";
 
@@ -1872,11 +1880,11 @@ SN번호복사 / 텍스트
 
     function refreshEquipmentLocationOptions() {
       const select = $("#equipmentLocationFilter");
+      if (!select) return;
       const current = select.value;
-      const actualLocations = uniqueSorted(equipmentRows.map(row => row.배치장소 || "미지정"));
-      select.innerHTML = optionHtml(actualLocations, current, "배치장소 전체");
+      select.innerHTML = optionHtml(locations, current, "배치장소 전체");
 
-      if (current && !actualLocations.includes(current)) {
+      if (current && !locations.includes(current)) {
         select.value = "";
       }
     }
@@ -2378,6 +2386,7 @@ SN번호복사 / 텍스트
       try {
         const data = await api(`/api/monthly?month=${encodeURIComponent(month)}`);
         monthlyRows = data.rows || [];
+        refreshMonthlyModelOptions();
         renderMonthlyList();
         renderDashboard();
       } catch (error) {
@@ -2389,23 +2398,154 @@ SN번호복사 / 텍스트
       return !row.확인여부 || row.이번달위치 !== row.원장기준배치장소 || row.이번달상태 !== "정상" || Boolean((row.메모 || "").trim());
     }
 
+
+    function equipmentForMonthly(row) {
+      return equipmentRows.find(eq => eq.id === row.장비) || null;
+    }
+
+    function monthlyModelOf(row) {
+      return modelOf(equipmentForMonthly(row));
+    }
+
+    function monthlyModelName(row) {
+      return monthlyModelOf(row)?.모델명 || "모델 미지정";
+    }
+
+    function monthlyModelId(row) {
+      return equipmentForMonthly(row)?.장비모델 || "";
+    }
+
+    function refreshMonthlyModelOptions() {
+      const select = $("#monthlyModelFilter");
+      if (!select) return;
+
+      const current = select.value;
+      const modelMap = new Map();
+
+      monthlyRows.forEach(row => {
+        const id = monthlyModelId(row);
+        const name = monthlyModelName(row);
+        if (!modelMap.has(id)) modelMap.set(id, name);
+      });
+
+      const options = [...modelMap.entries()].sort((a, b) => a[1].localeCompare(b[1], "ko"));
+      select.innerHTML = `<option value="">장비모델 전체</option>` + options.map(([id, name]) => `
+        <option value="${escapeHtml(id)}">${escapeHtml(name)}</option>
+      `).join("");
+
+      select.value = [...modelMap.keys()].includes(current) ? current : "";
+    }
+
+    function setMonthlyViewMode(mode) {
+      monthlyViewMode = mode === "model" ? "model" : "list";
+      localStorage.setItem("monthly_view_mode", monthlyViewMode);
+
+      $$("#monthlyModeToggle button").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.mode === monthlyViewMode);
+      });
+
+      renderMonthlyList();
+    }
+
+    function groupMonthlyRowsByModel(rows) {
+      const groups = new Map();
+
+      rows.forEach(row => {
+        const key = monthlyModelId(row) || "__none__";
+        if (!groups.has(key)) {
+          groups.set(key, {
+            id: key,
+            model: monthlyModelOf(row),
+            name: monthlyModelName(row),
+            rows: []
+          });
+        }
+        groups.get(key).rows.push(row);
+      });
+
+      return [...groups.values()].sort((a, b) => a.name.localeCompare(b.name, "ko"));
+    }
+
+    function monthlyModelGroupHtml(group) {
+      const model = group.model;
+      const rows = group.rows;
+      const photoUrl = model?.대표사진URL || "";
+      const photo = photoUrl
+        ? `<img class="model-photo" src="${escapeHtml(photoUrl)}" alt="">`
+        : `<div class="model-photo">MODEL</div>`;
+
+      const locationsSummary = summarizeBy(rows.map(row => ({ 배치장소: row.이번달위치 })), "배치장소").slice(0, 3);
+      const statusesSummary = summarizeBy(rows.map(row => ({ 장비상태등: row.이번달상태 })), "장비상태등", "상태없음").slice(0, 3);
+      const checkedCount = rows.filter(row => row.확인여부).length;
+
+      return `
+        <details class="model-group-card">
+          <summary class="model-group-head">
+            ${photo}
+            <div class="model-title">
+              <strong>${escapeHtml(group.name)}</strong>
+              <span>${escapeHtml(model?.제작회사 || "-")} · ${escapeHtml(model?.규격 || "-")}</span>
+            </div>
+            <div class="model-summary">
+              <span class="badge dark">전체 ${rows.length}개</span>
+              <span class="badge ${checkedCount === rows.length ? "normal" : "need"}">확인 ${checkedCount}/${rows.length}</span>
+              ${locationsSummary.map(([name, count]) => `<span class="badge gray">${escapeHtml(name)} ${count}</span>`).join("")}
+              ${statusesSummary.map(([name, count]) => `<span class="badge ${statusClass(name)}">${escapeHtml(name)} ${count}</span>`).join("")}
+              <span class="model-open-hint">클릭해서 펼치기</span>
+            </div>
+          </summary>
+          <div class="monthly-list" style="padding:14px;">
+            ${rows.map(row => monthlyCardHtml(row)).join("")}
+          </div>
+        </details>
+      `;
+    }
+
     function renderMonthlyList() {
+      const q = ($("#monthlySearch")?.value || "").trim().toLowerCase();
       const location = $("#monthlyLocationFilter").value;
+      const modelId = $("#monthlyModelFilter")?.value || "";
       const checkedFilter = $("#monthlyCheckedFilter").value;
 
       let rows = [...monthlyRows];
 
+      if (q) {
+        rows = rows.filter(row => {
+          const eq = equipmentForMonthly(row);
+          const text = [
+            row.장비명복사,
+            row.자체일련번호복사,
+            row.SN번호복사,
+            eq?.관리번호,
+            eq?.자체일련번호,
+            eq?.SN번호,
+            monthlyModelName(row)
+          ].filter(Boolean).join(" ").toLowerCase();
+          return text.includes(q);
+        });
+      }
       if (location) rows = rows.filter(row => row.이번달위치 === location);
+      if (modelId) rows = rows.filter(row => monthlyModelId(row) === modelId);
       if (checkedFilter === "checked") rows = rows.filter(row => row.확인여부);
       if (checkedFilter === "unchecked") rows = rows.filter(row => !row.확인여부);
       if (checkedFilter === "issue") rows = rows.filter(monthlyIsIssue);
 
       const checkedCount = rows.filter(row => row.확인여부).length;
-      $("#monthlySummary").textContent = `조회 결과 ${rows.length}건 · 확인완료 ${checkedCount}건 · 미확인 ${rows.length - checkedCount}건`;
+      const modelCount = groupMonthlyRowsByModel(rows).length;
+      $("#monthlySummary").textContent = `조회 결과 ${rows.length}건 · 모델 ${modelCount}개 · 확인완료 ${checkedCount}건 · 미확인 ${rows.length - checkedCount}건`;
 
-      $("#monthlyList").innerHTML = rows.length
-        ? rows.map(row => monthlyCardHtml(row)).join("")
-        : `<div class="empty">조회된 월별 현황이 없습니다. 관리자 계정으로 월별 현황을 생성하세요.</div>`;
+      $$("#monthlyModeToggle button").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.mode === monthlyViewMode);
+      });
+
+      if (!rows.length) {
+        $("#monthlyList").innerHTML = `<div class="empty">조회된 월별 현황이 없습니다. 관리자 계정으로 월별 현황을 생성하세요.</div>`;
+        return;
+      }
+
+      $("#monthlyList").innerHTML = monthlyViewMode === "model"
+        ? `<div class="model-group-list">${groupMonthlyRowsByModel(rows).map(monthlyModelGroupHtml).join("")}</div>`
+        : rows.map(row => monthlyCardHtml(row)).join("");
 
       $$(".save-monthly-btn").forEach(button => {
         button.addEventListener("click", () => saveMonthly(button.closest(".monthly-card")));
@@ -2777,10 +2917,26 @@ SN번호복사 / 텍스트
     }
 
     function renderPhotoReviewList() {
+      const q = ($("#photoReviewSearch")?.value || "").trim().toLowerCase();
       const location = $("#photoReviewLocationFilter")?.value || "";
       const status = $("#photoReviewStatusFilter")?.value || "";
 
       let rows = [...monthlyRows];
+      if (q) {
+        rows = rows.filter(row => {
+          const eq = equipmentForMonthly(row);
+          const text = [
+            row.장비명복사,
+            row.자체일련번호복사,
+            row.SN번호복사,
+            eq?.관리번호,
+            eq?.자체일련번호,
+            eq?.SN번호,
+            monthlyModelName(row)
+          ].filter(Boolean).join(" ").toLowerCase();
+          return text.includes(q);
+        });
+      }
       if (location) rows = rows.filter(row => row.이번달위치 === location);
       if (status) rows = rows.filter(row => row.이번달상태 === status);
 
@@ -2900,10 +3056,16 @@ SN번호복사 / 텍스트
       });
 
       onIfExists("#monthlyReloadBtn", "click", () => loadMonthly(true));
+      onIfExists("#monthlySearch", "input", renderMonthlyList);
       onIfExists("#monthlyLocationFilter", "change", renderMonthlyList);
+      onIfExists("#monthlyModelFilter", "change", renderMonthlyList);
       onIfExists("#monthlyCheckedFilter", "change", renderMonthlyList);
+      $$("#monthlyModeToggle button").forEach(button => {
+        button.addEventListener("click", () => setMonthlyViewMode(button.dataset.mode));
+      });
       onIfExists("#generateMonthlyBtn", "click", generateMonthly);
       onIfExists("#photoReviewReloadBtn", "click", loadPhotoReview);
+      onIfExists("#photoReviewSearch", "input", renderPhotoReviewList);
       onIfExists("#photoReviewLocationFilter", "change", renderPhotoReviewList);
       onIfExists("#photoReviewStatusFilter", "change", renderPhotoReviewList);
 
@@ -2926,6 +3088,7 @@ SN번호복사 / 텍스트
       setHtmlIfExists("#equipmentModelFilter", `<option value="">장비모델 전체</option>`);
       setHtmlIfExists("#equipmentStatusFilter", optionHtml(statuses, "", "상태 전체"));
       setHtmlIfExists("#monthlyLocationFilter", optionHtml(locations, "", "위치 전체"));
+      setHtmlIfExists("#monthlyModelFilter", `<option value="">장비모델 전체</option>`);
       setHtmlIfExists("#photoReviewLocationFilter", optionHtml(locations, "", "위치 전체"));
       setHtmlIfExists("#photoReviewStatusFilter", optionHtml(statuses, "", "상태 전체"));
       setHtmlIfExists("#newLocation", optionHtml(locations, "XR실"));
