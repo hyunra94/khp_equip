@@ -840,7 +840,7 @@
 
     .model-equipment-row {
       display: grid;
-      grid-template-columns: minmax(160px, 1.4fr) minmax(105px, .9fr) minmax(105px, .9fr) minmax(90px, .75fr) 74px;
+      grid-template-columns: minmax(160px, 1.35fr) minmax(120px, 1fr) minmax(105px, .9fr) minmax(105px, .9fr) minmax(90px, .75fr) 74px;
       gap: 10px;
       align-items: center;
       padding: 12px 16px;
@@ -932,7 +932,7 @@
     }
 
     .equipment-row {
-      grid-template-columns: 76px minmax(190px, 1.55fr) minmax(130px, .95fr) minmax(150px, 1.1fr) minmax(110px, .85fr) minmax(86px, .65fr);
+      grid-template-columns: 76px minmax(180px, 1.45fr) minmax(150px, 1.1fr) minmax(130px, .95fr) minmax(150px, 1.1fr) minmax(110px, .85fr) minmax(86px, .65fr);
       align-items: center;
       gap: 16px;
       padding: 16px;
@@ -996,7 +996,7 @@
     }
 
     #equipmentView.detail-open .equipment-row {
-      grid-template-columns: 48px minmax(110px, 1.5fr) minmax(74px, .85fr) minmax(92px, 1fr) minmax(82px, .8fr) 66px;
+      grid-template-columns: 48px minmax(108px, 1.35fr) minmax(92px, 1fr) minmax(74px, .85fr) minmax(92px, 1fr) minmax(82px, .8fr) 66px;
       gap: 10px;
       padding: 10px 12px;
       min-height: 66px;
@@ -2076,6 +2076,10 @@ SN번호복사 / 텍스트
                   <span class="cell-sub">SN ${escapeHtml(row.SN번호 || "-")}</span>
                 </div>
                 <div>
+                  <span class="cell-label">규격</span>
+                  <span class="cell-main">${escapeHtml(effectiveSpec(row) || "-")}</span>
+                </div>
+                <div>
                   <span class="cell-label">위치</span>
                   <span class="cell-main">${escapeHtml(row.배치장소 || "미지정")}</span>
                   ${row.세부위치 ? `<span class="cell-sub">${escapeHtml(row.세부위치)}</span>` : ""}
@@ -2286,6 +2290,11 @@ SN번호복사 / 텍스트
               <span class="eq-value">${escapeHtml(row.장비명 || "-")}</span>
               <span class="eq-sub">${modelName(row) ? "모델 " + escapeHtml(modelName(row)) + " · " : ""}SN ${escapeHtml(row.SN번호 || "-")}</span>
             </div>
+          </div>
+
+          <div class="eq-cell">
+            <span class="eq-label">규격</span>
+            <span class="eq-value">${escapeHtml(effectiveSpec(row) || "-")}</span>
           </div>
 
           <div class="eq-cell">
@@ -2594,7 +2603,7 @@ SN번호복사 / 텍스트
           <div class="monthly-head">
             <div>
               <div style="font-weight:900;letter-spacing:-.04em;">${escapeHtml(row.장비명복사 || "-")}</div>
-              <div class="small" style="color:var(--sub);font-size:13px;margin-top:4px;">자체일련번호 ${escapeHtml(row.자체일련번호복사 || "-")} · 원장 위치 ${escapeHtml(row.원장기준배치장소 || "-")}</div>
+              <div class="small" style="color:var(--sub);font-size:13px;margin-top:4px;">자체일련번호 ${escapeHtml(row.자체일련번호복사 || "-")} · 규격 ${escapeHtml(effectiveSpec(equipmentForMonthly(row)) || "-")} · 원장 위치 ${escapeHtml(row.원장기준배치장소 || "-")}</div>
             </div>
             <span class="badge ${row.확인여부 ? "normal" : "need"}">${row.확인여부 ? "확인완료" : "미확인"}</span>
           </div>
@@ -2983,7 +2992,7 @@ SN번호복사 / 텍스트
               <div>
                 <div style="font-weight:900;letter-spacing:-.04em;">${escapeHtml(row.장비명복사 || "-")}</div>
                 <div class="small" style="color:var(--sub);font-size:13px;margin-top:4px;">
-                  ${escapeHtml(row.이번달위치 || "-")} · ${escapeHtml(row.이번달상태 || "-")} · 확인자 ${escapeHtml(row.확인자명복사 || "-")}
+                  ${escapeHtml(row.이번달위치 || "-")} · ${escapeHtml(row.이번달상태 || "-")} · 규격 ${escapeHtml(effectiveSpec(equipmentForMonthly(row)) || "-")} · 확인자 ${escapeHtml(row.확인자명복사 || "-")}
                 </div>
                 ${row.메모 ? `<div class="small" style="margin-top:6px;">메모: ${escapeHtml(row.메모)}</div>` : ""}
               </div>
