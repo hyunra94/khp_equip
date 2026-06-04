@@ -1429,7 +1429,7 @@
             <div class="card-header">
               <div>
                 <h2 class="card-title">확인 목록</h2>
-                <div class="card-sub">정상 장비는 확인 완료만 누르고, 변경 항목만 위치·상태·메모를 수정합니다.</div>
+                <div class="card-sub">정상 장비는 확인 완료만 누르고, 변경 항목만 위치·상태·메모를 수정합니다. 대여중은 “대여”가 포함된 항목, 기타는 지정 위치 외 항목입니다.</div>
               </div>
             </div>
             <div class="card-body">
@@ -1698,6 +1698,7 @@ SN번호복사 / 텍스트
     const API_BASE = "https://equip.hyunra94.workers.dev";
 
     const locations = ["1층 안내센터", "지하1층 스튜디오", "지하1층 소강의실", "지하1층 창고", "5층 사무실", "7층 강의실", "VR체험버스", "대여중", "기타"];
+    const primaryLocations = ["1층 안내센터", "지하1층 스튜디오", "지하1층 소강의실", "지하1층 창고", "5층 사무실", "7층 강의실", "VR체험버스"];
     const statuses = ["정상", "대여중", "위치확인필요", "분실의심", "고장/수리중", "폐기", "기타"];
     const assetTypes = ["장비", "소프트웨어", "유지보수", "소모품", "기타"];
     const usageStatuses = ["사용중", "보관", "제외", "폐기"];
@@ -1750,8 +1751,41 @@ SN번호복사 / 텍스트
 
     function optionHtml(values, selected = "", allText = "") {
       let html = allText ? `<option value="">${escapeHtml(allText)}</option>` : "";
-      html += values.map(v => `<option value="${escapeHtml(v)}" ${v === selected ? "selected" : ""}>${escapeHtml(v)}</option>`).join("");
+      const list = [...values];
+
+      // 기존 데이터에 "외부대여", "서호영 국장 보유중"처럼 표준 위치가 아닌 값이 들어 있어도
+      // 카드 안의 선택값이 사라지지 않도록 현재 값을 임시 옵션으로 보존합니다.
+      if (selected && !list.includes(selected)) {
+        list.push(selected);
+      }
+
+      html += list.map(v => `<option value="${escapeHtml(v)}" ${v === selected ? "selected" : ""}>${escapeHtml(v)}</option>`).join("");
       return html;
+    }
+
+    function isRentalValue(locationValue = "", statusValue = "") {
+      const text = `${locationValue || ""} ${statusValue || ""}`;
+      return text.includes("대여");
+    }
+
+    function isPrimaryLocation(locationValue = "") {
+      return primaryLocations.includes(locationValue);
+    }
+
+    function matchesLocationFilter(locationValue = "", filterValue = "", statusValue = "") {
+      if (!filterValue) return true;
+
+      const loc = locationValue || "기타";
+
+      if (filterValue === "대여중") {
+        return isRentalValue(loc, statusValue);
+      }
+
+      if (filterValue === "기타") {
+        return !isPrimaryLocation(loc) && !isRentalValue(loc, statusValue);
+      }
+
+      return loc === filterValue;
     }
 
     function showNotice(element, message, isError = false) {
@@ -1923,7 +1957,7 @@ SN번호복사 / 텍스트
 
       return equipmentRows.filter(row => {
         const matchQ = !q || `${row.장비명 || ""} ${row.SN번호 || ""} ${row.자체일련번호 || ""} ${row.규격 || ""} ${modelName(row) || ""}`.toLowerCase().includes(q);
-        const matchLocation = !location || (row.배치장소 || "미지정") === location;
+        const matchLocation = matchesLocationFilter(row.배치장소, location, row.장비상태등);
         const matchModel = !modelId || (row.장비모델 || "") === modelId;
         const matchStatus = !status || row.장비상태등 === status;
         return matchQ && matchLocation && matchModel && matchStatus;
@@ -2524,7 +2558,7 @@ SN번호복사 / 텍스트
           return text.includes(q);
         });
       }
-      if (location) rows = rows.filter(row => row.이번달위치 === location);
+      if (location) rows = rows.filter(row => matchesLocationFilter(row.이번달위치, location, row.이번달상태));
       if (modelId) rows = rows.filter(row => monthlyModelId(row) === modelId);
       if (checkedFilter === "checked") rows = rows.filter(row => row.확인여부);
       if (checkedFilter === "unchecked") rows = rows.filter(row => !row.확인여부);
@@ -2937,7 +2971,7 @@ SN번호복사 / 텍스트
           return text.includes(q);
         });
       }
-      if (location) rows = rows.filter(row => row.이번달위치 === location);
+      if (location) rows = rows.filter(row => matchesLocationFilter(row.이번달위치, location, row.이번달상태));
       if (status) rows = rows.filter(row => row.이번달상태 === status);
 
       $("#photoReviewSummary").textContent = `조회 결과 ${rows.length}건 · 사진은 필요한 장비에서만 개별로 불러옵니다.`;
