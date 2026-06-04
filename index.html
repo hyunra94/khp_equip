@@ -2399,38 +2399,42 @@ SN번호복사 / 텍스트
       const button = $("#generateMonthlyBtn");
 
       button.disabled = true;
-      showNotice($("#monthlyMsg"), `${formatMonth(month)} 현황을 생성하는 중입니다. 장비 원장을 8개씩 나눠 처리합니다.`);
-
-      let cursor = "";
-      let totalCreated = 0;
-      let totalSkipped = 0;
-      let totalProcessed = 0;
+      showNotice($("#monthlyMsg"), `${formatMonth(month)} 현황을 생성하는 중입니다. 장비 원장 목록 기준으로 1건씩 안전하게 생성합니다.`);
 
       try {
-        for (let step = 1; step <= 200; step++) {
-          const data = await api("/api/monthly/generate", {
+        if (!equipmentRows.length) {
+          await loadEquipment();
+        }
+
+        const targets = equipmentRows.filter(row =>
+          row.자산유형 === "장비" &&
+          row.월별현황포함 === true &&
+          (row.사용상태 === "사용중" || row.사용상태 === "보관")
+        );
+
+        let created = 0;
+        let skipped = 0;
+        let processed = 0;
+
+        for (const row of targets) {
+          const data = await api("/api/monthly/ensure", {
             method: "POST",
-            body: JSON.stringify({ month, cursor, limit: 8 })
+            body: JSON.stringify({ month, equipment: row })
           });
 
-          totalCreated += Number(data.created || 0);
-          totalSkipped += Number(data.skipped || 0);
-          totalProcessed += Number(data.processed || 0);
-          cursor = data.nextCursor || "";
+          created += Number(data.created || 0);
+          skipped += Number(data.skipped || 0);
+          processed += 1;
 
           showNotice(
             $("#monthlyMsg"),
-            `${formatMonth(month)} 생성 중 · 처리 ${totalProcessed}건 · 신규 ${totalCreated}건 · 기존 ${totalSkipped}건`
+            `${formatMonth(month)} 생성 중 · 처리 ${processed}/${targets.length}건 · 신규 ${created}건 · 기존 ${skipped}건`
           );
 
-          if (data.done) {
-            showNotice($("#monthlyMsg"), `${formatMonth(month)} 생성 완료 · 처리 ${totalProcessed}건 · 신규 ${totalCreated}건 · 기존 ${totalSkipped}건`);
-            break;
-          }
-
-          await wait(250);
+          await wait(120);
         }
 
+        showNotice($("#monthlyMsg"), `${formatMonth(month)} 생성 완료 · 처리 ${processed}건 · 신규 ${created}건 · 기존 ${skipped}건`);
         await loadMonthly(false);
       } catch (error) {
         showNotice($("#monthlyMsg"), error.message, true);
