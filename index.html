@@ -2406,11 +2406,29 @@ SN번호복사 / 텍스트
           await loadEquipment();
         }
 
-        const targets = equipmentRows.filter(row =>
-          row.자산유형 === "장비" &&
-          row.월별현황포함 === true &&
-          (row.사용상태 === "사용중" || row.사용상태 === "보관")
-        );
+        const targets = equipmentRows.filter(row => {
+          // 현재는 기존 장비 원장 데이터가 여러 형식으로 들어와 있어,
+          // 기본적으로 "불러온 장비 원장 전체"를 생성 대상으로 봅니다.
+          // 단, 명확히 제외/폐기/소프트웨어/유지보수로 표시된 항목만 제외합니다.
+          const assetType = String(row.자산유형 || "").trim();
+          const usageStatus = String(row.사용상태 || "").trim();
+          const equipmentStatus = String(row.장비상태등 || "").trim();
+
+          const excludedAsset = ["소프트웨어", "유지보수", "소모품"].includes(assetType);
+          const excludedUsage = ["제외", "폐기"].includes(usageStatus);
+          const excludedStatus = equipmentStatus === "폐기";
+
+          return !excludedAsset && !excludedUsage && !excludedStatus;
+        });
+
+        if (!targets.length) {
+          showNotice(
+            $("#monthlyMsg"),
+            `생성 대상이 0건입니다. 현재 불러온 장비 원장 ${equipmentRows.length}건 중 제외 조건에 모두 걸렸습니다. 장비관리대장에서 새로고침 후 다시 시도하세요.`,
+            true
+          );
+          return;
+        }
 
         let created = 0;
         let skipped = 0;
