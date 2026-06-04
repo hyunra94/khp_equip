@@ -694,6 +694,60 @@
 
 
 
+
+    .photo-review-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .photo-review-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .photo-review-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .monthly-photo-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .photo-input {
+      max-width: 280px;
+      font-size: 13px;
+    }
+
+    details.model-group-card > summary {
+      list-style: none;
+      cursor: pointer;
+    }
+
+    details.model-group-card > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.model-group-card:not([open]) .model-group-head {
+      border-bottom: 0;
+    }
+
+    .model-open-hint {
+      color: var(--sub);
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
     .mode-toggle {
       display: inline-flex;
       gap: 6px;
@@ -1244,6 +1298,7 @@
         <button class="active" data-view="dashboardView">대시보드</button>
         <button data-view="equipmentView">장비관리대장</button>
         <button data-view="monthlyView">월별 위치·상태 확인</button>
+        <button data-view="photoReviewView">점검 사진 확인</button>
         <button data-view="addView" id="addNavBtn">신규 장비 등록</button>
         <button data-view="schemaView">DB 속성표</button>
       </nav>
@@ -1392,6 +1447,34 @@
               <div class="list-summary" id="monthlySummary"></div>
               <div id="monthlyMsg" class="notice hidden"></div>
               <div class="monthly-list" id="monthlyList"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="photoReviewView">
+          <div class="section-head">
+            <div>
+              <h1>점검 사진 확인</h1>
+              <p>월별 점검 사진을 장비별로 확인합니다. 사진은 필요 항목만 개별로 불러옵니다.</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">월별 점검 사진</h2>
+                <div class="card-sub">전체 PDF 출력 대신, 팀장이 화면에서 필요한 장비 사진만 확인하는 용도입니다.</div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="toolbar">
+                <input class="input" type="month" id="photoReviewMonth" />
+                <select class="select" id="photoReviewLocationFilter"></select>
+                <select class="select" id="photoReviewStatusFilter"></select>
+                <button class="btn primary" id="photoReviewReloadBtn">조회</button>
+              </div>
+              <div class="list-summary" id="photoReviewSummary"></div>
+              <div class="photo-review-list" id="photoReviewList"></div>
             </div>
           </div>
         </section>
@@ -1699,7 +1782,8 @@ SN번호복사 / 텍스트
         equipmentView: "장비관리대장",
         monthlyView: "월별 위치·상태 확인",
         addView: "신규 장비 등록",
-        schemaView: "DB 속성표"
+        schemaView: "DB 속성표",
+        photoReviewView: "점검 사진 확인"
       };
 
       if ($("#pageTitle")) $("#pageTitle").textContent = labels[viewId] || "장비 현황 관리";
@@ -1926,8 +2010,8 @@ SN번호복사 / 텍스트
       const statuses = summarizeBy(rows, "장비상태등", "상태없음").slice(0, 3);
 
       return `
-        <section class="model-group-card">
-          <div class="model-group-head">
+        <details class="model-group-card">
+          <summary class="model-group-head">
             ${photo}
             <div class="model-title">
               <strong>${escapeHtml(group.name)}</strong>
@@ -1937,8 +2021,9 @@ SN번호복사 / 텍스트
               <span class="badge dark">전체 ${rows.length}개</span>
               ${locations.map(([name, count]) => `<span class="badge gray">${escapeHtml(name)} ${count}</span>`).join("")}
               ${statuses.map(([name, count]) => `<span class="badge ${statusClass(name)}">${escapeHtml(name)} ${count}</span>`).join("")}
+              <span class="model-open-hint">클릭해서 펼치기</span>
             </div>
-          </div>
+          </summary>
 
           <div class="model-equipment-table">
             ${rows.map(row => `
@@ -1969,7 +2054,7 @@ SN번호복사 / 텍스트
               ${row.id === selectedEquipmentId ? equipmentInlineDetailHtml(row) : ""}
             `).join("")}
           </div>
-        </section>
+        </details>
       `;
     }
 
@@ -2325,6 +2410,8 @@ SN번호복사 / 텍스트
       $$(".save-monthly-btn").forEach(button => {
         button.addEventListener("click", () => saveMonthly(button.closest(".monthly-card")));
       });
+
+      bindMonthlyPhotoButtons($("#monthlyList"));
     }
 
     function monthlyCardHtml(row) {
@@ -2359,8 +2446,80 @@ SN번호복사 / 텍스트
           <div class="toolbar" style="margin:0;">
             <button class="btn primary save-monthly-btn">확인 완료 저장</button>
           </div>
+
+          <div class="monthly-photo-actions">
+            <input class="input photo-input monthly-photo-file" type="file" accept="image/*" multiple />
+            <button class="btn ghost upload-monthly-photo-btn" type="button">점검사진 업로드</button>
+            <button class="btn" type="button" data-photo-target="${escapeHtml(row.id)}">점검사진 보기</button>
+          </div>
+          <div class="monthly-photos-area"></div>
         </article>
       `;
+    }
+
+    async function loadMonthlyPhotos(rowId, area) {
+      area.innerHTML = `<div class="notice">점검사진을 불러오는 중입니다.</div>`;
+
+      try {
+        const data = await api(`/api/monthly/${encodeURIComponent(rowId)}/photos`);
+        const photos = data.photos || [];
+        area.innerHTML = photos.length
+          ? `<div class="photos-grid">${photos.map(photo => `<img src="${escapeHtml(photo.url)}" alt="">`).join("")}</div>`
+          : `<div class="notice">조회된 점검사진이 없습니다.</div>`;
+      } catch (error) {
+        area.innerHTML = `<div class="notice error">${escapeHtml(error.message)}</div>`;
+      }
+    }
+
+    async function uploadMonthlyPhotos(card) {
+      const id = card.dataset.id;
+      const fileInput = card.querySelector(".monthly-photo-file");
+      const files = fileInput?.files || [];
+      const area = card.querySelector(".monthly-photos-area");
+
+      if (!files.length) {
+        area.innerHTML = `<div class="notice error">업로드할 사진을 선택하세요.</div>`;
+        return;
+      }
+
+      const formData = new FormData();
+      [...files].forEach(file => formData.append("photos", file));
+
+      const token = localStorage.getItem("eq_token") || "";
+      area.innerHTML = `<div class="notice">점검사진을 업로드하는 중입니다.</div>`;
+
+      try {
+        const response = await fetch(`${API_BASE}/api/monthly/${encodeURIComponent(id)}/photos`, {
+          method: "POST",
+          headers: {
+            ...(token ? { Authorization: `Bearer ${token}` } : {})
+          },
+          body: formData
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error || "점검사진 업로드 중 오류가 발생했습니다.");
+
+        fileInput.value = "";
+        area.innerHTML = `<div class="notice">점검사진 ${data.count || 0}개 업로드 완료</div>`;
+        await loadMonthlyPhotos(id, area);
+      } catch (error) {
+        area.innerHTML = `<div class="notice error">${escapeHtml(error.message)}</div>`;
+      }
+    }
+
+    function bindMonthlyPhotoButtons(scope = document) {
+      scope.querySelectorAll("[data-photo-target]").forEach(button => {
+        button.addEventListener("click", () => {
+          const card = button.closest(".monthly-card, .photo-review-card");
+          const area = card.querySelector(".monthly-photos-area, .photo-review-photos-area");
+          loadMonthlyPhotos(button.dataset.photoTarget, area);
+        });
+      });
+
+      scope.querySelectorAll(".upload-monthly-photo-btn").forEach(button => {
+        button.addEventListener("click", () => uploadMonthlyPhotos(button.closest(".monthly-card")));
+      });
     }
 
     async function saveMonthly(card) {
@@ -2602,6 +2761,56 @@ SN번호복사 / 텍스트
       resizer.addEventListener("touchstart", start, { passive: false });
     }
 
+    async function loadPhotoReview() {
+      const month = $("#photoReviewMonth")?.value || monthNow();
+      if ($("#monthlyMonth")) $("#monthlyMonth").value = month;
+
+      $("#photoReviewList").innerHTML = `<div class="notice">월별 현황을 불러오는 중입니다.</div>`;
+
+      try {
+        const data = await api(`/api/monthly?month=${encodeURIComponent(month)}`);
+        monthlyRows = data.rows || [];
+        renderPhotoReviewList();
+      } catch (error) {
+        $("#photoReviewList").innerHTML = `<div class="notice error">${escapeHtml(error.message)}</div>`;
+      }
+    }
+
+    function renderPhotoReviewList() {
+      const location = $("#photoReviewLocationFilter")?.value || "";
+      const status = $("#photoReviewStatusFilter")?.value || "";
+
+      let rows = [...monthlyRows];
+      if (location) rows = rows.filter(row => row.이번달위치 === location);
+      if (status) rows = rows.filter(row => row.이번달상태 === status);
+
+      $("#photoReviewSummary").textContent = `조회 결과 ${rows.length}건 · 사진은 필요한 장비에서만 개별로 불러옵니다.`;
+
+      $("#photoReviewList").innerHTML = rows.length
+        ? rows.map(row => `
+          <article class="photo-review-card" data-id="${escapeHtml(row.id)}">
+            <div class="photo-review-head">
+              <div>
+                <div style="font-weight:900;letter-spacing:-.04em;">${escapeHtml(row.장비명복사 || "-")}</div>
+                <div class="small" style="color:var(--sub);font-size:13px;margin-top:4px;">
+                  ${escapeHtml(row.이번달위치 || "-")} · ${escapeHtml(row.이번달상태 || "-")} · 확인자 ${escapeHtml(row.확인자명복사 || "-")}
+                </div>
+                ${row.메모 ? `<div class="small" style="margin-top:6px;">메모: ${escapeHtml(row.메모)}</div>` : ""}
+              </div>
+              <span class="badge ${row.확인여부 ? "normal" : "need"}">${row.확인여부 ? "확인완료" : "미확인"}</span>
+            </div>
+            <div class="toolbar" style="margin:0;">
+              <button class="btn" type="button" data-photo-target="${escapeHtml(row.id)}">점검사진 보기</button>
+              ${row.url ? `<a class="btn ghost" href="${escapeHtml(row.url)}" target="_blank" rel="noreferrer">노션에서 열기</a>` : ""}
+            </div>
+            <div class="photo-review-photos-area"></div>
+          </article>
+        `).join("")
+        : `<div class="empty">조회된 월별 현황이 없습니다.</div>`;
+
+      bindMonthlyPhotoButtons($("#photoReviewList"));
+    }
+
     function onIfExists(selector, eventName, handler) {
       const el = $(selector);
       if (el) el.addEventListener(eventName, handler);
@@ -2694,6 +2903,9 @@ SN번호복사 / 텍스트
       onIfExists("#monthlyLocationFilter", "change", renderMonthlyList);
       onIfExists("#monthlyCheckedFilter", "change", renderMonthlyList);
       onIfExists("#generateMonthlyBtn", "click", generateMonthly);
+      onIfExists("#photoReviewReloadBtn", "click", loadPhotoReview);
+      onIfExists("#photoReviewLocationFilter", "change", renderPhotoReviewList);
+      onIfExists("#photoReviewStatusFilter", "change", renderPhotoReviewList);
 
       onIfExists("#newModel", "change", applySelectedModelToForm);
       onIfExists("#addForm", "submit", submitAddForm);
@@ -2714,6 +2926,8 @@ SN번호복사 / 텍스트
       setHtmlIfExists("#equipmentModelFilter", `<option value="">장비모델 전체</option>`);
       setHtmlIfExists("#equipmentStatusFilter", optionHtml(statuses, "", "상태 전체"));
       setHtmlIfExists("#monthlyLocationFilter", optionHtml(locations, "", "위치 전체"));
+      setHtmlIfExists("#photoReviewLocationFilter", optionHtml(locations, "", "위치 전체"));
+      setHtmlIfExists("#photoReviewStatusFilter", optionHtml(statuses, "", "상태 전체"));
       setHtmlIfExists("#newLocation", optionHtml(locations, "XR실"));
       setHtmlIfExists("#newStatus", optionHtml(statuses, "정상"));
       setHtmlIfExists("#newUsageStatus", optionHtml(usageStatuses, "사용중"));
@@ -2723,6 +2937,7 @@ SN번호복사 / 텍스트
       const now = monthNow();
       setValueIfExists("#dashMonth", now);
       setValueIfExists("#monthlyMonth", now);
+      setValueIfExists("#photoReviewMonth", now);
       if ($("#monthChip")) $("#monthChip").textContent = formatMonth(now);
     }
 
