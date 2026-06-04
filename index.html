@@ -2399,30 +2399,32 @@ SN번호복사 / 텍스트
       const button = $("#generateMonthlyBtn");
 
       button.disabled = true;
-      showNotice($("#monthlyMsg"), `${formatMonth(month)} 현황을 생성하는 중입니다. 20개씩 나눠서 생성합니다.`);
+      showNotice($("#monthlyMsg"), `${formatMonth(month)} 현황을 생성하는 중입니다. 장비 원장을 8개씩 나눠 처리합니다.`);
 
+      let cursor = "";
       let totalCreated = 0;
-      let lastSkipped = 0;
-      let target = 0;
+      let totalSkipped = 0;
+      let totalProcessed = 0;
 
       try {
-        for (let step = 1; step <= 80; step++) {
+        for (let step = 1; step <= 200; step++) {
           const data = await api("/api/monthly/generate", {
             method: "POST",
-            body: JSON.stringify({ month, limit: 20 })
+            body: JSON.stringify({ month, cursor, limit: 8 })
           });
 
           totalCreated += Number(data.created || 0);
-          lastSkipped = Number(data.skipped || 0);
-          target = Number(data.target || target || 0);
+          totalSkipped += Number(data.skipped || 0);
+          totalProcessed += Number(data.processed || 0);
+          cursor = data.nextCursor || "";
 
           showNotice(
             $("#monthlyMsg"),
-            `${formatMonth(month)} 생성 중 · 신규 ${totalCreated}건 · 기존 ${lastSkipped}건 · 남은 ${data.remaining || 0}건`
+            `${formatMonth(month)} 생성 중 · 처리 ${totalProcessed}건 · 신규 ${totalCreated}건 · 기존 ${totalSkipped}건`
           );
 
           if (data.done) {
-            showNotice($("#monthlyMsg"), `${formatMonth(month)} 생성 완료 · 신규 ${totalCreated}건 · 기존 ${lastSkipped}건`);
+            showNotice($("#monthlyMsg"), `${formatMonth(month)} 생성 완료 · 처리 ${totalProcessed}건 · 신규 ${totalCreated}건 · 기존 ${totalSkipped}건`);
             break;
           }
 
