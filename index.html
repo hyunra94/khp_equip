@@ -1422,6 +1422,101 @@
       .card-body { padding: 16px; }
       .toolbar .input, .toolbar .select, .toolbar .btn { flex-basis: 100%; }
     }
+
+
+    .clickable-photo {
+      cursor: pointer;
+      transition: transform .12s ease-out, box-shadow .12s ease-out;
+    }
+
+    .clickable-photo:hover {
+      transform: scale(1.04);
+      box-shadow: 0 8px 18px rgba(31, 58, 95, 0.18);
+    }
+
+    .monthly-check-filter {
+      margin-left: auto;
+    }
+
+    .monthly-group-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .monthly-group-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 8px 22px rgba(31, 41, 55, 0.04);
+    }
+
+    .monthly-group-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 16px;
+      background: #fbfdff;
+      border-bottom: 1px solid var(--line);
+      cursor: pointer;
+    }
+
+    .monthly-group-title strong {
+      display: block;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+    }
+
+    .monthly-group-title span {
+      display: block;
+      color: var(--sub);
+      font-size: 12px;
+      font-weight: 750;
+      margin-top: 4px;
+    }
+
+    .monthly-group-body {
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+    }
+
+    details.monthly-group-card > summary {
+      list-style: none;
+    }
+
+    details.monthly-group-card > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.monthly-group-card:not([open]) .monthly-group-head {
+      border-bottom: 0;
+    }
+
+    @media (max-width: 840px) {
+      .monthly-check-filter {
+        margin-left: 0;
+        width: 100%;
+      }
+    }
+
+    .site-footer {
+      margin-top: 34px;
+      padding: 18px 8px 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 750;
+      text-align: center;
+    }
+
+    .site-footer span {
+      color: var(--primary);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+    }
+
   </style>
 </head>
 <body>
@@ -1603,16 +1698,18 @@
                 <input class="input" id="monthlySearch" placeholder="장비명, 관리번호, SN 검색" />
                 <select class="select" id="monthlyLocationFilter"></select>
                 <select class="select" id="monthlyModelFilter"></select>
-                <select class="select" id="monthlyCheckedFilter">
-                  <option value="">확인 여부 전체</option>
-                  <option value="unchecked">미확인만</option>
-                  <option value="checked">확인 완료만</option>
-                  <option value="issue">조치 필요만</option>
-                </select>
                 <button class="btn" id="monthlyReloadBtn">조회</button>
                 <div class="mode-toggle" id="monthlyModeToggle">
                   <button type="button" data-mode="list" class="active">개별 장비</button>
                   <button type="button" data-mode="model">모델별</button>
+                  <button type="button" data-mode="location">위치별</button>
+                  <button type="button" data-mode="status">상태별</button>
+                </div>
+                <div class="mode-toggle monthly-check-filter" id="monthlyCheckToggle">
+                  <button type="button" data-filter="" class="active">확인 전체</button>
+                  <button type="button" data-filter="unchecked">미확인</button>
+                  <button type="button" data-filter="checked">확인완료</button>
+                  <button type="button" data-filter="issue">조치필요</button>
                 </div>
               </div>
               <div class="list-summary" id="monthlySummary"></div>
@@ -1855,6 +1952,10 @@ SN번호복사 / 텍스트
             </div>
           </div>
         </section>
+
+        <footer class="site-footer">
+          Copyright © <span>rh+</span>. All rights reserved.
+        </footer>
       </div>
     </main>
   </section>
@@ -1874,6 +1975,7 @@ SN번호복사 / 텍스트
     let modelRows = [];
     let equipmentViewMode = localStorage.getItem('equipment_view_mode') || 'list';
     let monthlyViewMode = localStorage.getItem('monthly_view_mode') || 'list';
+    let monthlyCheckFilter = localStorage.getItem('monthly_check_filter') || '';
     let selectedMonthlyId = '';
     let monthlyRows = [];
     let selectedEquipmentId = "";
@@ -2444,8 +2546,8 @@ SN번호복사 / 텍스트
       const active = selectable && row.id === selectedEquipmentId ? " active" : "";
       const photoUrl = effectivePhotoUrl(row);
       const photo = photoUrl
-        ? `<img class="eq-photo" src="${escapeHtml(photoUrl)}" alt="">`
-        : `<div class="eq-photo">EQ</div>`;
+        ? `<img class="eq-photo clickable-photo monthly-equipment-photo" src="${escapeHtml(photoUrl)}" alt="" title="장비관리대장 상세 보기">`
+        : `<div class="eq-photo clickable-photo monthly-equipment-photo" title="장비관리대장 상세 보기">EQ</div>`;
 
       const rowHtml = `
         <article class="equipment-card equipment-row${active}" data-id="${escapeHtml(row.id)}">
@@ -2454,7 +2556,7 @@ SN번호복사 / 텍스트
             <div class="eq-cell eq-name">
               <span class="eq-label">장비명</span>
               <span class="eq-value">${escapeHtml(row.장비명 || "-")}</span>
-              <span class="eq-sub">${modelName(row) ? "모델 " + escapeHtml(modelName(row)) + " · " : ""}SN ${escapeHtml(row.SN번호 || "-")}</span>
+              <span class="eq-sub">${modelName(row) ? "모델 " + escapeHtml(modelName(row)) + " · " : ""}자체일련번호 ${escapeHtml(row.자체일련번호 || "-")}</span>
             </div>
           </div>
 
@@ -2475,8 +2577,8 @@ SN번호복사 / 텍스트
           </div>
 
           <div class="eq-cell">
-            <span class="eq-label">취득년월일</span>
-            <span class="eq-value">${escapeHtml(row.취득년월일 || "-")}</span>
+            <span class="eq-label">입고일</span>
+            <span class="eq-value">${escapeHtml(inboundDate(row) || "-")}</span>
             <span class="eq-sub">${money(row.취득가격)}</span>
           </div>
 
@@ -2515,7 +2617,9 @@ SN번호복사 / 텍스트
         </div>
         ${cover}
 
-        <div class="kv"><div class="k">① SN번호</div><div class="v">${escapeHtml(row.SN번호 || "-")}</div></div>
+        <div class="kv"><div class="k">자체일련번호</div><div class="v">${escapeHtml(row.자체일련번호 || "-")}</div></div>
+        <div class="kv"><div class="k">SN번호</div><div class="v">${escapeHtml(row.SN번호 || "-")}</div></div>
+        <div class="kv"><div class="k">입고일</div><div class="v">${escapeHtml(inboundDate(row) || "-")}</div></div>
         <div class="kv"><div class="k">② 작성년월일</div><div class="v">${escapeHtml(row.작성년월일 || "-")}</div></div>
         <div class="kv"><div class="k">③ 장비명</div><div class="v">${escapeHtml(row.장비명 || "-")}</div></div>
         <div class="kv"><div class="k">장비모델</div><div class="v">${escapeHtml(modelName(row) || "-")}</div></div>
@@ -2608,6 +2712,25 @@ SN번호복사 / 텍스트
     }
 
 
+    function inboundDate(row) {
+      return row?.입고일 || row?.취득년월일 || "";
+    }
+
+    function openEquipmentDetailFromMonthly(row) {
+      const eq = equipmentForMonthly(row);
+      if (!eq) return;
+
+      selectedEquipmentId = eq.id;
+      showView("equipmentView");
+      renderEquipmentList();
+      renderEquipmentDetail();
+
+      setTimeout(() => {
+        const detail = $("#equipmentDetail");
+        if (detail) detail.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 80);
+    }
+
     function equipmentForMonthly(row) {
       return equipmentRows.find(eq => eq.id === row.장비) || null;
     }
@@ -2652,6 +2775,9 @@ SN번호복사 / 텍스트
       $$("#monthlyModeToggle button").forEach(btn => {
         btn.classList.toggle("active", btn.dataset.mode === monthlyViewMode);
       });
+      $$("#monthlyCheckToggle button").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.filter === monthlyCheckFilter);
+      });
 
       renderMonthlyList();
     }
@@ -2673,6 +2799,50 @@ SN번호복사 / 텍스트
       });
 
       return [...groups.values()].sort((a, b) => a.name.localeCompare(b.name, "ko"));
+    }
+
+    function groupMonthlyRowsByLocation(rows) {
+      const groups = new Map();
+      rows.forEach(row => {
+        const key = row.이번달위치 || "기타";
+        if (!groups.has(key)) groups.set(key, { name: key, rows: [] });
+        groups.get(key).rows.push(row);
+      });
+      return [...groups.values()].sort((a, b) => a.name.localeCompare(b.name, "ko"));
+    }
+
+    function groupMonthlyRowsByStatus(rows) {
+      const groups = new Map();
+      rows.forEach(row => {
+        const key = row.이번달상태 || "상태없음";
+        if (!groups.has(key)) groups.set(key, { name: key, rows: [] });
+        groups.get(key).rows.push(row);
+      });
+      return [...groups.values()].sort((a, b) => a.name.localeCompare(b.name, "ko"));
+    }
+
+    function monthlySimpleGroupHtml(group, type = "location") {
+      const rows = group.rows;
+      const checkedCount = rows.filter(row => row.확인여부).length;
+      const titleLabel = type === "status" ? "상태" : "위치";
+
+      return `
+        <details class="monthly-group-card">
+          <summary class="monthly-group-head">
+            <div class="monthly-group-title">
+              <strong>${escapeHtml(group.name)}</strong>
+              <span>${titleLabel} 기준 묶음</span>
+            </div>
+            <div class="model-summary">
+              <span class="badge dark">전체 ${rows.length}개</span>
+              <span class="badge ${checkedCount === rows.length ? "normal" : "need"}">확인 ${checkedCount}/${rows.length}</span>
+            </div>
+          </summary>
+          <div class="monthly-group-body">
+            ${rows.map(row => monthlyCardHtml(row)).join("")}
+          </div>
+        </details>
+      `;
     }
 
     function monthlyModelGroupHtml(group) {
@@ -2714,7 +2884,7 @@ SN번호복사 / 텍스트
       const q = ($("#monthlySearch")?.value || "").trim().toLowerCase();
       const location = $("#monthlyLocationFilter").value;
       const modelId = $("#monthlyModelFilter")?.value || "";
-      const checkedFilter = $("#monthlyCheckedFilter").value;
+      const checkedFilter = monthlyCheckFilter;
 
       let rows = [...monthlyRows];
 
@@ -2756,9 +2926,24 @@ SN번호복사 / 텍스트
         return;
       }
 
-      $("#monthlyList").innerHTML = monthlyViewMode === "model"
-        ? `<div class="model-group-list">${groupMonthlyRowsByModel(rows).map(monthlyModelGroupHtml).join("")}</div>`
-        : rows.map(row => monthlyCardHtml(row)).join("");
+      if (monthlyViewMode === "model") {
+        $("#monthlyList").innerHTML = `<div class="model-group-list">${groupMonthlyRowsByModel(rows).map(monthlyModelGroupHtml).join("")}</div>`;
+      } else if (monthlyViewMode === "location") {
+        $("#monthlyList").innerHTML = `<div class="monthly-group-list">${groupMonthlyRowsByLocation(rows).map(group => monthlySimpleGroupHtml(group, "location")).join("")}</div>`;
+      } else if (monthlyViewMode === "status") {
+        $("#monthlyList").innerHTML = `<div class="monthly-group-list">${groupMonthlyRowsByStatus(rows).map(group => monthlySimpleGroupHtml(group, "status")).join("")}</div>`;
+      } else {
+        $("#monthlyList").innerHTML = rows.map(row => monthlyCardHtml(row)).join("");
+      }
+
+      $$(".monthly-equipment-photo").forEach(photo => {
+        photo.addEventListener("click", (event) => {
+          event.stopPropagation();
+          const card = photo.closest(".monthly-card");
+          const row = monthlyRows.find(item => item.id === card?.dataset.id);
+          if (row) openEquipmentDetailFromMonthly(row);
+        });
+      });
 
       $$(".quick-monthly-check").forEach(input => {
         input.addEventListener("change", () => quickCheckMonthly(input.closest(".monthly-card")));
@@ -2829,12 +3014,14 @@ SN번호복사 / 텍스트
 
             <div class="monthly-row-title">
               <strong>${escapeHtml(row.장비명복사 || "-")}</strong>
-              <span>${monthlyModelName(row)} · SN ${escapeHtml(row.SN번호복사 || "-")}</span>
+              <span>${monthlyModelName(row)} · 자체일련번호 ${escapeHtml(row.자체일련번호복사 || "-")}</span>
             </div>
 
             <div class="monthly-cell">
               <span class="cell-label">규격</span>
               <span class="cell-main">${escapeHtml(effectiveSpec(eq) || "-")}</span>
+              <span class="cell-label" style="margin-top:4px;">입고일</span>
+              <span class="cell-main">${escapeHtml(inboundDate(eq) || "-")}</span>
             </div>
 
             <div class="monthly-cell monthly-location-cell">
@@ -3349,7 +3536,13 @@ SN번호복사 / 텍스트
       onIfExists("#monthlySearch", "input", renderMonthlyList);
       onIfExists("#monthlyLocationFilter", "change", renderMonthlyList);
       onIfExists("#monthlyModelFilter", "change", renderMonthlyList);
-      onIfExists("#monthlyCheckedFilter", "change", renderMonthlyList);
+      $$("#monthlyCheckToggle button").forEach(button => {
+        button.addEventListener("click", () => {
+          monthlyCheckFilter = button.dataset.filter || "";
+          localStorage.setItem("monthly_check_filter", monthlyCheckFilter);
+          renderMonthlyList();
+        });
+      });
       $$("#monthlyModeToggle button").forEach(button => {
         button.addEventListener("click", () => setMonthlyViewMode(button.dataset.mode));
       });
