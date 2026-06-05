@@ -1526,13 +1526,13 @@
         <div class="brand-mark">EQ</div>
         <div>
           <h1>장비 현황 관리</h1>
-          <p>이름과 보안코드를 입력해 접속하세요.</p>
+          <p>사용자명은 이름 세 글자로 입력하세요.</p>
         </div>
       </div>
 
       <form id="loginForm">
         <label class="label">이름</label>
-        <input id="loginName" class="input" type="text" placeholder="예: 관리자" autocomplete="username" style="width:100%;margin-bottom:12px;" />
+        <input id="loginName" class="input" type="text" placeholder="이름 세 글자 입력" autocomplete="username" style="width:100%;margin-bottom:12px;" />
 
         <label class="label">보안코드</label>
         <input id="loginCode" class="input" type="password" inputmode="numeric" placeholder="4자리 또는 6자리" style="width:100%;margin-bottom:16px;" />
@@ -2994,6 +2994,14 @@ SN번호복사 / 텍스트
             </div>
 
             <div class="small" style="color:var(--sub);font-size:13px;">확인자: ${escapeHtml(row.확인자명복사 || "-")} · 확인일: ${escapeHtml(row.확인일 || "-")}</div>
+
+            ${currentUser?.role === "admin" ? `
+              <div class="notice" style="margin:0;">
+                <div style="font-weight:900;margin-bottom:4px;">관리자 확인 정보</div>
+                <div>확인자: ${escapeHtml(row.확인자명복사 || "-")} · 확인일: ${escapeHtml(row.확인일 || "-")} · 마지막수정일: ${escapeHtml(row.마지막수정일 || "-")}</div>
+                <div style="margin-top:4px;">현재 저장값: 위치 ${escapeHtml(row.이번달위치 || "-")} / 상태 ${escapeHtml(row.이번달상태 || "-")} / 메모 ${escapeHtml(row.메모 || "-")}</div>
+              </div>
+            ` : ""}
 
             <div class="monthly-photo-actions">
               <button class="btn primary save-monthly-detail-btn" type="button">상세 저장</button>
