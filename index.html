@@ -2144,8 +2144,6 @@ SN번호복사 / 텍스트
     }
 
     async function loadLoginUsers() {
-      // 이름은 직원의 실제 이름 세글자를 직접 입력합니다.
-      // 사용자 목록을 불러와도 placeholder를 특정 사용자명으로 바꾸지 않습니다.
       const input = $("#loginName");
       if (input) input.placeholder = "이름 세글자";
     }
@@ -2669,11 +2667,21 @@ SN번호복사 / 텍스트
         </div>
         <div id="photosArea"></div>
         <div id="modelPhotosArea"></div>
+
+        <div class="monthly-detail" style="margin-top:16px;">
+          <div style="font-weight:900;color:var(--primary);">⑭ 유지보수</div>
+          <textarea id="maintenanceText" class="textarea" placeholder="유지보수 이력, 수리 내역, 점검 필요사항">${escapeHtml(maintenanceText(row) || "")}</textarea>
+          <div class="toolbar" style="margin:0;">
+            <button class="btn primary" id="saveMaintenanceBtn" type="button">유지보수 저장</button>
+          </div>
+        </div>
       `;
 
       $("#loadPhotosBtn").addEventListener("click", loadPhotos);
       const modelPhotosBtn = $("#loadModelPhotosBtn");
       if (modelPhotosBtn) modelPhotosBtn.addEventListener("click", loadModelPhotos);
+      const saveMaintenanceBtn = $("#saveMaintenanceBtn");
+      if (saveMaintenanceBtn) saveMaintenanceBtn.addEventListener("click", saveMaintenance);
       $("#closeDetailBtn").addEventListener("click", () => {
         selectedEquipmentId = "";
         renderEquipmentList();
@@ -2699,6 +2707,37 @@ SN번호복사 / 텍스트
       }
     }
 
+
+    async function saveMaintenance() {
+      const row = equipmentRows.find(item => item.id === selectedEquipmentId);
+      if (!row) return;
+
+      const button = $("#saveMaintenanceBtn");
+      const value = $("#maintenanceText")?.value || "";
+
+      if (button) {
+        button.disabled = true;
+        button.textContent = "저장 중";
+      }
+
+      try {
+        await api(`/api/equipment/${encodeURIComponent(row.id)}/maintenance`, {
+          method: "PATCH",
+          body: JSON.stringify({ 유지보수: value })
+        });
+
+        row.유지보수 = value;
+        renderEquipmentList();
+        renderEquipmentDetail();
+      } catch (error) {
+        alert(error.message);
+      } finally {
+        if (button) {
+          button.disabled = false;
+          button.textContent = "유지보수 저장";
+        }
+      }
+    }
 
     async function loadModelPhotos() {
       const row = equipmentRows.find(item => item.id === selectedEquipmentId);
@@ -2747,6 +2786,30 @@ SN번호복사 / 텍스트
       return !row.확인여부 || row.이번달위치 !== row.원장기준배치장소 || row.이번달상태 !== "정상" || Boolean((row.메모 || "").trim());
     }
 
+
+    function loanPersonFromMemo(value = "") {
+      const text = String(value || "");
+      const match = text.match(/대여(?:처|자)?\s*[:：]\s*([^\n]+)/);
+      return match ? match[1].trim() : "";
+    }
+
+    function memoWithoutLoan(value = "") {
+      return String(value || "")
+        .split(/\n+/)
+        .filter(line => !/^대여(?:처|자)?\s*[:：]/.test(line.trim()))
+        .join("\n")
+        .trim();
+    }
+
+    function mergeLoanMemo(loanPerson = "", memo = "") {
+      const cleanLoan = String(loanPerson || "").trim();
+      const cleanMemo = memoWithoutLoan(memo);
+      return [cleanLoan ? `대여처: ${cleanLoan}` : "", cleanMemo].filter(Boolean).join("\n");
+    }
+
+    function isLoanRow(row) {
+      return isRentalValue(row?.이번달위치, row?.이번달상태);
+    }
 
     function inboundDate(row) {
       return row?.입고일 || row?.취득년월일 || "";
@@ -2986,7 +3049,20 @@ SN번호복사 / 텍스트
       });
 
       $$(".monthly-location").forEach(select => {
-        select.addEventListener("change", () => saveMonthly(select.closest(".monthly-card"), false));
+        select.addEventListener("change", () => {
+          const card = select.closest(".monthly-card");
+          const row = monthlyRows.find(item => item.id === card?.dataset.id);
+
+          if (row) row.이번달위치 = select.value;
+
+          if (isRentalValue(select.value, row?.이번달상태 || "")) {
+            selectedMonthlyId = card.dataset.id;
+            renderMonthlyList();
+            return;
+          }
+
+          saveMonthly(card, false);
+        });
       });
 
       $$(".toggle-monthly-detail-btn").forEach(button => {
@@ -3008,13 +3084,17 @@ SN번호복사 / 텍스트
       const eq = equipmentForMonthly(row);
       const photoUrl = effectivePhotoUrl(eq);
       const photo = photoUrl
-        ? `<img class="eq-photo" src="${escapeHtml(photoUrl)}" alt="">`
-        : `<div class="eq-photo">EQ</div>`;
+        ? `<img class="eq-photo clickable-photo monthly-equipment-photo" src="${escapeHtml(photoUrl)}" alt="" title="장비관리대장 상세 보기">`
+        : `<div class="eq-photo clickable-photo monthly-equipment-photo" title="장비관리대장 상세 보기">EQ</div>`;
 
       const isOpen = selectedMonthlyId === row.id;
       const status = row.이번달상태 || "정상";
       const prev = previousMonthlyFor(row);
       const prevText = prev ? `${prev.이번달위치 || "-"} / ${prev.이번달상태 || "-"}` : "전월 기록 없음";
+      const loanPerson = loanPersonFromMemo(row.메모);
+      const isLoan = isLoanRow(row);
+      const visibleMemo = memoWithoutLoan(row.메모);
+
       const detailHtml = isOpen ? `
           <div class="monthly-detail">
             <div class="monthly-detail-grid">
@@ -3023,8 +3103,13 @@ SN번호복사 / 텍스트
                   ${optionHtml(statuses, status)}
                 </select>
               </label>
-              <label>메모
-                <input class="input monthly-memo" value="${escapeHtml(row.메모 || "")}" placeholder="필요한 경우만 입력" />
+              ${isLoan ? `
+                <label>대여처/대여자
+                  <input class="input monthly-loan-person" value="${escapeHtml(loanPerson)}" placeholder="예: 홍길동, ○○기관, ○○팀" />
+                </label>
+              ` : ""}
+              <label class="${isLoan ? "full" : ""}">메모
+                <input class="input monthly-memo" value="${escapeHtml(visibleMemo)}" placeholder="필요한 경우만 입력" />
               </label>
               <label class="full">점검사진
                 <input class="input monthly-photo-file" type="file" accept="image/*" multiple />
@@ -3075,8 +3160,7 @@ SN번호복사 / 텍스트
               <select class="monthly-inline-location monthly-location">
                 ${optionHtml(locations, row.이번달위치)}
               </select>
-              <span class="cell-label" style="margin-top:4px;">전월 기준</span>
-              <span class="cell-main">${escapeHtml(prevText)}</span>
+              ${isLoan ? `<span class="cell-label" style="margin-top:4px;">대여처</span><span class="cell-main">${escapeHtml(loanPerson || "입력 필요")}</span>` : `<span class="cell-label" style="margin-top:4px;">전월 기준</span><span class="cell-main">${escapeHtml(prevText)}</span>`}
             </div>
 
             <div class="monthly-cell monthly-status-cell">
@@ -3166,7 +3250,14 @@ SN번호복사 / 텍스트
       const nextChecked = checkbox.checked;
       const nextLocation = card.querySelector(".monthly-location").value;
 
-      // 화면은 즉시 반영합니다. 서버 저장은 뒤에서 처리합니다.
+      if (row && isRentalValue(nextLocation, row.이번달상태)) {
+        row.이번달위치 = nextLocation;
+        selectedMonthlyId = id;
+        checkbox.checked = false;
+        renderMonthlyList();
+        return;
+      }
+
       if (row) {
         row.확인여부 = nextChecked;
         row.이번달위치 = nextLocation;
@@ -3199,25 +3290,49 @@ SN번호복사 / 텍스트
     async function saveMonthly(card, markChecked = true) {
       const id = card.dataset.id;
       const button = card.querySelector(".save-monthly-detail-btn");
+      const row = monthlyRows.find(item => item.id === id);
+
+      const nextLocation = card.querySelector(".monthly-location")?.value || row?.이번달위치 || "";
+      const nextStatus = card.querySelector(".monthly-status")?.value || row?.이번달상태 || "정상";
+      const memoValue = card.querySelector(".monthly-memo")?.value || "";
+      const loanValue = card.querySelector(".monthly-loan-person")?.value || "";
+      const nextMemo = isRentalValue(nextLocation, nextStatus) ? mergeLoanMemo(loanValue, memoValue) : memoValue;
+      const nextChecked = markChecked ? true : card.querySelector(".quick-monthly-check")?.checked || false;
+
+      const previous = row ? { ...row } : null;
 
       if (button) {
         button.disabled = true;
         button.textContent = "저장 중";
       }
 
+      if (row) {
+        row.이번달위치 = nextLocation;
+        row.이번달상태 = nextStatus;
+        row.메모 = nextMemo;
+        row.확인여부 = nextChecked;
+        if (nextChecked) {
+          row.확인자명복사 = currentUser?.name || row.확인자명복사 || "";
+          row.확인일 = new Date().toISOString().slice(0, 10);
+        }
+        renderMonthlyList();
+      }
+
       try {
         await api(`/api/monthly/${encodeURIComponent(id)}`, {
           method: "PATCH",
           body: JSON.stringify({
-            이번달위치: card.querySelector(".monthly-location").value,
-            이번달상태: card.querySelector(".monthly-status")?.value || "정상",
-            메모: card.querySelector(".monthly-memo")?.value || "",
-            확인여부: markChecked ? true : card.querySelector(".quick-monthly-check")?.checked || false
+            이번달위치: nextLocation,
+            이번달상태: nextStatus,
+            메모: nextMemo,
+            확인여부: nextChecked
           })
         });
-
-        await loadMonthly(false);
       } catch (error) {
+        if (row && previous) {
+          Object.assign(row, previous);
+          renderMonthlyList();
+        }
         alert(error.message);
       } finally {
         if (button) {
