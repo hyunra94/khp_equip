@@ -1648,6 +1648,10 @@
                   <select class="select" id="equipmentLocationFilter"></select>
                   <select class="select" id="equipmentModelFilter"></select>
                   <select class="select" id="equipmentStatusFilter"></select>
+                  <select class="select" id="equipmentMaintenanceFilter">
+                    <option value="">유지보수 전체</option>
+                    <option value="has">유지보수 있음</option>
+                  </select>
                   <button class="btn refresh" id="equipmentReloadBtn">새로고침</button>
                   <div class="mode-toggle" id="equipmentModeToggle">
                     <button type="button" data-mode="list" class="active">개별 장비</button>
@@ -1839,6 +1843,10 @@
                     <label class="label">⑬ 기타</label>
                     <input class="input" name="기타" />
                   </div>
+                  <div class="form-field full">
+                    <label class="label">⑭ 유지보수</label>
+                    <textarea class="textarea" name="유지보수" placeholder="유지보수 이력, 점검 필요사항, 수리 내역 등"></textarea>
+                  </div>
 
                   <div class="section-divider">사진 정보</div>
 
@@ -1907,6 +1915,7 @@ SN번호 / 텍스트
 취득근거 / 텍스트
 장비상태등 / 선택
 기타 / 텍스트
+유지보수 / 텍스트
 대표사진URL / URL
 자산유형 / 선택
 월별현황포함 / 체크박스
@@ -1978,6 +1987,7 @@ SN번호복사 / 텍스트
     let monthlyCheckFilter = localStorage.getItem('monthly_check_filter') || '';
     let selectedMonthlyId = '';
     let monthlyRows = [];
+    let previousMonthlyRows = [];
     let selectedEquipmentId = "";
 
     const $ = (selector) => document.querySelector(selector);
@@ -1992,6 +2002,26 @@ SN번호복사 / 텍스트
       if (!month) return "";
       const [y, m] = month.split("-");
       return `${y}년 ${m}월`;
+    }
+
+    function previousMonth(month) {
+      if (!month) return "";
+      const [year, monthNumber] = month.split("-").map(Number);
+      const date = new Date(year, monthNumber - 2, 1);
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+    }
+
+    function previousMonthlyFor(row) {
+      return previousMonthlyRows.find(prev =>
+        (row.장비 && prev.장비 === row.장비) ||
+        (row.자체일련번호복사 && prev.자체일련번호복사 === row.자체일련번호복사) ||
+        (row.SN번호복사 && prev.SN번호복사 === row.SN번호복사) ||
+        (row.장비명복사 && prev.장비명복사 === row.장비명복사)
+      ) || null;
+    }
+
+    function maintenanceText(row) {
+      return String(row?.유지보수 || "").trim();
     }
 
     function escapeHtml(value) {
@@ -2222,13 +2252,15 @@ SN번호복사 / 텍스트
       const location = $("#equipmentLocationFilter").value;
       const modelId = $("#equipmentModelFilter")?.value || "";
       const status = $("#equipmentStatusFilter").value;
+      const maintenanceFilter = $("#equipmentMaintenanceFilter")?.value || "";
 
       return equipmentRows.filter(row => {
-        const matchQ = !q || `${row.장비명 || ""} ${row.SN번호 || ""} ${row.자체일련번호 || ""} ${row.규격 || ""} ${modelName(row) || ""}`.toLowerCase().includes(q);
+        const matchQ = !q || `${row.장비명 || ""} ${row.관리번호 || ""} ${row.SN번호 || ""} ${row.자체일련번호 || ""} ${row.규격 || ""} ${modelName(row) || ""} ${maintenanceText(row)}`.toLowerCase().includes(q);
         const matchLocation = matchesLocationFilter(row.배치장소, location, row.장비상태등);
         const matchModel = !modelId || (row.장비모델 || "") === modelId;
         const matchStatus = !status || row.장비상태등 === status;
-        return matchQ && matchLocation && matchModel && matchStatus;
+        const matchMaintenance = maintenanceFilter !== "has" || Boolean(maintenanceText(row));
+        return matchQ && matchLocation && matchModel && matchStatus && matchMaintenance;
       });
     }
 
@@ -2479,6 +2511,7 @@ SN번호복사 / 텍스트
           <div class="kv"><div class="k">⑫ 취득근거</div><div class="v">${escapeHtml(row.취득근거 || "-")}</div></div>
           <div class="kv"><div class="k">⑬ 장비상태 등</div><div class="v"><span class="badge ${statusClass(row.장비상태등)}">${escapeHtml(row.장비상태등 || "-")}</span></div></div>
           <div class="kv"><div class="k">⑬ 기타</div><div class="v">${escapeHtml(row.기타 || "-")}</div></div>
+        <div class="kv"><div class="k">⑭ 유지보수</div><div class="v">${escapeHtml(maintenanceText(row) || "-")}</div></div>
 
           <div class="toolbar" style="margin-top:16px;">
             <button class="btn primary load-inline-photos-btn" type="button" data-id="${escapeHtml(row.id)}">▼ ⑭ 장비사진 보기</button>
@@ -2585,6 +2618,7 @@ SN번호복사 / 텍스트
           <div class="eq-cell">
             <span class="eq-label">상태</span>
             <span class="badge ${statusClass(row.장비상태등)}">${escapeHtml(row.장비상태등 || "-")}</span>
+            ${maintenanceText(row) ? `<span class="badge need">유지보수</span>` : ""}
           </div>
         </article>
       `;
@@ -2699,6 +2733,15 @@ SN번호복사 / 텍스트
       try {
         const data = await api(`/api/monthly?month=${encodeURIComponent(month)}`);
         monthlyRows = data.rows || [];
+
+        const prev = previousMonth(month);
+        try {
+          const prevData = await api(`/api/monthly?month=${encodeURIComponent(prev)}`);
+          previousMonthlyRows = prevData.rows || [];
+        } catch {
+          previousMonthlyRows = [];
+        }
+
         refreshMonthlyModelOptions();
         renderMonthlyList();
         renderDashboard();
@@ -2977,6 +3020,8 @@ SN번호복사 / 텍스트
 
       const isOpen = selectedMonthlyId === row.id;
       const status = row.이번달상태 || "정상";
+      const prev = previousMonthlyFor(row);
+      const prevText = prev ? `${prev.이번달위치 || "-"} / ${prev.이번달상태 || "-"}` : "전월 기록 없음";
       const detailHtml = isOpen ? `
           <div class="monthly-detail">
             <div class="monthly-detail-grid">
@@ -2993,7 +3038,7 @@ SN번호복사 / 텍스트
               </label>
             </div>
 
-            <div class="small" style="color:var(--sub);font-size:13px;">확인자: ${escapeHtml(row.확인자명복사 || "-")} · 확인일: ${escapeHtml(row.확인일 || "-")}</div>
+            <div class="small" style="color:var(--sub);font-size:13px;">전월 기준: ${escapeHtml(prevText)} · 확인자: ${escapeHtml(row.확인자명복사 || "-")} · 확인일: ${escapeHtml(row.확인일 || "-")}</div>
 
             ${currentUser?.role === "admin" ? `
               <div class="notice" style="margin:0;">
@@ -3037,6 +3082,8 @@ SN번호복사 / 텍스트
               <select class="monthly-inline-location monthly-location">
                 ${optionHtml(locations, row.이번달위치)}
               </select>
+              <span class="cell-label" style="margin-top:4px;">전월 기준</span>
+              <span class="cell-main">${escapeHtml(prevText)}</span>
             </div>
 
             <div class="monthly-cell monthly-status-cell">
@@ -3532,6 +3579,10 @@ SN번호복사 / 텍스트
       });
 
       onIfExists("#equipmentStatusFilter", "change", () => {
+        renderEquipmentList();
+        renderEquipmentDetail();
+      });
+      onIfExists("#equipmentMaintenanceFilter", "change", () => {
         renderEquipmentList();
         renderEquipmentDetail();
       });
