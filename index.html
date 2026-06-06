@@ -4648,7 +4648,7 @@ SN번호복사 / 텍스트
       area.innerHTML = `<div class="notice">유지보수 내역을 불러오는 중입니다.</div>`;
 
       try {
-        const data = await api("/api/maintenance");
+        const data = await api(`/api/maintenance?equipment=${encodeURIComponent(row.id)}`);
         maintenanceRows = data.rows || [];
         renderSelectedEquipmentMaintenance(row);
       } catch (error) {
@@ -4684,7 +4684,7 @@ SN번호복사 / 텍스트
         `).join("") : `<div class="notice">등록된 유지보수 내역이 없습니다.</div>`}
 
         <form class="equipment-maintenance-form" id="equipmentMaintenanceForm">
-          <div style="font-weight:900;color:var(--primary);">새 유지보수 내역 등록</div>
+          <div style="font-weight:900;color:var(--primary);">새 유지보수 내역 등록</div><div class="small" style="color:var(--sub);font-size:12px;">유지보수 DB 환경변수가 없으면 장비 원장 페이지 내부 ⑮ 유지보수 내역에 저장됩니다.</div>
           <div class="equipment-maintenance-form-grid">
             <label>일자
               <input class="input" type="date" name="일자" />
