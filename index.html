@@ -974,6 +974,97 @@
 
 
 
+
+    .report-photo-doc {
+      display: grid;
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .report-photo-doc-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .report-photo-doc-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 10px;
+    }
+
+    .report-photo-doc-head strong {
+      display: block;
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      line-height: 1.35;
+    }
+
+    .report-photo-doc-head span {
+      display: block;
+      color: var(--sub);
+      font-size: 12px;
+      font-weight: 750;
+      margin-top: 4px;
+    }
+
+    .report-photo-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .report-photo-grid img {
+      width: 100%;
+      max-height: 260px;
+      object-fit: contain;
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+    }
+
+    .report-status-summary {
+      display: grid;
+      gap: 10px;
+    }
+
+    .report-status-row {
+      display: grid;
+      grid-template-columns: minmax(140px, 1fr) 90px;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 14px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      font-size: 14px;
+    }
+
+    .report-status-row strong {
+      font-weight: 900;
+      letter-spacing: -0.04em;
+    }
+
+    .report-status-row span {
+      text-align: right;
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--primary);
+    }
+
+    @media (max-width: 720px) {
+      .report-photo-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
     .report-grid {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1056,6 +1147,132 @@
       gap: 8px;
     }
 
+
+    .depreciation-row.clickable {
+      cursor: pointer;
+      border-radius: 10px;
+      padding-left: 10px;
+      padding-right: 10px;
+      transition: .12s ease-out;
+    }
+
+    .depreciation-row.clickable:hover,
+    .depreciation-row.clickable.active {
+      background: #eef6ff;
+      border-color: #c6d6eb;
+    }
+
+    .depreciation-detail {
+      border: 1px solid #cbd9ea;
+      border-radius: 16px;
+      background: #fbfdff;
+      padding: 16px;
+      margin: 8px 0 14px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .depreciation-detail-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .depreciation-detail-head strong {
+      display: block;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      line-height: 1.35;
+    }
+
+    .depreciation-detail-head span {
+      display: block;
+      margin-top: 4px;
+      color: var(--sub);
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .depreciation-schedule {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    .depreciation-schedule-row {
+      min-width: 820px;
+      display: grid;
+      grid-template-columns: 78px 130px 70px 90px 120px 80px 130px 130px;
+      align-items: center;
+      border-bottom: 1px solid var(--line);
+      font-size: 13px;
+    }
+
+    .depreciation-schedule-row:last-child {
+      border-bottom: 0;
+    }
+
+    .depreciation-schedule-row > div {
+      padding: 10px 9px;
+      border-right: 1px solid var(--line);
+      min-height: 40px;
+    }
+
+    .depreciation-schedule-row > div:last-child {
+      border-right: 0;
+    }
+
+    .depreciation-schedule-row.header {
+      background: #f8fafc;
+      color: var(--sub);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .depreciation-schedule-row.current {
+      background: #fffbe8;
+    }
+
+    .depreciation-schedule-row.total {
+      background: #f8fafc;
+      font-weight: 900;
+    }
+
+    .depreciation-detail-summary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 10px;
+    }
+
+    .depreciation-detail-summary .box {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .depreciation-detail-summary .box .k {
+      color: var(--sub);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .depreciation-detail-summary .box .v {
+      margin-top: 6px;
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--primary);
+    }
+
+    @media (max-width: 720px) {
+      .depreciation-detail-summary {
+        grid-template-columns: 1fr;
+      }
+    }
+
     .depreciation-note {
       background: #fff7e6;
       border: 1px solid #f1e1ca;
@@ -1090,6 +1307,72 @@
     @media (max-width: 560px) {
       .report-grid {
         grid-template-columns: 1fr;
+      }
+    }
+
+
+    .equipment-maintenance-area {
+      margin-top: 12px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .equipment-maintenance-card {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      background: #fff;
+      display: grid;
+      gap: 8px;
+    }
+
+    .equipment-maintenance-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .equipment-maintenance-head strong {
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      line-height: 1.3;
+    }
+
+    .equipment-maintenance-form {
+      border: 1px solid #d8e5f4;
+      border-radius: 14px;
+      background: #fbfdff;
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .equipment-maintenance-form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .equipment-maintenance-form-grid .full {
+      grid-column: 1 / -1;
+    }
+
+    .equipment-maintenance-form-grid label {
+      display: grid;
+      gap: 5px;
+      color: var(--sub);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    @media (max-width: 840px) {
+      .equipment-maintenance-form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .equipment-maintenance-form-grid .full {
+        grid-column: auto;
       }
     }
 
@@ -1493,6 +1776,12 @@
       display: flex;
       justify-content: flex-end;
       margin: -4px 0 10px;
+      position: sticky;
+      top: 0;
+      z-index: 12;
+      padding: 8px 0;
+      background: linear-gradient(180deg, #fff 72%, rgba(255,255,255,0.86));
+      border-bottom: 1px solid rgba(229,231,235,0.8);
     }
 
 
@@ -1750,7 +2039,6 @@
         <button data-view="equipmentView">장비관리대장</button>
         <button data-view="monthlyView">월별 위치·상태 확인</button>
         <button data-view="photoReviewView">점검 사진 확인</button>
-        <button data-view="maintenanceView">유지보수</button>
         <button data-view="depreciationView">감가상각비</button>
         <button data-view="reportView">결과보고</button>
         <button data-view="addView" id="addNavBtn">신규 장비 등록</button>
@@ -1952,104 +2240,6 @@
           </div>
         </section>
 
-        <section class="view" id="maintenanceView">
-          <div class="section-head">
-            <div>
-              <h1>유지보수 관리</h1>
-              <p>장비별 유지보수 내역을 조회하고 새 내역을 저장합니다.</p>
-            </div>
-            <button class="btn primary" id="maintenanceReloadBtn">새로고침</button>
-          </div>
-
-          <div class="layout-2">
-            <div class="card">
-              <div class="card-header">
-                <div>
-                  <h2 class="card-title">유지보수 내역</h2>
-                  <div class="card-sub">Notion 유지보수 DB에 저장된 내용을 불러옵니다.</div>
-                </div>
-              </div>
-              <div class="card-body">
-                <div class="toolbar">
-                  <input class="input" id="maintenanceSearch" placeholder="장비명, 모델명, 내용 검색" />
-                  <select class="select" id="maintenanceEquipmentFilter"></select>
-                  <select class="select" id="maintenanceStatusFilter">
-                    <option value="">상태 전체</option>
-                    <option>접수</option>
-                    <option>진행중</option>
-                    <option>완료</option>
-                    <option>보류</option>
-                  </select>
-                </div>
-                <div class="list-summary" id="maintenanceSummary"></div>
-                <div id="maintenanceMsg" class="notice hidden"></div>
-                <div class="maintenance-list" id="maintenanceList"></div>
-              </div>
-            </div>
-
-            <aside class="card">
-              <div class="card-header">
-                <div>
-                  <h2 class="card-title">유지보수 등록</h2>
-                  <div class="card-sub">필요한 항목만 간단히 저장합니다.</div>
-                </div>
-              </div>
-              <div class="card-body">
-                <form id="maintenanceForm">
-                  <div class="maintenance-form-grid">
-                    <label>
-                      <span class="label">장비</span>
-                      <select class="select" name="장비" id="maintenanceEquipmentSelect"></select>
-                    </label>
-                    <label>
-                      <span class="label">일자</span>
-                      <input class="input" type="date" name="일자" />
-                    </label>
-                    <label>
-                      <span class="label">구분</span>
-                      <select class="select" name="구분">
-                        <option>유지보수</option>
-                        <option>수리</option>
-                        <option>점검</option>
-                        <option>교체</option>
-                        <option>기타</option>
-                      </select>
-                    </label>
-                    <label>
-                      <span class="label">상태</span>
-                      <select class="select" name="상태">
-                        <option>접수</option>
-                        <option>진행중</option>
-                        <option>완료</option>
-                        <option>보류</option>
-                      </select>
-                    </label>
-                    <label class="full">
-                      <span class="label">내용</span>
-                      <textarea class="textarea" name="내용" placeholder="유지보수 내용"></textarea>
-                    </label>
-                    <label class="full">
-                      <span class="label">처리결과</span>
-                      <textarea class="textarea" name="처리결과" placeholder="처리 결과 또는 조치 내용"></textarea>
-                    </label>
-                    <label>
-                      <span class="label">비용</span>
-                      <input class="input" type="number" name="비용" />
-                    </label>
-                    <label>
-                      <span class="label">비고</span>
-                      <input class="input" name="비고" />
-                    </label>
-                  </div>
-                  <div class="toolbar" style="margin-top:16px;">
-                    <button class="btn primary" type="submit">유지보수 저장</button>
-                  </div>
-                </form>
-              </div>
-            </aside>
-          </div>
-        </section>
-
         <section class="view" id="depreciationView">
           <div class="section-head">
             <div>
@@ -2086,7 +2276,7 @@
           <div class="section-head">
             <div>
               <h1>결과보고</h1>
-              <p>월별 장비 위치·상태 확인 결과를 화면에서 요약 확인합니다.</p>
+              <p>월별 장비 위치·상태 확인 결과를 단순 보고 형태로 확인합니다.</p>
             </div>
             <button class="btn primary" id="reportReloadBtn">보고서 조회</button>
           </div>
@@ -2095,7 +2285,7 @@
             <div class="card-header">
               <div>
                 <h2 class="card-title">월별 점검 결과 요약</h2>
-                <div class="card-sub">전체 출력 대신 팀장 확인용 화면 보고서입니다.</div>
+                <div class="card-sub">정상/대여중/수리중 등 상태별 개수와 이상 장비 목록을 확인합니다.</div>
               </div>
             </div>
             <div class="card-body">
@@ -2103,45 +2293,46 @@
                 <input class="input" type="month" id="reportMonth" />
                 <select class="select" id="reportLocationFilter"></select>
                 <select class="select" id="reportModelFilter"></select>
+                <button class="btn ghost" id="reportPhotoDocBtn" type="button">점검사진 문서 생성/보기</button>
+                <button class="btn" id="reportPhotoCacheClearBtn" type="button">사진문서 캐시삭제</button>
               </div>
 
               <div class="report-grid" id="reportStats"></div>
 
-              <div class="layout-2" style="margin-top:16px;">
-                <div class="card" style="box-shadow:none;">
-                  <div class="card-header">
-                    <div>
-                      <h2 class="card-title">위치별 현황</h2>
-                      <div class="card-sub">이번달 위치 기준입니다.</div>
-                    </div>
-                  </div>
-                  <div class="card-body">
-                    <div id="reportLocationTable" class="report-section"></div>
+              <div class="card" style="box-shadow:none;margin-top:16px;">
+                <div class="card-header">
+                  <div>
+                    <h2 class="card-title">상태별 현황</h2>
+                    <div class="card-sub">이번달 상태와 위치의 “대여” 표시를 함께 반영합니다.</div>
                   </div>
                 </div>
-
-                <div class="card" style="box-shadow:none;">
-                  <div class="card-header">
-                    <div>
-                      <h2 class="card-title">모델별 현황</h2>
-                      <div class="card-sub">장비모델 관계형 기준입니다.</div>
-                    </div>
-                  </div>
-                  <div class="card-body">
-                    <div id="reportModelTable" class="report-section"></div>
-                  </div>
+                <div class="card-body">
+                  <div id="reportStatusTable" class="report-status-summary"></div>
                 </div>
               </div>
 
               <div class="card" style="box-shadow:none;margin-top:16px;">
                 <div class="card-header">
                   <div>
-                    <h2 class="card-title">조치 필요 / 메모 항목</h2>
-                    <div class="card-sub">미확인, 위치 변경, 상태 이상, 메모가 있는 장비입니다.</div>
+                    <h2 class="card-title">이상 / 확인 필요 장비</h2>
+                    <div class="card-sub">미확인, 정상 외 상태, 위치 변경, 메모가 있는 장비입니다. 자체일련번호 또는 관리번호를 함께 표시합니다.</div>
                   </div>
                 </div>
                 <div class="card-body">
                   <div id="reportIssueList" class="report-issue-list"></div>
+                </div>
+              </div>
+
+              <div class="card" style="box-shadow:none;margin-top:16px;">
+                <div class="card-header">
+                  <div>
+                    <h2 class="card-title">점검사진 확인용 문서</h2>
+                    <div class="card-sub">점검사진이 있는 장비만 표시합니다. 최초 생성은 오래 걸릴 수 있고, 이후에는 브라우저 캐시를 우선 사용합니다.</div>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <div id="reportPhotoDocStatus" class="notice hidden"></div>
+                  <div id="reportPhotoDocArea" class="report-photo-doc"></div>
                 </div>
               </div>
             </div>
@@ -2379,6 +2570,7 @@ SN번호복사 / 텍스트
     let selectedMonthlySideId = '';
     let monthlyRows = [];
     let maintenanceRows = [];
+    let selectedDepreciationId = "";
     let selectedEquipmentId = "";
 
     const $ = (selector) => document.querySelector(selector);
@@ -2495,16 +2687,12 @@ SN번호복사 / 텍스트
         addView: "신규 장비 등록",
         schemaView: "DB 속성표",
         photoReviewView: "점검 사진 확인",
-        maintenanceView: "유지보수 관리",
         depreciationView: "감가상각비",
         reportView: "결과보고"
       };
 
       if ($("#pageTitle")) $("#pageTitle").textContent = labels[viewId] || "장비 현황 관리";
       $("#sidebar")?.classList.remove("open");
-      if (viewId === "maintenanceView" && !maintenanceRows.length) {
-        loadMaintenance();
-      }
       if (viewId === "depreciationView") {
         renderDepreciation();
       }
@@ -3141,15 +3329,18 @@ SN번호복사 / 텍스트
         <div class="toolbar" style="margin-top:16px;">
           <button class="btn primary" id="loadPhotosBtn">▼ ⑭ 장비사진 보기</button>
           ${model ? `<button class="btn ghost" id="loadModelPhotosBtn">▼ 모델 공통사진 보기</button>` : ""}
+          <button class="btn ghost" id="loadMaintenanceBtn">▼ ⑮ 유지보수 내역</button>
           ${row.url ? `<a class="btn ghost" href="${escapeHtml(row.url)}" target="_blank" rel="noreferrer">노션에서 열기</a>` : ""}
         </div>
         <div id="photosArea"></div>
         <div id="modelPhotosArea"></div>
+        <div id="equipmentMaintenanceArea" class="equipment-maintenance-area"></div>
       `;
 
       $("#loadPhotosBtn").addEventListener("click", loadPhotos);
       const modelPhotosBtn = $("#loadModelPhotosBtn");
       if (modelPhotosBtn) modelPhotosBtn.addEventListener("click", loadModelPhotos);
+      $("#loadMaintenanceBtn").addEventListener("click", loadSelectedEquipmentMaintenance);
       $("#closeDetailBtn").addEventListener("click", () => {
         selectedEquipmentId = "";
         renderEquipmentList();
@@ -3953,40 +4144,90 @@ SN번호복사 / 텍스트
       return 13 - month;
     }
 
-    function calcDepreciation(row, targetYear) {
+    function calcDepreciationSchedule(row, targetYear) {
       const cost = Number(row.취득가격 || 0);
       const life = Number(row.내용연수 || 0);
       const acqDate = row.취득년월일 || row.입고일 || row.작성년월일 || "";
       const acqYear = Number(String(acqDate).slice(0, 4));
       const rate = depreciationRate(life);
+      const quantity = Number(row.수량 || 1) || 1;
 
-      if (!cost || !life || !acqYear || !rate || targetYear < acqYear) {
+      if (!cost || !life || !acqYear || !rate) {
         return {
           valid: false,
           rate,
-          currentDep: 0,
-          endingBook: cost || 0,
+          quantity,
+          rows: [],
+          totalDep: 0,
+          targetDep: 0,
+          targetBook: cost || 0,
           message: "취득가격/취득일/내용연수 확인 필요"
         };
       }
 
       let book = cost;
-      let currentDep = 0;
+      let totalDep = 0;
+      let targetDep = 0;
+      let targetBook = book;
+      const rows = [];
 
-      for (let year = acqYear; year <= targetYear; year++) {
+      for (let year = acqYear; year <= acqYear + life; year++) {
+        const beginBook = book;
         const months = year === acqYear ? monthsInFirstYear(acqDate) : 12;
-        const dep = Math.floor(book * rate * (months / 12));
-        const safeDep = Math.min(dep, Math.max(book - 1000, 0));
-        book -= safeDep;
-        if (year === targetYear) currentDep = safeDep;
+        const rawDep = Math.floor(beginBook * rate * (months / 12));
+        const dep = Math.min(rawDep, Math.max(beginBook - 1000, 0));
+        const endBook = beginBook - dep;
+
+        rows.push({
+          year,
+          beginBook,
+          quantity,
+          life,
+          method: "정률법",
+          rate,
+          dep,
+          endBook,
+          months,
+          current: year === Number(targetYear)
+        });
+
+        totalDep += dep;
+        book = endBook;
+
+        if (year === Number(targetYear)) {
+          targetDep = dep;
+          targetBook = endBook;
+        }
+      }
+
+      if (Number(targetYear) < acqYear) {
+        targetDep = 0;
+        targetBook = cost;
+      } else if (Number(targetYear) > acqYear + life) {
+        targetDep = 0;
+        targetBook = book;
       }
 
       return {
         valid: true,
         rate,
-        currentDep,
-        endingBook: book,
+        quantity,
+        rows,
+        totalDep,
+        targetDep,
+        targetBook,
         message: ""
+      };
+    }
+
+    function calcDepreciation(row, targetYear) {
+      const schedule = calcDepreciationSchedule(row, targetYear);
+      return {
+        valid: schedule.valid,
+        rate: schedule.rate,
+        currentDep: schedule.targetDep,
+        endingBook: schedule.targetBook,
+        message: schedule.message
       };
     }
 
@@ -4016,6 +4257,74 @@ SN번호복사 / 텍스트
       });
     }
 
+    function depreciationDetailHtml(row, year) {
+      const schedule = calcDepreciationSchedule(row, year);
+      const currentRow = schedule.rows.find(item => item.year === Number(year));
+      const targetDep = currentRow?.dep || schedule.targetDep || 0;
+      const targetBook = currentRow?.endBook ?? schedule.targetBook ?? 0;
+
+      if (!schedule.valid) {
+        return `
+          <div class="depreciation-detail">
+            <div class="notice error">${escapeHtml(schedule.message)}</div>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="depreciation-detail">
+          <div class="depreciation-detail-head">
+            <div>
+              <strong>${escapeHtml(row.장비명 || "-")} 감가상각내역</strong>
+              <span>관리번호 ${escapeHtml(row.관리번호 || row.자체일련번호 || "-")} · 취득일 ${escapeHtml(row.취득년월일 || row.입고일 || "-")} · 내용연수 ${row.내용연수 || "-"}년 · 상각률 ${schedule.rate}</span>
+            </div>
+            <button class="btn" type="button" data-depreciation-close>닫기</button>
+          </div>
+
+          <div class="depreciation-detail-summary">
+            <div class="box"><div class="k">${year}년 상각비</div><div class="v">${money(targetDep)}</div></div>
+            <div class="box"><div class="k">${year}년 잔존가액</div><div class="v">${money(targetBook)}</div></div>
+            <div class="box"><div class="k">누계상각비</div><div class="v">${money(schedule.totalDep)}</div></div>
+          </div>
+
+          <div class="depreciation-schedule">
+            <div class="depreciation-schedule-row header">
+              <div>년도별</div>
+              <div>단가(원)</div>
+              <div>수량</div>
+              <div>내용연수</div>
+              <div>감가상각방법</div>
+              <div>상각률</div>
+              <div>년감가상각비</div>
+              <div>잔존가액(원)</div>
+            </div>
+            ${schedule.rows.map(item => `
+              <div class="depreciation-schedule-row ${item.current ? "current" : ""}">
+                <div><strong>${item.year}</strong></div>
+                <div>${money(item.beginBook)}</div>
+                <div>${item.quantity}</div>
+                <div>${item.life}</div>
+                <div>${item.method}</div>
+                <div>${item.rate}</div>
+                <div>${money(item.dep)}</div>
+                <div>${money(item.endBook)}</div>
+              </div>
+            `).join("")}
+            <div class="depreciation-schedule-row total">
+              <div>합계</div>
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+              <div>${money(schedule.totalDep)}</div>
+              <div>${money(schedule.rows.at(-1)?.endBook || 0)}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
     function renderDepreciation() {
       if (!equipmentRows.length) {
         $("#depreciationList").innerHTML = `<div class="notice">장비 원장을 먼저 불러오는 중입니다.</div>`;
@@ -4025,6 +4334,10 @@ SN번호복사 / 텍스트
 
       const year = Number($("#depreciationYear")?.value || new Date().getFullYear());
       const rows = filteredDepreciationRows();
+
+      if (selectedDepreciationId && !rows.some(row => row.id === selectedDepreciationId)) {
+        selectedDepreciationId = "";
+      }
 
       const calculated = rows.map(row => ({
         row,
@@ -4042,7 +4355,7 @@ SN번호복사 / 텍스트
           <div>장비명</div><div>관리번호</div><div>취득일</div><div>내용연수</div><div>상각률</div><div>당기상각비</div><div>기말잔존가</div>
         </div>
         ${calculated.map(({ row, calc }) => `
-          <div class="depreciation-row">
+          <div class="depreciation-row clickable ${selectedDepreciationId === row.id ? "active" : ""}" data-depreciation-id="${escapeHtml(row.id)}">
             <div><strong>${escapeHtml(row.장비명 || "-")}</strong><br><span class="small">${escapeHtml(modelName(row) || "-")}</span></div>
             <div>${escapeHtml(row.관리번호 || row.자체일련번호 || "-")}</div>
             <div>${escapeHtml(row.취득년월일 || row.입고일 || "-")}</div>
@@ -4051,8 +4364,24 @@ SN번호복사 / 텍스트
             <div>${money(calc.currentDep)}</div>
             <div>${money(calc.endingBook)}</div>
           </div>
+          ${selectedDepreciationId === row.id ? depreciationDetailHtml(row, year) : ""}
         `).join("")}
       `;
+
+      $$("#depreciationList [data-depreciation-id]").forEach(el => {
+        el.addEventListener("click", () => {
+          selectedDepreciationId = selectedDepreciationId === el.dataset.depreciationId ? "" : el.dataset.depreciationId;
+          renderDepreciation();
+        });
+      });
+
+      $$("#depreciationList [data-depreciation-close]").forEach(btn => {
+        btn.addEventListener("click", (event) => {
+          event.stopPropagation();
+          selectedDepreciationId = "";
+          renderDepreciation();
+        });
+      });
     }
 
     function reportRows() {
@@ -4101,13 +4430,30 @@ SN번호복사 / 텍스트
       select.value = [...modelMap.keys()].includes(current) ? current : "";
     }
 
-    function countBy(rows, getter) {
-      const map = new Map();
-      rows.forEach(row => {
-        const key = getter(row) || "미지정";
-        map.set(key, (map.get(key) || 0) + 1);
+    function reportManagementNo(row) {
+      const eq = equipmentForMonthly(row);
+      return row.자체일련번호복사 || eq?.관리번호 || eq?.자체일련번호 || eq?.SN번호 || "-";
+    }
+
+    function reportStatusBucket(row) {
+      const status = row.이번달상태 || "";
+      const location = row.이번달위치 || "";
+
+      if (!row.확인여부) return "미확인";
+      if (isRentalValue(location, status)) return "대여중";
+      if (status.includes("수리") || status.includes("고장")) return "수리중";
+      if (status.includes("분실")) return "분실의심";
+      if (status.includes("위치")) return "위치확인필요";
+      if (status === "정상" || !status) return "정상";
+      return status || "기타";
+    }
+
+    function reportIssueRows(rows) {
+      return rows.filter(row => {
+        const bucket = reportStatusBucket(row);
+        const locationChanged = row.원장기준배치장소 && row.이번달위치 && row.원장기준배치장소 !== row.이번달위치;
+        return bucket !== "정상" || locationChanged || Boolean((row.메모 || "").trim());
       });
-      return [...map.entries()].sort((a, b) => b[1] - a[1]);
     }
 
     function renderReport() {
@@ -4115,13 +4461,28 @@ SN번호복사 / 텍스트
       const total = rows.length;
       const checked = rows.filter(row => row.확인여부).length;
       const unchecked = total - checked;
-      const issueRows = rows.filter(monthlyIsIssue);
+      const issues = reportIssueRows(rows);
+
+      const bucketMap = new Map();
+      rows.forEach(row => {
+        const key = reportStatusBucket(row);
+        bucketMap.set(key, (bucketMap.get(key) || 0) + 1);
+      });
+
+      const priority = ["정상", "대여중", "수리중", "위치확인필요", "분실의심", "미확인", "기타"];
+      const bucketRows = [...bucketMap.entries()].sort((a, b) => {
+        const ai = priority.includes(a[0]) ? priority.indexOf(a[0]) : 999;
+        const bi = priority.includes(b[0]) ? priority.indexOf(b[0]) : 999;
+        return ai - bi || b[1] - a[1];
+      });
 
       $("#reportStats").innerHTML = [
         ["전체", total],
-        ["확인완료", checked],
+        ["정상", bucketMap.get("정상") || 0],
+        ["대여중", bucketMap.get("대여중") || 0],
+        ["수리중", bucketMap.get("수리중") || 0],
         ["미확인", unchecked],
-        ["조치필요", issueRows.length]
+        ["이상/확인필요", issues.length]
       ].map(([label, value]) => `
         <div class="report-stat">
           <div class="label">${label}</div>
@@ -4129,59 +4490,270 @@ SN번호복사 / 텍스트
         </div>
       `).join("");
 
-      const locationRows = countBy(rows, row => row.이번달위치);
-      $("#reportLocationTable").innerHTML = `
-        <div class="report-row header"><div>위치</div><div>전체</div><div>확인</div><div>미확인</div><div>이슈</div></div>
-        ${locationRows.map(([loc, count]) => {
-          const subset = rows.filter(row => (row.이번달위치 || "미지정") === loc);
-          return `<div class="report-row">
-            <div><strong>${escapeHtml(loc)}</strong></div>
-            <div>${count}</div>
-            <div>${subset.filter(row => row.확인여부).length}</div>
-            <div>${subset.filter(row => !row.확인여부).length}</div>
-            <div>${subset.filter(monthlyIsIssue).length}</div>
-          </div>`;
-        }).join("")}
-      `;
-
-      const modelRows = countBy(rows, row => monthlyModelName(row));
-      $("#reportModelTable").innerHTML = `
-        <div class="report-row header"><div>모델</div><div>전체</div><div>확인</div><div>미확인</div><div>이슈</div></div>
-        ${modelRows.map(([model, count]) => {
-          const subset = rows.filter(row => monthlyModelName(row) === model);
-          return `<div class="report-row">
-            <div><strong>${escapeHtml(model)}</strong></div>
-            <div>${count}</div>
-            <div>${subset.filter(row => row.확인여부).length}</div>
-            <div>${subset.filter(row => !row.확인여부).length}</div>
-            <div>${subset.filter(monthlyIsIssue).length}</div>
-          </div>`;
-        }).join("")}
-      `;
-
-      $("#reportIssueList").innerHTML = issueRows.length
-        ? issueRows.map(row => `
-          <article class="report-issue-card">
-            <div style="display:flex;justify-content:space-between;gap:10px;">
-              <div>
-                <strong>${escapeHtml(row.장비명복사 || "-")}</strong>
-                <div class="small" style="color:var(--sub);font-size:13px;margin-top:4px;">
-                  ${escapeHtml(monthlyModelName(row))} · ${escapeHtml(row.이번달위치 || "-")} · ${escapeHtml(row.이번달상태 || "-")}
-                </div>
-              </div>
-              <span class="badge ${row.확인여부 ? "normal" : "need"}">${row.확인여부 ? "확인완료" : "미확인"}</span>
-            </div>
-            ${row.메모 ? `<div class="small"><b>메모</b> ${escapeHtml(row.메모)}</div>` : ""}
-            <div class="toolbar" style="margin:0;">
-              <button class="btn" type="button" data-photo-target="${escapeHtml(row.id)}">점검사진 보기</button>
-              ${row.url ? `<a class="btn ghost" href="${escapeHtml(row.url)}" target="_blank" rel="noreferrer">노션에서 열기</a>` : ""}
-            </div>
-            <div class="photo-review-photos-area"></div>
-          </article>
+      $("#reportStatusTable").innerHTML = bucketRows.length
+        ? bucketRows.map(([name, count]) => `
+          <div class="report-status-row">
+            <strong>${escapeHtml(name)}</strong>
+            <span>${count}</span>
+          </div>
         `).join("")
-        : `<div class="empty">조치 필요 항목이 없습니다.</div>`;
+        : `<div class="empty">상태 데이터가 없습니다.</div>`;
+
+      $("#reportIssueList").innerHTML = issues.length
+        ? issues.map(row => {
+          const bucket = reportStatusBucket(row);
+          const eq = equipmentForMonthly(row);
+          const locationChanged = row.원장기준배치장소 && row.이번달위치 && row.원장기준배치장소 !== row.이번달위치;
+
+          return `
+            <article class="report-issue-card">
+              <div style="display:flex;justify-content:space-between;gap:10px;">
+                <div>
+                  <strong>${escapeHtml(row.장비명복사 || "-")}</strong>
+                  <div class="small" style="color:var(--sub);font-size:13px;margin-top:4px;">
+                    자체일련번호/관리번호 ${escapeHtml(reportManagementNo(row))} · ${escapeHtml(monthlyModelName(row))} · ${escapeHtml(row.이번달위치 || "-")}
+                  </div>
+                </div>
+                <span class="badge ${statusClass(row.이번달상태)}">${escapeHtml(bucket)}</span>
+              </div>
+              <div class="small">
+                <b>상태</b> ${escapeHtml(row.이번달상태 || "-")}
+                ${locationChanged ? ` · <b>위치변경</b> ${escapeHtml(row.원장기준배치장소 || "-")} → ${escapeHtml(row.이번달위치 || "-")}` : ""}
+              </div>
+              ${row.메모 ? `<div class="small"><b>메모</b> ${escapeHtml(row.메모)}</div>` : ""}
+              <div class="toolbar" style="margin:0;">
+                <button class="btn" type="button" data-photo-target="${escapeHtml(row.id)}">점검사진 보기</button>
+                ${row.url ? `<a class="btn ghost" href="${escapeHtml(row.url)}" target="_blank" rel="noreferrer">노션에서 열기</a>` : ""}
+              </div>
+              <div class="photo-review-photos-area"></div>
+            </article>
+          `;
+        }).join("")
+        : `<div class="empty">이상 또는 확인 필요 장비가 없습니다.</div>`;
 
       bindMonthlyPhotoButtons($("#reportIssueList"));
+    }
+
+    function reportPhotoCacheKey() {
+      const month = $("#reportMonth")?.value || monthNow();
+      const location = $("#reportLocationFilter")?.value || "";
+      const model = $("#reportModelFilter")?.value || "";
+      return `equipment_report_photos_${month}_${location}_${model}`;
+    }
+
+    function showReportPhotoStatus(message, isError = false) {
+      const box = $("#reportPhotoDocStatus");
+      if (!box) return;
+      box.classList.remove("hidden");
+      box.classList.toggle("error", isError);
+      box.textContent = message;
+    }
+
+    function renderReportPhotoDocument(items, fromCache = false) {
+      const area = $("#reportPhotoDocArea");
+      if (!area) return;
+
+      if (!items.length) {
+        area.innerHTML = `<div class="empty">점검사진이 등록된 장비가 없습니다.</div>`;
+        return;
+      }
+
+      area.innerHTML = items.map(item => `
+        <article class="report-photo-doc-card">
+          <div class="report-photo-doc-head">
+            <div>
+              <strong>${escapeHtml(item.장비명 || "-")}</strong>
+              <span>자체일련번호/관리번호 ${escapeHtml(item.관리번호 || "-")} · ${escapeHtml(item.모델명 || "-")} · ${escapeHtml(item.위치 || "-")} · ${escapeHtml(item.상태 || "-")}</span>
+            </div>
+            <span class="badge normal">사진 ${item.photos.length}장</span>
+          </div>
+          ${item.메모 ? `<div class="small"><b>메모</b> ${escapeHtml(item.메모)}</div>` : ""}
+          <div class="report-photo-grid">
+            ${item.photos.map(photo => `<img src="${escapeHtml(photo.url)}" alt="">`).join("")}
+          </div>
+        </article>
+      `).join("");
+
+      showReportPhotoStatus(fromCache ? `캐시된 점검사진 문서를 불러왔습니다. 사진 등록 장비 ${items.length}건` : `점검사진 문서 생성 완료. 사진 등록 장비 ${items.length}건`);
+    }
+
+    async function buildReportPhotoDocument(force = false) {
+      const key = reportPhotoCacheKey();
+      const area = $("#reportPhotoDocArea");
+      if (!area) return;
+
+      if (!force) {
+        try {
+          const cached = JSON.parse(localStorage.getItem(key) || "null");
+          if (cached?.items?.length) {
+            renderReportPhotoDocument(cached.items, true);
+            return;
+          }
+        } catch {}
+      }
+
+      const rows = reportRows();
+      const items = [];
+      area.innerHTML = "";
+      showReportPhotoStatus(`점검사진 문서를 생성하는 중입니다. 0/${rows.length}건 확인`);
+
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        showReportPhotoStatus(`점검사진 확인 중 · ${i + 1}/${rows.length}건`);
+
+        try {
+          const data = await api(`/api/monthly/${encodeURIComponent(row.id)}/photos`);
+          const photos = data.photos || [];
+
+          if (photos.length) {
+            items.push({
+              id: row.id,
+              장비명: row.장비명복사 || "",
+              관리번호: reportManagementNo(row),
+              모델명: monthlyModelName(row),
+              위치: row.이번달위치 || "",
+              상태: row.이번달상태 || "",
+              메모: row.메모 || "",
+              photos
+            });
+          }
+        } catch {}
+
+        await wait(80);
+      }
+
+      try {
+        localStorage.setItem(key, JSON.stringify({
+          createdAt: new Date().toISOString(),
+          items
+        }));
+      } catch {
+        showReportPhotoStatus("사진 문서 생성은 완료됐지만 캐시 저장 용량이 부족해 저장하지 못했습니다.", true);
+      }
+
+      renderReportPhotoDocument(items, false);
+    }
+
+    function clearReportPhotoCache() {
+      localStorage.removeItem(reportPhotoCacheKey());
+      $("#reportPhotoDocArea").innerHTML = "";
+      showReportPhotoStatus("점검사진 문서 캐시를 삭제했습니다.");
+    }
+
+    async function loadSelectedEquipmentMaintenance() {
+      const row = equipmentRows.find(item => item.id === selectedEquipmentId);
+      const area = $("#equipmentMaintenanceArea");
+      if (!row || !area) return;
+
+      area.innerHTML = `<div class="notice">유지보수 내역을 불러오는 중입니다.</div>`;
+
+      try {
+        const data = await api("/api/maintenance");
+        maintenanceRows = data.rows || [];
+        renderSelectedEquipmentMaintenance(row);
+      } catch (error) {
+        area.innerHTML = `<div class="notice error">${escapeHtml(error.message)}</div>`;
+      }
+    }
+
+    function renderSelectedEquipmentMaintenance(row) {
+      const area = $("#equipmentMaintenanceArea");
+      if (!area) return;
+
+      const rows = maintenanceRows.filter(item => item.장비 === row.id);
+
+      area.innerHTML = `
+        <div class="kv"><div class="k">⑮ 유지보수 내역</div><div class="v">${rows.length}건</div></div>
+
+        ${rows.length ? rows.map(item => `
+          <article class="equipment-maintenance-card">
+            <div class="equipment-maintenance-head">
+              <div>
+                <strong>${escapeHtml(item.유지보수명 || item.내용 || "유지보수 내역")}</strong>
+                <div class="small" style="color:var(--sub);font-size:13px;margin-top:4px;">
+                  ${escapeHtml(item.일자 || "-")} · ${escapeHtml(item.구분 || "-")}
+                </div>
+              </div>
+              <span class="badge ${item.상태 === "완료" ? "normal" : item.상태 === "진행중" ? "loan" : "need"}">${escapeHtml(item.상태 || "-")}</span>
+            </div>
+            ${item.내용 ? `<div class="small"><b>내용</b> ${escapeHtml(item.내용)}</div>` : ""}
+            ${item.처리결과 ? `<div class="small"><b>처리결과</b> ${escapeHtml(item.처리결과)}</div>` : ""}
+            ${item.비용 ? `<div class="small"><b>비용</b> ${Number(item.비용).toLocaleString("ko-KR")}원</div>` : ""}
+            ${item.비고 ? `<div class="small"><b>비고</b> ${escapeHtml(item.비고)}</div>` : ""}
+          </article>
+        `).join("") : `<div class="notice">등록된 유지보수 내역이 없습니다.</div>`}
+
+        <form class="equipment-maintenance-form" id="equipmentMaintenanceForm">
+          <div style="font-weight:900;color:var(--primary);">새 유지보수 내역 등록</div>
+          <div class="equipment-maintenance-form-grid">
+            <label>일자
+              <input class="input" type="date" name="일자" />
+            </label>
+            <label>구분
+              <select class="select" name="구분">
+                <option>유지보수</option>
+                <option>수리</option>
+                <option>점검</option>
+                <option>교체</option>
+                <option>기타</option>
+              </select>
+            </label>
+            <label>상태
+              <select class="select" name="상태">
+                <option>접수</option>
+                <option>진행중</option>
+                <option>완료</option>
+                <option>보류</option>
+              </select>
+            </label>
+            <label>비용
+              <input class="input" type="number" name="비용" />
+            </label>
+            <label class="full">내용
+              <textarea class="textarea" name="내용" placeholder="유지보수 내용"></textarea>
+            </label>
+            <label class="full">처리결과
+              <textarea class="textarea" name="처리결과" placeholder="처리 결과 또는 조치 내용"></textarea>
+            </label>
+            <label class="full">비고
+              <input class="input" name="비고" />
+            </label>
+          </div>
+          <button class="btn primary" type="submit">유지보수 저장</button>
+        </form>
+      `;
+
+      const form = $("#equipmentMaintenanceForm");
+      if (form) {
+        form.addEventListener("submit", (event) => submitSelectedEquipmentMaintenance(event, row));
+      }
+    }
+
+    async function submitSelectedEquipmentMaintenance(event, row) {
+      event.preventDefault();
+
+      const form = event.currentTarget;
+      const button = form.querySelector("button[type='submit']");
+      const payload = Object.fromEntries(new FormData(form).entries());
+      payload.장비 = row.id;
+
+      button.disabled = true;
+      button.textContent = "저장 중";
+
+      try {
+        await api("/api/maintenance", {
+          method: "POST",
+          body: JSON.stringify(payload)
+        });
+
+        form.reset();
+        await loadSelectedEquipmentMaintenance();
+      } catch (error) {
+        alert(error.message);
+      } finally {
+        button.disabled = false;
+        button.textContent = "유지보수 저장";
+      }
     }
 
     async function loadMaintenance() {
@@ -4396,6 +4968,8 @@ SN번호복사 / 텍스트
       onIfExists("#reportReloadBtn", "click", loadReport);
       onIfExists("#reportLocationFilter", "change", renderReport);
       onIfExists("#reportModelFilter", "change", renderReport);
+      onIfExists("#reportPhotoDocBtn", "click", () => buildReportPhotoDocument(false));
+      onIfExists("#reportPhotoCacheClearBtn", "click", clearReportPhotoCache);
 
       onIfExists("#newModel", "change", applySelectedModelToForm);
       onIfExists("#addForm", "submit", submitAddForm);
