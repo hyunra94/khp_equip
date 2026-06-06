@@ -2012,7 +2012,7 @@
 
       <form id="loginForm">
         <label class="label">이름</label>
-        <input id="loginName" class="input" type="text" placeholder="예: 관리자" autocomplete="username" style="width:100%;margin-bottom:12px;" />
+        <input id="loginName" class="input" type="text" placeholder="이름 입력" autocomplete="username" style="width:100%;margin-bottom:12px;" />
 
         <label class="label">보안코드</label>
         <input id="loginCode" class="input" type="password" inputmode="numeric" placeholder="4자리 또는 6자리" style="width:100%;margin-bottom:16px;" />
@@ -2716,15 +2716,15 @@ SN번호복사 / 텍스트
 
     async function loadLoginUsers() {
       // 이름은 드롭다운이 아니라 직접 입력 방식입니다.
-      // Cloudflare ACCESS_USERS_JSON에 등록된 name과 입력한 이름이 일치하면 로그인됩니다.
+      // 사용자 목록을 불러와도 입력칸 예시는 특정 사용자명으로 바꾸지 않습니다.
       try {
-        const data = await api("/api/users");
-        const names = (data.users || []).map(user => user.name).filter(Boolean);
-        if (names.length) {
-          $("#loginName").placeholder = `예: ${names[0]}`;
-        }
+        await api("/api/users");
       } catch {
         // 사용자 목록 조회 실패는 로그인 입력 화면 표시를 막지 않습니다.
+      }
+
+      if ($("#loginName")) {
+        $("#loginName").placeholder = "이름 입력";
       }
     }
 
