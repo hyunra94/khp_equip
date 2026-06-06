@@ -975,6 +975,180 @@
 
 
 
+
+    .report-document {
+      background: #fff;
+      border: 1px solid #cfd8e3;
+      border-radius: 16px;
+      padding: 22px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .report-doc-title {
+      text-align: center;
+      border-bottom: 2px solid #1f2937;
+      padding-bottom: 14px;
+    }
+
+    .report-doc-title h2 {
+      margin: 0;
+      font-size: 26px;
+      letter-spacing: -0.06em;
+      color: #111827;
+    }
+
+    .report-doc-title p {
+      margin: 8px 0 0;
+      color: #6b7280;
+      font-weight: 800;
+    }
+
+    .report-meta-table,
+    .report-official-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      background: #fff;
+    }
+
+    .report-meta-table th,
+    .report-meta-table td,
+    .report-official-table th,
+    .report-official-table td {
+      border: 1px solid #d1d5db;
+      padding: 9px 10px;
+      text-align: left;
+      vertical-align: middle;
+      word-break: keep-all;
+    }
+
+    .report-meta-table th,
+    .report-official-table th {
+      background: #f3f6fa;
+      color: #374151;
+      font-weight: 900;
+    }
+
+    .report-official-table td.num,
+    .report-official-table th.num {
+      text-align: right;
+    }
+
+    .report-subtitle {
+      font-size: 17px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      margin: 6px 0 8px;
+      color: #1f2937;
+    }
+
+    .report-official-section {
+      display: grid;
+      gap: 8px;
+    }
+
+    .report-sign-area {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .report-sign-box {
+      border: 1px solid #d1d5db;
+      min-height: 74px;
+      border-radius: 8px;
+      display: grid;
+      grid-template-rows: 34px 1fr;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .report-sign-box .label {
+      background: #f3f6fa;
+      border-bottom: 1px solid #d1d5db;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      color: #374151;
+      font-size: 13px;
+    }
+
+    .report-sign-box .blank {
+      display: grid;
+      place-items: center;
+      color: #9ca3af;
+      font-weight: 700;
+    }
+
+    .print-only-note {
+      color: var(--sub);
+      font-size: 12px;
+      font-weight: 800;
+      margin-top: 8px;
+    }
+
+    @media print {
+      body.print-report {
+        background: #fff !important;
+      }
+
+      body.print-report .sidebar,
+      body.print-report .topbar,
+      body.print-report .section-head,
+      body.print-report .nav,
+      body.print-report .toolbar,
+      body.print-report #dashboardView,
+      body.print-report #equipmentView,
+      body.print-report #monthlyView,
+      body.print-report #photoReviewView,
+      body.print-report #maintenanceView,
+      body.print-report #depreciationView,
+      body.print-report #addView,
+      body.print-report #schemaView,
+      body.print-report .side-user {
+        display: none !important;
+      }
+
+      body.print-report .app,
+      body.print-report .main,
+      body.print-report .content,
+      body.print-report #reportView,
+      body.print-report #reportPrintable {
+        display: block !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: none !important;
+        background: #fff !important;
+      }
+
+      body.print-report #reportView > .card {
+        box-shadow: none !important;
+        border: 0 !important;
+      }
+
+      body.print-report .card-header {
+        display: none !important;
+      }
+
+      body.print-report .report-document {
+        border: 0 !important;
+        border-radius: 0 !important;
+        padding: 0 !important;
+      }
+
+      body.print-report .report-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+      }
+
+      @page {
+        size: A4;
+        margin: 14mm;
+      }
+    }
+
     .report-photo-doc {
       display: grid;
       gap: 14px;
@@ -2215,15 +2389,15 @@
           <div class="section-head">
             <div>
               <h1>점검 사진 확인</h1>
-              <p>월별 점검 사진을 장비별로 확인합니다. 사진은 필요 항목만 개별로 불러옵니다.</p>
+              <p>월별 점검 사진이 등록된 장비만 문서 형태로 확인합니다.</p>
             </div>
           </div>
 
           <div class="card">
             <div class="card-header">
               <div>
-                <h2 class="card-title">월별 점검 사진</h2>
-                <div class="card-sub">전체 PDF 출력 대신, 팀장이 화면에서 필요한 장비 사진만 확인하는 용도입니다.</div>
+                <h2 class="card-title">월별 점검 사진 문서</h2>
+                <div class="card-sub">점검사진이 있는 장비만 표시합니다. 최초 생성은 오래 걸릴 수 있고, 이후에는 브라우저 캐시를 우선 사용합니다.</div>
               </div>
             </div>
             <div class="card-body">
@@ -2232,10 +2406,12 @@
                 <input class="input" id="photoReviewSearch" placeholder="장비명, 관리번호, SN 검색" />
                 <select class="select" id="photoReviewLocationFilter"></select>
                 <select class="select" id="photoReviewStatusFilter"></select>
-                <button class="btn primary" id="photoReviewReloadBtn">조회</button>
+                <button class="btn primary" id="photoReviewReloadBtn">점검사진 문서 생성/보기</button>
+                <button class="btn" id="photoReviewCacheClearBtn" type="button">캐시삭제</button>
               </div>
               <div class="list-summary" id="photoReviewSummary"></div>
-              <div class="photo-review-list" id="photoReviewList"></div>
+              <div id="photoReviewMsg" class="notice hidden"></div>
+              <div class="report-photo-doc" id="photoReviewList"></div>
             </div>
           </div>
         </section>
@@ -2276,16 +2452,19 @@
           <div class="section-head">
             <div>
               <h1>결과보고</h1>
-              <p>월별 장비 위치·상태 확인 결과를 단순 보고 형태로 확인합니다.</p>
+              <p>월별 장비 점검 결과를 보고서 형식으로 확인하고 PDF로 저장합니다.</p>
             </div>
-            <button class="btn primary" id="reportReloadBtn">보고서 조회</button>
+            <div class="toolbar" style="margin:0;">
+              <button class="btn primary" id="reportReloadBtn">보고서 조회</button>
+              <button class="btn ghost" id="reportPrintBtn" type="button">PDF 저장/인쇄</button>
+            </div>
           </div>
 
           <div class="card">
             <div class="card-header">
               <div>
-                <h2 class="card-title">월별 점검 결과 요약</h2>
-                <div class="card-sub">정상/대여중/수리중 등 상태별 개수와 이상 장비 목록을 확인합니다.</div>
+                <h2 class="card-title">장비 점검 결과보고서</h2>
+                <div class="card-sub">점검 사진은 왼쪽 메뉴의 ‘점검 사진 확인’ 탭에서 별도로 확인합니다.</div>
               </div>
             </div>
             <div class="card-body">
@@ -2293,48 +2472,43 @@
                 <input class="input" type="month" id="reportMonth" />
                 <select class="select" id="reportLocationFilter"></select>
                 <select class="select" id="reportModelFilter"></select>
-                <button class="btn ghost" id="reportPhotoDocBtn" type="button">점검사진 문서 생성/보기</button>
-                <button class="btn" id="reportPhotoCacheClearBtn" type="button">사진문서 캐시삭제</button>
               </div>
 
-              <div class="report-grid" id="reportStats"></div>
-
-              <div class="card" style="box-shadow:none;margin-top:16px;">
-                <div class="card-header">
-                  <div>
-                    <h2 class="card-title">상태별 현황</h2>
-                    <div class="card-sub">이번달 상태와 위치의 “대여” 표시를 함께 반영합니다.</div>
-                  </div>
+              <div id="reportPrintable" class="report-document">
+                <div class="report-doc-title">
+                  <h2>월별 장비 점검 결과보고서</h2>
+                  <p id="reportDocSubtitle">-</p>
                 </div>
-                <div class="card-body">
+
+                <div class="report-official-section">
+                  <div class="report-subtitle">1. 점검 개요</div>
+                  <table class="report-meta-table">
+                    <tbody id="reportMetaTable"></tbody>
+                  </table>
+                </div>
+
+                <div class="report-official-section">
+                  <div class="report-subtitle">2. 점검 결과 요약</div>
+                  <div class="report-grid" id="reportStats"></div>
                   <div id="reportStatusTable" class="report-status-summary"></div>
                 </div>
-              </div>
 
-              <div class="card" style="box-shadow:none;margin-top:16px;">
-                <div class="card-header">
-                  <div>
-                    <h2 class="card-title">이상 / 확인 필요 장비</h2>
-                    <div class="card-sub">미확인, 정상 외 상태, 위치 변경, 메모가 있는 장비입니다. 자체일련번호 또는 관리번호를 함께 표시합니다.</div>
-                  </div>
-                </div>
-                <div class="card-body">
+                <div class="report-official-section">
+                  <div class="report-subtitle">3. 이상 / 확인 필요 장비</div>
                   <div id="reportIssueList" class="report-issue-list"></div>
                 </div>
-              </div>
 
-              <div class="card" style="box-shadow:none;margin-top:16px;">
-                <div class="card-header">
-                  <div>
-                    <h2 class="card-title">점검사진 확인용 문서</h2>
-                    <div class="card-sub">점검사진이 있는 장비만 표시합니다. 최초 생성은 오래 걸릴 수 있고, 이후에는 브라우저 캐시를 우선 사용합니다.</div>
+                <div class="report-official-section">
+                  <div class="report-subtitle">4. 확인란</div>
+                  <div class="report-sign-area">
+                    <div class="report-sign-box"><div class="label">작성</div><div class="blank">확인</div></div>
+                    <div class="report-sign-box"><div class="label">검토</div><div class="blank">확인</div></div>
+                    <div class="report-sign-box"><div class="label">승인</div><div class="blank">확인</div></div>
                   </div>
                 </div>
-                <div class="card-body">
-                  <div id="reportPhotoDocStatus" class="notice hidden"></div>
-                  <div id="reportPhotoDocArea" class="report-photo-doc"></div>
-                </div>
               </div>
+
+              <div class="print-only-note">PDF 저장은 브라우저 인쇄 창에서 “PDF로 저장”을 선택하면 됩니다.</div>
             </div>
           </div>
         </section>
@@ -4060,70 +4234,142 @@ SN번호복사 / 텍스트
       resizer.addEventListener("touchstart", start, { passive: false });
     }
 
-    async function loadPhotoReview() {
+    function photoReviewCacheKey() {
       const month = $("#photoReviewMonth")?.value || monthNow();
-      if ($("#monthlyMonth")) $("#monthlyMonth").value = month;
+      const location = $("#photoReviewLocationFilter")?.value || "";
+      const status = $("#photoReviewStatusFilter")?.value || "";
+      return `equipment_photo_review_${month}_${location}_${status}`;
+    }
 
-      $("#photoReviewList").innerHTML = `<div class="notice">월별 현황을 불러오는 중입니다.</div>`;
+    function showPhotoReviewMsg(message, isError = false) {
+      const box = $("#photoReviewMsg");
+      if (!box) return;
+      box.classList.remove("hidden");
+      box.classList.toggle("error", isError);
+      box.textContent = message;
+    }
+
+    function filterPhotoReviewItems(items) {
+      const q = ($("#photoReviewSearch")?.value || "").trim().toLowerCase();
+      if (!q) return items;
+
+      return items.filter(item => [
+        item.장비명,
+        item.관리번호,
+        item.모델명,
+        item.위치,
+        item.상태,
+        item.메모
+      ].filter(Boolean).join(" ").toLowerCase().includes(q));
+    }
+
+    function renderPhotoReviewList(fromCache = false) {
+      const items = filterPhotoReviewItems(photoReviewItems);
+
+      $("#photoReviewSummary").textContent = `사진 등록 장비 ${items.length}건${fromCache ? " · 캐시 사용" : ""}`;
+
+      if (!items.length) {
+        $("#photoReviewList").innerHTML = `<div class="empty">점검사진이 등록된 장비가 없습니다.</div>`;
+        return;
+      }
+
+      $("#photoReviewList").innerHTML = items.map(item => `
+        <article class="report-photo-doc-card">
+          <div class="report-photo-doc-head">
+            <div>
+              <strong>${escapeHtml(item.장비명 || "-")}</strong>
+              <span>자체일련번호/관리번호 ${escapeHtml(item.관리번호 || "-")} · ${escapeHtml(item.모델명 || "-")} · ${escapeHtml(item.위치 || "-")} · ${escapeHtml(item.상태 || "-")}</span>
+            </div>
+            <span class="badge normal">사진 ${item.photos.length}장</span>
+          </div>
+          ${item.메모 ? `<div class="small"><b>메모</b> ${escapeHtml(item.메모)}</div>` : ""}
+          <div class="report-photo-grid">
+            ${item.photos.map(photo => `<img src="${escapeHtml(photo.url)}" alt="">`).join("")}
+          </div>
+        </article>
+      `).join("");
+    }
+
+    async function loadPhotoReview(force = false) {
+      const month = $("#photoReviewMonth")?.value || monthNow();
+      const location = $("#photoReviewLocationFilter")?.value || "";
+      const status = $("#photoReviewStatusFilter")?.value || "";
+      const key = photoReviewCacheKey();
+
+      if (!force) {
+        try {
+          const cached = JSON.parse(localStorage.getItem(key) || "null");
+          if (cached?.items) {
+            photoReviewItems = cached.items;
+            showPhotoReviewMsg(`캐시된 점검사진 문서를 불러왔습니다. 사진 등록 장비 ${photoReviewItems.length}건`);
+            renderPhotoReviewList(true);
+            return;
+          }
+        } catch {}
+      }
+
+      $("#photoReviewList").innerHTML = "";
+      showPhotoReviewMsg("월별 현황을 불러오는 중입니다.");
 
       try {
         const data = await api(`/api/monthly?month=${encodeURIComponent(month)}`);
         monthlyRows = data.rows || [];
-        renderPhotoReviewList();
+
+        let rows = [...monthlyRows];
+        if (location) rows = rows.filter(row => matchesLocationFilter(row.이번달위치, location, row.이번달상태));
+        if (status) rows = rows.filter(row => row.이번달상태 === status);
+
+        const items = [];
+        for (let i = 0; i < rows.length; i++) {
+          const row = rows[i];
+          showPhotoReviewMsg(`점검사진 확인 중 · ${i + 1}/${rows.length}건`);
+
+          try {
+            const photoData = await api(`/api/monthly/${encodeURIComponent(row.id)}/photos`);
+            const photos = photoData.photos || [];
+
+            if (photos.length) {
+              items.push({
+                id: row.id,
+                장비명: row.장비명복사 || "",
+                관리번호: reportManagementNo(row),
+                모델명: monthlyModelName(row),
+                위치: row.이번달위치 || "",
+                상태: row.이번달상태 || "",
+                메모: row.메모 || "",
+                photos
+              });
+            }
+          } catch {}
+
+          await wait(70);
+        }
+
+        photoReviewItems = items;
+
+        try {
+          localStorage.setItem(key, JSON.stringify({
+            createdAt: new Date().toISOString(),
+            items
+          }));
+        } catch {
+          showPhotoReviewMsg("점검사진 문서 생성은 완료됐지만 캐시 저장 용량이 부족해 저장하지 못했습니다.", true);
+        }
+
+        showPhotoReviewMsg(`점검사진 문서 생성 완료. 사진 등록 장비 ${photoReviewItems.length}건`);
+        renderPhotoReviewList(false);
       } catch (error) {
+        showPhotoReviewMsg(error.message, true);
         $("#photoReviewList").innerHTML = `<div class="notice error">${escapeHtml(error.message)}</div>`;
       }
     }
 
-    function renderPhotoReviewList() {
-      const q = ($("#photoReviewSearch")?.value || "").trim().toLowerCase();
-      const location = $("#photoReviewLocationFilter")?.value || "";
-      const status = $("#photoReviewStatusFilter")?.value || "";
-
-      let rows = [...monthlyRows];
-      if (q) {
-        rows = rows.filter(row => {
-          const eq = equipmentForMonthly(row);
-          const text = [
-            row.장비명복사,
-            row.자체일련번호복사,
-            row.SN번호복사,
-            eq?.관리번호,
-            eq?.자체일련번호,
-            eq?.SN번호,
-            monthlyModelName(row)
-          ].filter(Boolean).join(" ").toLowerCase();
-          return text.includes(q);
-        });
-      }
-      if (location) rows = rows.filter(row => matchesLocationFilter(row.이번달위치, location, row.이번달상태));
-      if (status) rows = rows.filter(row => row.이번달상태 === status);
-
-      $("#photoReviewSummary").textContent = `조회 결과 ${rows.length}건 · 사진은 필요한 장비에서만 개별로 불러옵니다.`;
-
-      $("#photoReviewList").innerHTML = rows.length
-        ? rows.map(row => `
-          <article class="photo-review-card" data-id="${escapeHtml(row.id)}">
-            <div class="photo-review-head">
-              <div>
-                <div style="font-weight:900;letter-spacing:-.04em;">${escapeHtml(row.장비명복사 || "-")}</div>
-                <div class="small" style="color:var(--sub);font-size:13px;margin-top:4px;">
-                  ${escapeHtml(row.이번달위치 || "-")} · ${escapeHtml(row.이번달상태 || "-")} · 규격 ${escapeHtml(effectiveSpec(equipmentForMonthly(row)) || "-")} · 확인자 ${escapeHtml(row.확인자명복사 || "-")}
-                </div>
-                ${row.메모 ? `<div class="small" style="margin-top:6px;">메모: ${escapeHtml(row.메모)}</div>` : ""}
-              </div>
-              <span class="badge ${row.확인여부 ? "normal" : "need"}">${row.확인여부 ? "확인완료" : "미확인"}</span>
-            </div>
-            <div class="toolbar" style="margin:0;">
-              <button class="btn" type="button" data-photo-target="${escapeHtml(row.id)}">점검사진 보기</button>
-              ${row.url ? `<a class="btn ghost" href="${escapeHtml(row.url)}" target="_blank" rel="noreferrer">노션에서 열기</a>` : ""}
-            </div>
-            <div class="photo-review-photos-area"></div>
-          </article>
-        `).join("")
-        : `<div class="empty">조회된 월별 현황이 없습니다.</div>`;
-
-      bindMonthlyPhotoButtons($("#photoReviewList"));
+    function clearPhotoReviewCache() {
+      localStorage.removeItem(photoReviewCacheKey());
+      photoReviewItems = [];
+      $("#photoReviewList").innerHTML = "";
+      $("#photoReviewSummary").textContent = "";
+      showPhotoReviewMsg("점검사진 문서 캐시를 삭제했습니다.");
     }
 
 
@@ -4462,6 +4708,10 @@ SN번호복사 / 텍스트
       const checked = rows.filter(row => row.확인여부).length;
       const unchecked = total - checked;
       const issues = reportIssueRows(rows);
+      const month = $("#reportMonth")?.value || monthNow();
+      const locationText = $("#reportLocationFilter")?.selectedOptions?.[0]?.textContent || "전체";
+      const modelText = $("#reportModelFilter")?.selectedOptions?.[0]?.textContent || "전체";
+      const today = new Date().toLocaleDateString("ko-KR");
 
       const bucketMap = new Map();
       rows.forEach(row => {
@@ -4475,6 +4725,14 @@ SN번호복사 / 텍스트
         const bi = priority.includes(b[0]) ? priority.indexOf(b[0]) : 999;
         return ai - bi || b[1] - a[1];
       });
+
+      $("#reportDocSubtitle").textContent = `${formatMonth(month)} 장비 위치·상태 점검 결과`;
+
+      $("#reportMetaTable").innerHTML = `
+        <tr><th>점검월</th><td>${escapeHtml(formatMonth(month))}</td><th>작성일</th><td>${escapeHtml(today)}</td></tr>
+        <tr><th>점검대상</th><td>월별 장비 현황 등록 장비</td><th>조회조건</th><td>위치: ${escapeHtml(locationText)} / 모델: ${escapeHtml(modelText)}</td></tr>
+        <tr><th>총 점검대상</th><td>${total}건</td><th>확인완료</th><td>${checked}건</td></tr>
+      `;
 
       $("#reportStats").innerHTML = [
         ["전체", total],
@@ -4491,161 +4749,68 @@ SN번호복사 / 텍스트
       `).join("");
 
       $("#reportStatusTable").innerHTML = bucketRows.length
-        ? bucketRows.map(([name, count]) => `
-          <div class="report-status-row">
-            <strong>${escapeHtml(name)}</strong>
-            <span>${count}</span>
-          </div>
-        `).join("")
+        ? `
+          <table class="report-official-table">
+            <thead>
+              <tr><th>구분</th><th class="num">수량</th><th>비고</th></tr>
+            </thead>
+            <tbody>
+              ${bucketRows.map(([name, count]) => `
+                <tr>
+                  <td><strong>${escapeHtml(name)}</strong></td>
+                  <td class="num">${count}</td>
+                  <td>${name === "정상" ? "정상 확인 장비" : name === "미확인" ? "점검 미완료 장비" : "확인 필요"}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        `
         : `<div class="empty">상태 데이터가 없습니다.</div>`;
 
       $("#reportIssueList").innerHTML = issues.length
-        ? issues.map(row => {
-          const bucket = reportStatusBucket(row);
-          const eq = equipmentForMonthly(row);
-          const locationChanged = row.원장기준배치장소 && row.이번달위치 && row.원장기준배치장소 !== row.이번달위치;
+        ? `
+          <table class="report-official-table">
+            <thead>
+              <tr>
+                <th>장비명</th>
+                <th>자체일련번호/관리번호</th>
+                <th>모델</th>
+                <th>위치</th>
+                <th>상태</th>
+                <th>비고/메모</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${issues.map(row => {
+                const bucket = reportStatusBucket(row);
+                const locationChanged = row.원장기준배치장소 && row.이번달위치 && row.원장기준배치장소 !== row.이번달위치;
+                const note = [
+                  locationChanged ? `위치변경: ${row.원장기준배치장소 || "-"} → ${row.이번달위치 || "-"}` : "",
+                  row.메모 || ""
+                ].filter(Boolean).join(" / ");
 
-          return `
-            <article class="report-issue-card">
-              <div style="display:flex;justify-content:space-between;gap:10px;">
-                <div>
-                  <strong>${escapeHtml(row.장비명복사 || "-")}</strong>
-                  <div class="small" style="color:var(--sub);font-size:13px;margin-top:4px;">
-                    자체일련번호/관리번호 ${escapeHtml(reportManagementNo(row))} · ${escapeHtml(monthlyModelName(row))} · ${escapeHtml(row.이번달위치 || "-")}
-                  </div>
-                </div>
-                <span class="badge ${statusClass(row.이번달상태)}">${escapeHtml(bucket)}</span>
-              </div>
-              <div class="small">
-                <b>상태</b> ${escapeHtml(row.이번달상태 || "-")}
-                ${locationChanged ? ` · <b>위치변경</b> ${escapeHtml(row.원장기준배치장소 || "-")} → ${escapeHtml(row.이번달위치 || "-")}` : ""}
-              </div>
-              ${row.메모 ? `<div class="small"><b>메모</b> ${escapeHtml(row.메모)}</div>` : ""}
-              <div class="toolbar" style="margin:0;">
-                <button class="btn" type="button" data-photo-target="${escapeHtml(row.id)}">점검사진 보기</button>
-                ${row.url ? `<a class="btn ghost" href="${escapeHtml(row.url)}" target="_blank" rel="noreferrer">노션에서 열기</a>` : ""}
-              </div>
-              <div class="photo-review-photos-area"></div>
-            </article>
-          `;
-        }).join("")
+                return `
+                  <tr>
+                    <td><strong>${escapeHtml(row.장비명복사 || "-")}</strong></td>
+                    <td>${escapeHtml(reportManagementNo(row))}</td>
+                    <td>${escapeHtml(monthlyModelName(row))}</td>
+                    <td>${escapeHtml(row.이번달위치 || "-")}</td>
+                    <td>${escapeHtml(bucket)}</td>
+                    <td>${escapeHtml(note || "-")}</td>
+                  </tr>
+                `;
+              }).join("")}
+            </tbody>
+          </table>
+        `
         : `<div class="empty">이상 또는 확인 필요 장비가 없습니다.</div>`;
-
-      bindMonthlyPhotoButtons($("#reportIssueList"));
     }
 
-    function reportPhotoCacheKey() {
-      const month = $("#reportMonth")?.value || monthNow();
-      const location = $("#reportLocationFilter")?.value || "";
-      const model = $("#reportModelFilter")?.value || "";
-      return `equipment_report_photos_${month}_${location}_${model}`;
-    }
-
-    function showReportPhotoStatus(message, isError = false) {
-      const box = $("#reportPhotoDocStatus");
-      if (!box) return;
-      box.classList.remove("hidden");
-      box.classList.toggle("error", isError);
-      box.textContent = message;
-    }
-
-    function renderReportPhotoDocument(items, fromCache = false) {
-      const area = $("#reportPhotoDocArea");
-      if (!area) return;
-
-      if (!items.length) {
-        area.innerHTML = `<div class="empty">점검사진이 등록된 장비가 없습니다.</div>`;
-        return;
-      }
-
-      area.innerHTML = items.map(item => `
-        <article class="report-photo-doc-card">
-          <div class="report-photo-doc-head">
-            <div>
-              <strong>${escapeHtml(item.장비명 || "-")}</strong>
-              <span>자체일련번호/관리번호 ${escapeHtml(item.관리번호 || "-")} · ${escapeHtml(item.모델명 || "-")} · ${escapeHtml(item.위치 || "-")} · ${escapeHtml(item.상태 || "-")}</span>
-            </div>
-            <span class="badge normal">사진 ${item.photos.length}장</span>
-          </div>
-          ${item.메모 ? `<div class="small"><b>메모</b> ${escapeHtml(item.메모)}</div>` : ""}
-          <div class="report-photo-grid">
-            ${item.photos.map(photo => `<img src="${escapeHtml(photo.url)}" alt="">`).join("")}
-          </div>
-        </article>
-      `).join("");
-
-      showReportPhotoStatus(fromCache ? `캐시된 점검사진 문서를 불러왔습니다. 사진 등록 장비 ${items.length}건` : `점검사진 문서 생성 완료. 사진 등록 장비 ${items.length}건`);
-    }
-
-    async function buildReportPhotoDocument(force = false) {
-      const key = reportPhotoCacheKey();
-      const area = $("#reportPhotoDocArea");
-      if (!area) return;
-
-      if (!force) {
-        try {
-          const cached = JSON.parse(localStorage.getItem(key) || "null");
-          if (cached?.items?.length) {
-            renderReportPhotoDocument(cached.items, true);
-            return;
-          }
-        } catch {}
-      }
-
-      const rows = reportRows();
-      const items = [];
-      area.innerHTML = "";
-      showReportPhotoStatus(`점검사진 문서를 생성하는 중입니다. 0/${rows.length}건 확인`);
-
-      for (let i = 0; i < rows.length; i++) {
-        const row = rows[i];
-        showReportPhotoStatus(`점검사진 확인 중 · ${i + 1}/${rows.length}건`);
-
-        try {
-          const data = await api(`/api/monthly/${encodeURIComponent(row.id)}/photos`);
-          const photos = data.photos || [];
-
-          if (photos.length) {
-            items.push({
-              id: row.id,
-              장비명: row.장비명복사 || "",
-              관리번호: reportManagementNo(row),
-              모델명: monthlyModelName(row),
-              위치: row.이번달위치 || "",
-              상태: row.이번달상태 || "",
-              메모: row.메모 || "",
-              photos
-            });
-          }
-        } catch {}
-
-        await wait(80);
-      }
-
-      try {
-        localStorage.setItem(key, JSON.stringify({
-          createdAt: new Date().toISOString(),
-          items
-        }));
-      } catch {
-        showReportPhotoStatus("사진 문서 생성은 완료됐지만 캐시 저장 용량이 부족해 저장하지 못했습니다.", true);
-      }
-
-      renderReportPhotoDocument(items, false);
-    }
-
-    function clearReportPhotoCache() {
-      localStorage.removeItem(reportPhotoCacheKey());
-      $("#reportPhotoDocArea").innerHTML = "";
-      showReportPhotoStatus("점검사진 문서 캐시를 삭제했습니다.");
-    }
-
-    function maintenanceDateKey(item) {
-      return String(item?.일자 || "0000-00-00").slice(0, 10);
-    }
-
-    function sortMaintenanceDesc(rows) {
-      return [...rows].sort((a, b) => maintenanceDateKey(b).localeCompare(maintenanceDateKey(a)));
+    function printReportPDF() {
+      renderReport();
+      document.body.classList.add("print-report");
+      window.print();
+      setTimeout(() => document.body.classList.remove("print-report"), 500);
     }
 
     async function loadSelectedEquipmentMaintenance() {
@@ -4957,10 +5122,19 @@ SN번호복사 / 텍스트
         button.addEventListener("click", () => setMonthlyViewMode(button.dataset.mode));
       });
       onIfExists("#generateMonthlyBtn", "click", generateMonthly);
-      onIfExists("#photoReviewReloadBtn", "click", loadPhotoReview);
-      onIfExists("#photoReviewSearch", "input", renderPhotoReviewList);
-      onIfExists("#photoReviewLocationFilter", "change", renderPhotoReviewList);
-      onIfExists("#photoReviewStatusFilter", "change", renderPhotoReviewList);
+      onIfExists("#photoReviewReloadBtn", "click", () => loadPhotoReview(false));
+      onIfExists("#photoReviewCacheClearBtn", "click", clearPhotoReviewCache);
+      onIfExists("#photoReviewSearch", "input", () => renderPhotoReviewList(Boolean(photoReviewItems.length)));
+      onIfExists("#photoReviewLocationFilter", "change", () => {
+        photoReviewItems = [];
+        $("#photoReviewList").innerHTML = "";
+        $("#photoReviewSummary").textContent = "조건이 변경되었습니다. 점검사진 문서 생성/보기를 눌러 다시 불러오세요.";
+      });
+      onIfExists("#photoReviewStatusFilter", "change", () => {
+        photoReviewItems = [];
+        $("#photoReviewList").innerHTML = "";
+        $("#photoReviewSummary").textContent = "조건이 변경되었습니다. 점검사진 문서 생성/보기를 눌러 다시 불러오세요.";
+      });
 
       onIfExists("#maintenanceReloadBtn", "click", loadMaintenance);
       onIfExists("#maintenanceSearch", "input", renderMaintenanceList);
@@ -4976,8 +5150,7 @@ SN번호복사 / 텍스트
       onIfExists("#reportReloadBtn", "click", loadReport);
       onIfExists("#reportLocationFilter", "change", renderReport);
       onIfExists("#reportModelFilter", "change", renderReport);
-      onIfExists("#reportPhotoDocBtn", "click", () => buildReportPhotoDocument(false));
-      onIfExists("#reportPhotoCacheClearBtn", "click", clearReportPhotoCache);
+      onIfExists("#reportPrintBtn", "click", printReportPDF);
 
       onIfExists("#newModel", "change", applySelectedModelToForm);
       onIfExists("#addForm", "submit", submitAddForm);
