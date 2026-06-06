@@ -2019,6 +2019,60 @@
 
 
 
+
+    /* 장비관리대장 필터/새로고침 위치 고정 */
+    .equipment-toolbar {
+      display: grid;
+      grid-template-areas:
+        "search loc model status sort refresh"
+        "mode mode mode mode mode mode";
+      grid-template-columns: minmax(190px, 1.2fr) minmax(150px, .8fr) minmax(220px, 1.7fr) minmax(130px, .7fr) minmax(170px, .9fr) 104px;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .equipment-toolbar #equipmentSearch { grid-area: search; }
+    .equipment-toolbar #equipmentLocationFilter { grid-area: loc; }
+    .equipment-toolbar #equipmentModelFilter { grid-area: model; }
+    .equipment-toolbar #equipmentStatusFilter { grid-area: status; }
+    .equipment-toolbar #equipmentSortFilter { grid-area: sort; }
+    .equipment-toolbar #equipmentReloadBtn { grid-area: refresh; }
+    .equipment-toolbar #equipmentModeToggle { grid-area: mode; justify-self: start; }
+
+    .equipment-toolbar > .input,
+    .equipment-toolbar > .select,
+    .equipment-toolbar > .btn {
+      width: 100%;
+    }
+
+    @media (max-width: 1320px) {
+      .equipment-toolbar {
+        grid-template-areas:
+          "search model refresh"
+          "loc status sort"
+          "mode mode mode";
+        grid-template-columns: minmax(190px, 1.2fr) minmax(240px, 1.6fr) 104px;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .equipment-toolbar {
+        grid-template-areas:
+          "search"
+          "loc"
+          "model"
+          "status"
+          "sort"
+          "refresh"
+          "mode";
+        grid-template-columns: 1fr;
+      }
+
+      .equipment-toolbar #equipmentModeToggle {
+        width: 100%;
+      }
+    }
+
     .sync-note {
       color: var(--sub);
       font-size: 12px;
@@ -2299,7 +2353,7 @@
                 </div>
               </div>
               <div class="card-body">
-                <div class="toolbar">
+                <div class="toolbar equipment-toolbar">
                   <input class="input" id="equipmentSearch" placeholder="장비명, SN번호, 자체일련번호 검색" />
                   <select class="select" id="equipmentLocationFilter"></select>
                   <select class="select" id="equipmentModelFilter"></select>
