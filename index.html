@@ -4640,6 +4640,14 @@ SN번호복사 / 텍스트
       showReportPhotoStatus("점검사진 문서 캐시를 삭제했습니다.");
     }
 
+    function maintenanceDateKey(item) {
+      return String(item?.일자 || "0000-00-00").slice(0, 10);
+    }
+
+    function sortMaintenanceDesc(rows) {
+      return [...rows].sort((a, b) => maintenanceDateKey(b).localeCompare(maintenanceDateKey(a)));
+    }
+
     async function loadSelectedEquipmentMaintenance() {
       const row = equipmentRows.find(item => item.id === selectedEquipmentId);
       const area = $("#equipmentMaintenanceArea");
@@ -4660,7 +4668,7 @@ SN번호복사 / 텍스트
       const area = $("#equipmentMaintenanceArea");
       if (!area) return;
 
-      const rows = maintenanceRows.filter(item => item.장비 === row.id);
+      const rows = sortMaintenanceDesc(maintenanceRows.filter(item => item.장비 === row.id));
 
       area.innerHTML = `
         <div class="kv"><div class="k">⑮ 유지보수 내역</div><div class="v">${rows.length}건</div></div>
@@ -4773,7 +4781,7 @@ SN번호복사 / 텍스트
       const equipmentId = $("#maintenanceEquipmentFilter")?.value || "";
       const status = $("#maintenanceStatusFilter")?.value || "";
 
-      let rows = [...maintenanceRows];
+      let rows = sortMaintenanceDesc(maintenanceRows);
 
       if (q) {
         rows = rows.filter(row => {
