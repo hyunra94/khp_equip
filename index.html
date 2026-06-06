@@ -2131,10 +2131,10 @@
                   <select class="select" id="equipmentModelFilter"></select>
                   <select class="select" id="equipmentStatusFilter"></select>
                   <select class="select" id="equipmentSortFilter">
-                    <option value="">기본 정렬</option>
                     <option value="date">입고일/취득일 순</option>
                     <option value="model">모델명 순</option>
                     <option value="serial">자체일련번호/관리번호 순</option>
+                    <option value="">입력순/기본순</option>
                   </select>
                   <button class="btn refresh" id="equipmentReloadBtn">새로고침</button>
                   <div class="mode-toggle" id="equipmentModeToggle">
@@ -2187,10 +2187,10 @@
                 <select class="select" id="monthlyLocationFilter"></select>
                 <select class="select" id="monthlyModelFilter"></select>
                 <select class="select" id="monthlySortFilter">
-                  <option value="">기본 정렬</option>
                   <option value="date">입고일/취득일 순</option>
                   <option value="model">모델명 순</option>
                   <option value="serial">자체일련번호/관리번호 순</option>
+                  <option value="">입력순/기본순</option>
                 </select>
                 <select class="select" id="monthlyCheckedFilter">
                   <option value="">확인 여부 전체</option>
@@ -2848,7 +2848,7 @@ SN번호복사 / 텍스트
     }
 
     function monthlySortRows(rows) {
-      const sortValue = $("#monthlySortFilter")?.value || "";
+      const sortValue = $("#monthlySortFilter")?.value || "date";
       const arr = [...rows];
 
       if (sortValue === "date") {
@@ -2919,7 +2919,7 @@ SN번호복사 / 텍스트
         return matchQ && matchLocation && matchModel && matchStatus;
       });
 
-      return sortEquipmentLike(rows, $("#equipmentSortFilter")?.value || "");
+      return sortEquipmentLike(rows, $("#equipmentSortFilter")?.value || "date");
     }
 
     async function loadEquipment() {
@@ -3079,7 +3079,7 @@ SN번호복사 / 텍스트
         : `조회 결과 ${rows.length}건 · 모델 ${modelCount}개 · 월별현황 포함 ${includeCount}건`;
 
       $("#equipmentSyncNote").textContent = equipmentLastLoadedAt
-        ? `마지막 동기화: ${equipmentLastLoadedAt} · 필터/검색은 저장된 목록 안에서 즉시 적용됩니다. Notion 변경사항은 새로고침 버튼을 눌러 반영하세요.`
+        ? `마지막 동기화: ${equipmentLastLoadedAt} · 필터/검색은 저장된 목록 안에서 즉시 적용됩니다. 기본 정렬은 입고일/취득일 순입니다. Notion 변경사항은 새로고침 버튼을 눌러 반영하세요.`
         : "";
 
       $("#equipmentView").classList.toggle("detail-open", Boolean(selectedEquipmentId));
@@ -4989,10 +4989,10 @@ SN번호복사 / 텍스트
       setHtmlIfExists("#equipmentLocationFilter", optionHtml([], "", "배치장소 전체"));
       setHtmlIfExists("#equipmentModelFilter", `<option value="">장비모델 전체</option>`);
       setHtmlIfExists("#equipmentStatusFilter", optionHtml(statuses, "", "상태 전체"));
-      setValueIfExists("#equipmentSortFilter", "");
+      setValueIfExists("#equipmentSortFilter", "date");
       setHtmlIfExists("#monthlyLocationFilter", optionHtml(locations, "", "위치 전체"));
       setHtmlIfExists("#monthlyModelFilter", `<option value="">장비모델 전체</option>`);
-      setValueIfExists("#monthlySortFilter", "");
+      setValueIfExists("#monthlySortFilter", "date");
       setHtmlIfExists("#photoReviewLocationFilter", optionHtml(locations, "", "위치 전체"));
       setHtmlIfExists("#photoReviewStatusFilter", optionHtml(statuses, "", "상태 전체"));
       setHtmlIfExists("#newLocation", optionHtml(locations, "XR실"));
