@@ -2472,7 +2472,7 @@
                 <input class="input" id="photoReviewSearch" placeholder="장비명, 관리번호, SN 검색" />
                 <select class="select" id="photoReviewLocationFilter"></select>
                 <select class="select" id="photoReviewStatusFilter"></select>
-                <button class="btn primary" id="photoReviewReloadBtn">점검사진 문서 생성/보기</button>
+                <button class="btn primary" id="photoReviewReloadBtn">점검사진 문서 확인/갱신</button>
                 <button class="btn" id="photoReviewCacheClearBtn" type="button">캐시삭제</button>
               </div>
               <div class="list-summary" id="photoReviewSummary"></div>
@@ -4489,20 +4489,25 @@ SN번호복사 / 텍스트
       const status = $("#photoReviewStatusFilter")?.value || "";
       const key = photoReviewCacheKey();
 
+      let hadCache = false;
+
+      // 캐시가 있으면 먼저 즉시 보여주고, 버튼을 눌렀을 때는 뒤에서 다시 한 번 실제 데이터를 확인합니다.
       if (!force) {
         try {
           const cached = JSON.parse(localStorage.getItem(key) || "null");
           if (cached?.items) {
+            hadCache = true;
             photoReviewItems = cached.items;
-            showPhotoReviewMsg(`캐시된 점검사진 문서를 불러왔습니다. 사진 등록 장비 ${photoReviewItems.length}건`);
             renderPhotoReviewList(true);
-            return;
+            showPhotoReviewMsg(`캐시된 점검사진 문서를 먼저 불러왔습니다. 사진 등록 장비 ${photoReviewItems.length}건 · 최신 데이터 확인 중`);
           }
         } catch {}
       }
 
-      $("#photoReviewList").innerHTML = "";
-      showPhotoReviewMsg("월별 현황을 불러오는 중입니다.");
+      if (!hadCache) {
+        $("#photoReviewList").innerHTML = "";
+        showPhotoReviewMsg("월별 현황을 불러오는 중입니다.");
+      }
 
       try {
         const data = await api(`/api/monthly?month=${encodeURIComponent(month)}`);
@@ -4515,7 +4520,7 @@ SN번호복사 / 텍스트
         const items = [];
         for (let i = 0; i < rows.length; i++) {
           const row = rows[i];
-          showPhotoReviewMsg(`점검사진 확인 중 · ${i + 1}/${rows.length}건`);
+          showPhotoReviewMsg(`점검사진 최신 확인 중 · ${i + 1}/${rows.length}건`);
 
           try {
             const photoData = await api(`/api/monthly/${encodeURIComponent(row.id)}/photos`);
@@ -4546,14 +4551,18 @@ SN번호복사 / 텍스트
             items
           }));
         } catch {
-          showPhotoReviewMsg("점검사진 문서 생성은 완료됐지만 캐시 저장 용량이 부족해 저장하지 못했습니다.", true);
+          showPhotoReviewMsg("최신 점검사진 문서 생성은 완료됐지만 캐시 저장 용량이 부족해 저장하지 못했습니다.", true);
         }
 
-        showPhotoReviewMsg(`점검사진 문서 생성 완료. 사진 등록 장비 ${photoReviewItems.length}건`);
+        showPhotoReviewMsg(`점검사진 문서 최신 확인 완료. 사진 등록 장비 ${photoReviewItems.length}건`);
         renderPhotoReviewList(false);
       } catch (error) {
-        showPhotoReviewMsg(error.message, true);
-        $("#photoReviewList").innerHTML = `<div class="notice error">${escapeHtml(error.message)}</div>`;
+        if (hadCache) {
+          showPhotoReviewMsg(`최신 확인 중 오류가 발생해 캐시된 문서를 유지합니다. ${error.message}`, true);
+        } else {
+          showPhotoReviewMsg(error.message, true);
+          $("#photoReviewList").innerHTML = `<div class="notice error">${escapeHtml(error.message)}</div>`;
+        }
       }
     }
 
@@ -5430,12 +5439,12 @@ SN번호복사 / 텍스트
       onIfExists("#photoReviewLocationFilter", "change", () => {
         photoReviewItems = [];
         $("#photoReviewList").innerHTML = "";
-        $("#photoReviewSummary").textContent = "조건이 변경되었습니다. 점검사진 문서 생성/보기를 눌러 다시 불러오세요.";
+        $("#photoReviewSummary").textContent = "조건이 변경되었습니다. 점검사진 문서 확인/갱신를 눌러 다시 불러오세요.";
       });
       onIfExists("#photoReviewStatusFilter", "change", () => {
         photoReviewItems = [];
         $("#photoReviewList").innerHTML = "";
-        $("#photoReviewSummary").textContent = "조건이 변경되었습니다. 점검사진 문서 생성/보기를 눌러 다시 불러오세요.";
+        $("#photoReviewSummary").textContent = "조건이 변경되었습니다. 점검사진 문서 확인/갱신를 눌러 다시 불러오세요.";
       });
 
       onIfExists("#maintenanceReloadBtn", "click", loadMaintenance);
