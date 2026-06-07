@@ -3799,8 +3799,10 @@ SN번호복사 / 텍스트
       const statusesSummary = summarizeBy(rows.map(row => ({ 장비상태등: row.이번달상태 })), "장비상태등", "상태없음").slice(0, 3);
       const checkedCount = rows.filter(row => row.확인여부).length;
 
+      const isOpen = openMonthlyModelGroups.has(group.id);
+
       return `
-        <details class="model-group-card">
+        <details class="model-group-card" data-monthly-group-id="${escapeHtml(group.id)}" ${isOpen ? "open" : ""}>
           <summary class="model-group-head">
             ${photo}
             <div class="model-title">
@@ -3971,15 +3973,18 @@ SN번호복사 / 텍스트
       });
 
       $$(".quick-monthly-check").forEach(input => {
+        input.addEventListener("click", event => event.stopPropagation());
         input.addEventListener("change", () => quickCheckMonthly(input.closest(".monthly-card")));
       });
 
       $$(".monthly-location").forEach(select => {
+        select.addEventListener("click", event => event.stopPropagation());
         select.addEventListener("change", () => saveMonthly(select.closest(".monthly-card"), false));
       });
 
       $$(".toggle-monthly-detail-btn").forEach(button => {
-        button.addEventListener("click", () => {
+        button.addEventListener("click", event => {
+          event.stopPropagation();
           const id = button.closest(".monthly-card").dataset.id;
           selectedMonthlyId = selectedMonthlyId === id ? "" : id;
           renderMonthlyList();
