@@ -2024,15 +2024,16 @@
     .equipment-toolbar {
       display: grid;
       grid-template-areas:
-        "search loc model status sort refresh"
-        "mode mode mode mode mode mode";
-      grid-template-columns: minmax(190px, 1.2fr) minmax(150px, .8fr) minmax(220px, 1.7fr) minmax(130px, .7fr) minmax(170px, .9fr) 104px;
+        "search loc year model status sort refresh"
+        "mode mode mode mode mode mode mode";
+      grid-template-columns: minmax(180px, 1.1fr) minmax(145px, .75fr) minmax(120px, .65fr) minmax(220px, 1.55fr) minmax(120px, .65fr) minmax(165px, .85fr) 104px;
       gap: 10px;
       align-items: center;
     }
 
     .equipment-toolbar #equipmentSearch { grid-area: search; }
     .equipment-toolbar #equipmentLocationFilter { grid-area: loc; }
+    .equipment-toolbar #equipmentYearFilter { grid-area: year; }
     .equipment-toolbar #equipmentModelFilter { grid-area: model; }
     .equipment-toolbar #equipmentStatusFilter { grid-area: status; }
     .equipment-toolbar #equipmentSortFilter { grid-area: sort; }
@@ -2049,7 +2050,8 @@
       .equipment-toolbar {
         grid-template-areas:
           "search model refresh"
-          "loc status sort"
+          "loc year status"
+          "sort sort sort"
           "mode mode mode";
         grid-template-columns: minmax(190px, 1.2fr) minmax(240px, 1.6fr) 104px;
       }
@@ -2060,6 +2062,7 @@
         grid-template-areas:
           "search"
           "loc"
+          "year"
           "model"
           "status"
           "sort"
@@ -2265,7 +2268,7 @@
       <nav class="nav">
         <button class="active" data-view="dashboardView">대시보드</button>
         <button data-view="equipmentView">장비관리대장</button>
-        <button data-view="monthlyView">월별 위치·상태 확인</button>
+        <button data-view="monthlyView">월별 점검 목록</button>
         <button data-view="photoReviewView">점검 사진 확인</button>
         <button data-view="depreciationView">감가상각비</button>
         <button data-view="reportView">결과보고</button>
@@ -2297,7 +2300,7 @@
           <div class="section-head">
             <div>
               <h1>장비 현황 대시보드</h1>
-              <p>장비 원장과 월별 위치·상태 확인 현황을 요약합니다.</p>
+              <p>장비 원장과 월별 점검 목록 현황을 요약합니다.</p>
             </div>
             <div class="toolbar" style="margin:0;">
               <input class="input" type="month" id="dashMonth" />
@@ -2356,6 +2359,7 @@
                 <div class="toolbar equipment-toolbar">
                   <input class="input" id="equipmentSearch" placeholder="장비명, SN번호, 자체일련번호 검색" />
                   <select class="select" id="equipmentLocationFilter"></select>
+                  <select class="select" id="equipmentYearFilter"></select>
                   <select class="select" id="equipmentModelFilter"></select>
                   <select class="select" id="equipmentStatusFilter"></select>
                   <select class="select" id="equipmentSortFilter">
@@ -2395,8 +2399,8 @@
         <section class="view" id="monthlyView">
           <div class="section-head">
             <div>
-              <h1>월별 위치·상태 확인</h1>
-              <p>위치와 상태만 확인하고, 확인 완료 시 로그인 사용자가 자동 기록됩니다.</p>
+              <h1>월별 점검 목록</h1>
+              <p>월별 장비 위치와 상태를 점검하고, 확인 완료 시 로그인 사용자가 자동 기록됩니다.</p>
             </div>
             <button class="btn primary admin-only" id="generateMonthlyBtn">월별 현황 생성</button>
           </div>
@@ -2796,6 +2800,7 @@ SN번호복사 / 텍스트
     let monthlyViewMode = localStorage.getItem('monthly_view_mode') || 'list';
     let selectedMonthlyId = '';
     let selectedMonthlySideId = '';
+    let openMonthlyModelGroups = new Set();
     let monthlyRows = [];
     let maintenanceRows = [];
     let selectedDepreciationId = "";
@@ -2911,7 +2916,7 @@ SN번호복사 / 텍스트
       const labels = {
         dashboardView: "대시보드",
         equipmentView: "장비관리대장",
-        monthlyView: "월별 위치·상태 확인",
+        monthlyView: "월별 점검 목록",
         addView: "신규 장비 등록",
         schemaView: "DB 속성표",
         photoReviewView: "점검 사진 확인",
@@ -3019,6 +3024,28 @@ SN번호복사 / 텍스트
       if (current && !locations.includes(current)) {
         select.value = "";
       }
+    }
+
+
+    function equipmentYearValue(row) {
+      const raw = equipmentDateValue(row);
+      const year = String(raw || "").slice(0, 4);
+      return /^\d{4}$/.test(year) ? year : "";
+    }
+
+    function refreshEquipmentYearOptions() {
+      const select = $("#equipmentYearFilter");
+      if (!select) return;
+
+      const current = select.value;
+      const years = [...new Set(equipmentRows.map(equipmentYearValue).filter(Boolean))]
+        .sort((a, b) => b.localeCompare(a));
+
+      select.innerHTML = `<option value="">년도 전체</option>` + years.map(year => `
+        <option value="${escapeHtml(year)}">${escapeHtml(year)}년</option>
+      `).join("");
+
+      select.value = years.includes(current) ? current : "";
     }
 
 
@@ -3136,15 +3163,17 @@ SN번호복사 / 텍스트
     function filteredEquipmentRows() {
       const q = $("#equipmentSearch").value.trim().toLowerCase();
       const location = $("#equipmentLocationFilter").value;
+      const year = $("#equipmentYearFilter")?.value || "";
       const modelId = $("#equipmentModelFilter")?.value || "";
       const status = $("#equipmentStatusFilter").value;
 
       const rows = equipmentRows.filter(row => {
         const matchQ = !q || `${row.장비명 || ""} ${row.SN번호 || ""} ${row.자체일련번호 || ""} ${row.규격 || ""} ${modelName(row) || ""}`.toLowerCase().includes(q);
         const matchLocation = matchesLocationFilter(row.배치장소, location, row.장비상태등);
+        const matchYear = !year || equipmentYearValue(row) === year;
         const matchModel = !modelId || (row.장비모델 || "") === modelId;
         const matchStatus = !status || row.장비상태등 === status;
-        return matchQ && matchLocation && matchModel && matchStatus;
+        return matchQ && matchLocation && matchYear && matchModel && matchStatus;
       });
 
       return sortEquipmentLike(rows, $("#equipmentSortFilter")?.value || "date");
@@ -3159,6 +3188,7 @@ SN번호복사 / 텍스트
         equipmentLastLoadedAt = new Date().toLocaleString("ko-KR");
 
         refreshEquipmentLocationOptions();
+        refreshEquipmentYearOptions();
         refreshEquipmentModelOptions();
         refreshMaintenanceEquipmentOptions();
         refreshDepreciationModelOptions();
@@ -3240,8 +3270,10 @@ SN번호복사 / 텍스트
       const locations = summarizeBy(rows, "배치장소").slice(0, 3);
       const statuses = summarizeBy(rows, "장비상태등", "상태없음").slice(0, 3);
 
+      const isOpen = openMonthlyModelGroups.has(group.id);
+
       return `
-        <details class="model-group-card">
+        <details class="model-group-card" data-monthly-group-id="${escapeHtml(group.id)}" ${isOpen ? "open" : ""}>
           <summary class="model-group-head">
             ${photo}
             <div class="model-title">
@@ -3404,10 +3436,12 @@ SN번호복사 / 텍스트
           <div class="toolbar" style="margin-top:16px;">
             <button class="btn primary load-inline-photos-btn" type="button" data-id="${escapeHtml(row.id)}">▼ ⑭ 장비사진 보기</button>
             ${model ? `<button class="btn ghost load-inline-model-photos-btn" type="button" data-id="${escapeHtml(model.id)}">▼ 모델 공통사진 보기</button>` : ""}
+            <button class="btn ghost load-inline-maintenance-btn" type="button" data-id="${escapeHtml(row.id)}">▼ ⑮ 유지보수 내역</button>
             ${row.url ? `<a class="btn ghost" href="${escapeHtml(row.url)}" target="_blank" rel="noreferrer">노션에서 열기</a>` : ""}
           </div>
           <div class="inline-photos-area"></div>
           <div class="inline-model-photos-area"></div>
+          <div class="inline-maintenance-area equipment-maintenance-area"></div>
         </div>
       `;
     }
@@ -3457,6 +3491,15 @@ SN번호복사 / 텍스트
           } catch (error) {
             area.innerHTML = `<div class="notice error">${escapeHtml(error.message)}</div>`;
           }
+        });
+      });
+
+      $$("#equipmentList .load-inline-maintenance-btn").forEach(button => {
+        button.addEventListener("click", async (event) => {
+          event.stopPropagation();
+          const row = equipmentRows.find(item => item.id === button.dataset.id);
+          const area = button.closest(".mobile-inline-detail").querySelector(".inline-maintenance-area");
+          await loadEquipmentMaintenanceForArea(row, area);
         });
       });
     }
@@ -3675,6 +3718,10 @@ SN번호복사 / 텍스트
       monthlyViewMode = mode === "model" ? "model" : "list";
       localStorage.setItem("monthly_view_mode", monthlyViewMode);
 
+      if (monthlyViewMode !== "model") {
+        openMonthlyModelGroups.clear();
+      }
+
       $$("#monthlyModeToggle button").forEach(btn => {
         btn.classList.toggle("active", btn.dataset.mode === monthlyViewMode);
       });
@@ -3776,7 +3823,7 @@ SN번호복사 / 텍스트
 
         <div class="toolbar" style="margin-top:14px;">
           <button class="btn primary" type="button" id="sideLoadMonthlyPhotosBtn">점검사진 보기</button>
-          <button class="btn ghost" type="button" id="sideOpenDetailBtn">점검 입력 열기</button>
+          <button class="btn ghost" type="button" id="sideOpenEquipmentBtn">관리대장으로 이동</button>
         </div>
         <div class="monthly-side-photos-area"></div>
       `;
@@ -3790,10 +3837,39 @@ SN번호복사 / 텍스트
         loadMonthlyPhotos(row.id, panel.querySelector(".monthly-side-photos-area"));
       });
 
-      $("#sideOpenDetailBtn").addEventListener("click", () => {
-        selectedMonthlyId = row.id;
-        renderMonthlyList();
+      $("#sideOpenEquipmentBtn").addEventListener("click", () => {
+        const eq = equipmentForMonthly(row);
+        if (!eq) {
+          alert("연결된 장비 원장 정보를 찾지 못했습니다.");
+          return;
+        }
+
+        // 장비관리대장에서 해당 장비가 필터 때문에 숨지지 않도록 필터를 초기화합니다.
+        if ($("#equipmentSearch")) $("#equipmentSearch").value = "";
+        if ($("#equipmentLocationFilter")) $("#equipmentLocationFilter").value = "";
+        if ($("#equipmentYearFilter")) $("#equipmentYearFilter").value = "";
+        if ($("#equipmentModelFilter")) $("#equipmentModelFilter").value = "";
+        if ($("#equipmentStatusFilter")) $("#equipmentStatusFilter").value = "";
+
+        selectedEquipmentId = eq.id;
+        selectedMonthlySideId = "";
+        panel.classList.add("hidden");
+
+        showView("equipmentView");
+        renderEquipmentList();
+        renderEquipmentDetail();
+
+        const detail = $("#equipmentDetail");
+        if (detail) detail.scrollIntoView({ behavior: "smooth", block: "start" });
       });
+    }
+
+    function monthlyGroupIdForRow(row) {
+      return monthlyModelId(row) || "__none__";
+    }
+
+    function applyMonthlyPatchToLocal(id, patch) {
+      monthlyRows = monthlyRows.map(row => row.id === id ? { ...row, ...patch } : row);
     }
 
     function renderMonthlyList() {
@@ -3847,6 +3923,15 @@ SN번호복사 / 텍스트
       $("#monthlyList").innerHTML = monthlyViewMode === "model"
         ? `<div class="model-group-list">${groupMonthlyRowsByModel(rows).map(monthlyModelGroupHtml).join("")}</div>`
         : rows.map(row => monthlyCardHtml(row)).join("");
+
+      $$("#monthlyList .model-group-card").forEach(details => {
+        details.addEventListener("toggle", () => {
+          const id = details.dataset.monthlyGroupId;
+          if (!id) return;
+          if (details.open) openMonthlyModelGroups.add(id);
+          else openMonthlyModelGroups.delete(id);
+        });
+      });
 
       $$(".quick-monthly-check").forEach(input => {
         input.addEventListener("change", () => quickCheckMonthly(input.closest(".monthly-card")));
@@ -4022,21 +4107,29 @@ SN번호복사 / 텍스트
     async function quickCheckMonthly(card) {
       const checkbox = card.querySelector(".quick-monthly-check");
       const id = card.dataset.id;
+      const row = monthlyRows.find(item => item.id === id);
+      const groupId = row ? monthlyGroupIdForRow(row) : "";
 
+      if (groupId) openMonthlyModelGroups.add(groupId);
       checkbox.disabled = true;
+
+      const patch = {
+        이번달위치: card.querySelector(".monthly-location").value,
+        이번달상태: "정상",
+        메모: "",
+        확인여부: checkbox.checked
+      };
 
       try {
         await api(`/api/monthly/${encodeURIComponent(id)}`, {
           method: "PATCH",
-          body: JSON.stringify({
-            이번달위치: card.querySelector(".monthly-location").value,
-            이번달상태: "정상",
-            메모: "",
-            확인여부: checkbox.checked
-          })
+          body: JSON.stringify(patch)
         });
 
-        await loadMonthly(false);
+        applyMonthlyPatchToLocal(id, patch);
+        renderMonthlyList();
+        renderDashboard();
+        if (selectedMonthlySideId === id) renderMonthlySideDetail(id);
       } catch (error) {
         alert(error.message);
         checkbox.checked = !checkbox.checked;
@@ -4047,25 +4140,34 @@ SN번호복사 / 텍스트
 
     async function saveMonthly(card, markChecked = true) {
       const id = card.dataset.id;
+      const row = monthlyRows.find(item => item.id === id);
+      const groupId = row ? monthlyGroupIdForRow(row) : "";
       const button = card.querySelector(".save-monthly-detail-btn");
+
+      if (groupId) openMonthlyModelGroups.add(groupId);
 
       if (button) {
         button.disabled = true;
         button.textContent = "저장 중";
       }
 
+      const patch = {
+        이번달위치: card.querySelector(".monthly-location").value,
+        이번달상태: card.querySelector(".monthly-status")?.value || "정상",
+        메모: card.querySelector(".monthly-memo")?.value || "",
+        확인여부: markChecked ? true : card.querySelector(".quick-monthly-check")?.checked || false
+      };
+
       try {
         await api(`/api/monthly/${encodeURIComponent(id)}`, {
           method: "PATCH",
-          body: JSON.stringify({
-            이번달위치: card.querySelector(".monthly-location").value,
-            이번달상태: card.querySelector(".monthly-status")?.value || "정상",
-            메모: card.querySelector(".monthly-memo")?.value || "",
-            확인여부: markChecked ? true : card.querySelector(".quick-monthly-check")?.checked || false
-          })
+          body: JSON.stringify(patch)
         });
 
-        await loadMonthly(false);
+        applyMonthlyPatchToLocal(id, patch);
+        renderMonthlyList();
+        renderDashboard();
+        if (selectedMonthlySideId === id) renderMonthlySideDetail(id);
       } catch (error) {
         alert(error.message);
       } finally {
@@ -4867,20 +4969,128 @@ SN번호복사 / 텍스트
       setTimeout(() => document.body.classList.remove("print-report"), 500);
     }
 
-    async function loadSelectedEquipmentMaintenance() {
-      const row = equipmentRows.find(item => item.id === selectedEquipmentId);
-      const area = $("#equipmentMaintenanceArea");
+    function maintenanceDateKey(item) {
+      return String(item?.일자 || "0000-00-00").slice(0, 10);
+    }
+
+    function sortMaintenanceDesc(rows) {
+      return [...rows].sort((a, b) => maintenanceDateKey(b).localeCompare(maintenanceDateKey(a)));
+    }
+
+    async function loadEquipmentMaintenanceForArea(row, area) {
       if (!row || !area) return;
 
       area.innerHTML = `<div class="notice">유지보수 내역을 불러오는 중입니다.</div>`;
 
       try {
         const data = await api(`/api/maintenance?equipment=${encodeURIComponent(row.id)}`);
-        maintenanceRows = data.rows || [];
-        renderSelectedEquipmentMaintenance(row);
+        const rows = sortMaintenanceDesc((data.rows || []).filter(item => item.장비 === row.id));
+        renderEquipmentMaintenanceArea(row, area, rows);
       } catch (error) {
         area.innerHTML = `<div class="notice error">${escapeHtml(error.message)}</div>`;
       }
+    }
+
+    function renderEquipmentMaintenanceArea(row, area, rows = []) {
+      area.innerHTML = `
+        <div class="kv"><div class="k">⑮ 유지보수 내역</div><div class="v">${rows.length}건</div></div>
+
+        ${rows.length ? rows.map(item => `
+          <article class="equipment-maintenance-card">
+            <div class="equipment-maintenance-head">
+              <div>
+                <strong>${escapeHtml(item.유지보수명 || item.내용 || "유지보수 내역")}</strong>
+                <div class="small" style="color:var(--sub);font-size:13px;margin-top:4px;">
+                  ${escapeHtml(item.일자 || "-")} · ${escapeHtml(item.구분 || "-")}
+                </div>
+              </div>
+              <span class="badge ${item.상태 === "완료" ? "normal" : item.상태 === "진행중" ? "loan" : "need"}">${escapeHtml(item.상태 || "-")}</span>
+            </div>
+            ${item.내용 ? `<div class="small"><b>내용</b> ${escapeHtml(item.내용)}</div>` : ""}
+            ${item.처리결과 ? `<div class="small"><b>처리결과</b> ${escapeHtml(item.처리결과)}</div>` : ""}
+            ${item.비용 ? `<div class="small"><b>비용</b> ${Number(item.비용).toLocaleString("ko-KR")}원</div>` : ""}
+            ${item.비고 ? `<div class="small"><b>비고</b> ${escapeHtml(item.비고)}</div>` : ""}
+          </article>
+        `).join("") : `<div class="notice">등록된 유지보수 내역이 없습니다.</div>`}
+
+        <form class="equipment-maintenance-form">
+          <div style="font-weight:900;color:var(--primary);">새 유지보수 내역 등록</div>
+          <div class="small" style="color:var(--sub);font-size:12px;">유지보수 DB 환경변수가 없으면 장비 원장 페이지 내부 ⑮ 유지보수 내역에 저장됩니다.</div>
+          <div class="equipment-maintenance-form-grid">
+            <label>일자
+              <input class="input" type="date" name="일자" />
+            </label>
+            <label>구분
+              <select class="select" name="구분">
+                <option>유지보수</option>
+                <option>수리</option>
+                <option>점검</option>
+                <option>교체</option>
+                <option>기타</option>
+              </select>
+            </label>
+            <label>상태
+              <select class="select" name="상태">
+                <option>접수</option>
+                <option>진행중</option>
+                <option>완료</option>
+                <option>보류</option>
+              </select>
+            </label>
+            <label>비용
+              <input class="input" type="number" name="비용" />
+            </label>
+            <label class="full">내용
+              <textarea class="textarea" name="내용" placeholder="유지보수 내용"></textarea>
+            </label>
+            <label class="full">처리결과
+              <textarea class="textarea" name="처리결과" placeholder="처리 결과 또는 조치 내용"></textarea>
+            </label>
+            <label class="full">비고
+              <input class="input" name="비고" />
+            </label>
+          </div>
+          <button class="btn primary" type="submit">유지보수 저장</button>
+        </form>
+      `;
+
+      const form = area.querySelector(".equipment-maintenance-form");
+      if (form) {
+        form.addEventListener("submit", (event) => submitEquipmentMaintenanceForArea(event, row, area));
+      }
+    }
+
+    async function submitEquipmentMaintenanceForArea(event, row, area) {
+      event.preventDefault();
+
+      const form = event.currentTarget;
+      const button = form.querySelector("button[type='submit']");
+      const payload = Object.fromEntries(new FormData(form).entries());
+      payload.장비 = row.id;
+
+      button.disabled = true;
+      button.textContent = "저장 중";
+
+      try {
+        await api("/api/maintenance", {
+          method: "POST",
+          body: JSON.stringify(payload)
+        });
+
+        form.reset();
+        await loadEquipmentMaintenanceForArea(row, area);
+      } catch (error) {
+        alert(error.message);
+      } finally {
+        button.disabled = false;
+        button.textContent = "유지보수 저장";
+      }
+    }
+
+    async function loadSelectedEquipmentMaintenance() {
+      const row = equipmentRows.find(item => item.id === selectedEquipmentId);
+      const area = $("#equipmentMaintenanceArea");
+      return loadEquipmentMaintenanceForArea(row, area);
     }
 
     function renderSelectedEquipmentMaintenance(row) {
@@ -5148,6 +5358,11 @@ SN번호복사 / 텍스트
         renderEquipmentDetail();
       });
 
+      onIfExists("#equipmentYearFilter", "change", () => {
+        renderEquipmentList();
+        renderEquipmentDetail();
+      });
+
       onIfExists("#equipmentModelFilter", "change", () => {
         renderEquipmentList();
         renderEquipmentDetail();
@@ -5222,6 +5437,7 @@ SN번호복사 / 텍스트
 
     function initSelects() {
       setHtmlIfExists("#equipmentLocationFilter", optionHtml([], "", "배치장소 전체"));
+      setHtmlIfExists("#equipmentYearFilter", `<option value="">년도 전체</option>`);
       setHtmlIfExists("#equipmentModelFilter", `<option value="">장비모델 전체</option>`);
       setHtmlIfExists("#equipmentStatusFilter", optionHtml(statuses, "", "상태 전체"));
       setValueIfExists("#equipmentSortFilter", "date");
