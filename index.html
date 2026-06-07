@@ -1675,6 +1675,16 @@
       color: var(--sub);
     }
 
+    .sort-toggle {
+      width: fit-content;
+      max-width: 100%;
+      overflow-x: auto;
+    }
+
+    .sort-toggle button {
+      white-space: nowrap;
+    }
+
     .mode-toggle button.active {
       background: #fff;
       color: var(--primary);
@@ -2024,9 +2034,10 @@
     .equipment-toolbar {
       display: grid;
       grid-template-areas:
-        "search loc year model status sort refresh"
-        "mode mode mode mode mode mode mode";
-      grid-template-columns: minmax(180px, 1.1fr) minmax(145px, .75fr) minmax(120px, .65fr) minmax(220px, 1.55fr) minmax(120px, .65fr) minmax(165px, .85fr) 104px;
+        "search loc year status refresh"
+        "sort sort sort sort sort"
+        "mode mode mode mode mode";
+      grid-template-columns: minmax(190px, 1.3fr) minmax(145px, .8fr) minmax(120px, .65fr) minmax(130px, .7fr) 104px;
       gap: 10px;
       align-items: center;
     }
@@ -2034,9 +2045,8 @@
     .equipment-toolbar #equipmentSearch { grid-area: search; }
     .equipment-toolbar #equipmentLocationFilter { grid-area: loc; }
     .equipment-toolbar #equipmentYearFilter { grid-area: year; }
-    .equipment-toolbar #equipmentModelFilter { grid-area: model; }
     .equipment-toolbar #equipmentStatusFilter { grid-area: status; }
-    .equipment-toolbar #equipmentSortFilter { grid-area: sort; }
+    .equipment-toolbar #equipmentSortToggle { grid-area: sort; justify-self: start; }
     .equipment-toolbar #equipmentReloadBtn { grid-area: refresh; }
     .equipment-toolbar #equipmentModeToggle { grid-area: mode; justify-self: start; }
 
@@ -2049,11 +2059,12 @@
     @media (max-width: 1320px) {
       .equipment-toolbar {
         grid-template-areas:
-          "search model refresh"
-          "loc year status"
-          "sort sort sort"
-          "mode mode mode";
-        grid-template-columns: minmax(190px, 1.2fr) minmax(240px, 1.6fr) 104px;
+          "search refresh"
+          "loc year"
+          "status status"
+          "sort sort"
+          "mode mode";
+        grid-template-columns: minmax(190px, 1fr) 104px;
       }
     }
 
@@ -2063,7 +2074,6 @@
           "search"
           "loc"
           "year"
-          "model"
           "status"
           "sort"
           "refresh"
@@ -2360,15 +2370,14 @@
                   <input class="input" id="equipmentSearch" placeholder="장비명, SN번호, 자체일련번호 검색" />
                   <select class="select" id="equipmentLocationFilter"></select>
                   <select class="select" id="equipmentYearFilter"></select>
-                  <select class="select" id="equipmentModelFilter"></select>
                   <select class="select" id="equipmentStatusFilter"></select>
-                  <select class="select" id="equipmentSortFilter">
-                    <option value="date">입고일/취득일 순</option>
-                    <option value="model">모델명 순</option>
-                    <option value="serial">자체일련번호/관리번호 순</option>
-                    <option value="">입력순/기본순</option>
-                  </select>
                   <button class="btn refresh" id="equipmentReloadBtn">새로고침</button>
+                  <div class="mode-toggle sort-toggle" id="equipmentSortToggle" title="정렬 방식">
+                    <button type="button" data-sort="date" class="active">입고일</button>
+                    <button type="button" data-sort="model">모델명</button>
+                    <button type="button" data-sort="serial">관리번호</button>
+                    <button type="button" data-sort="">입력순</button>
+                  </div>
                   <div class="mode-toggle" id="equipmentModeToggle">
                     <button type="button" data-mode="list" class="active">개별 장비</button>
                     <button type="button" data-mode="model">모델별</button>
@@ -2417,13 +2426,12 @@
                 <input class="input" type="month" id="monthlyMonth" />
                 <input class="input" id="monthlySearch" placeholder="장비명, 관리번호, SN 검색" />
                 <select class="select" id="monthlyLocationFilter"></select>
-                <select class="select" id="monthlyModelFilter"></select>
-                <select class="select" id="monthlySortFilter">
-                  <option value="date">입고일/취득일 순</option>
-                  <option value="model">모델명 순</option>
-                  <option value="serial">자체일련번호/관리번호 순</option>
-                  <option value="">입력순/기본순</option>
-                </select>
+                <div class="mode-toggle sort-toggle" id="monthlySortToggle" title="정렬 방식">
+                  <button type="button" data-sort="date" class="active">입고일</button>
+                  <button type="button" data-sort="model">모델명</button>
+                  <button type="button" data-sort="serial">관리번호</button>
+                  <button type="button" data-sort="">입력순</button>
+                </div>
                 <select class="select" id="monthlyCheckedFilter">
                   <option value="">확인 여부 전체</option>
                   <option value="unchecked">미확인만</option>
@@ -2797,7 +2805,9 @@ SN번호복사 / 텍스트
     let equipmentLastLoadedAt = '';
     let modelRows = [];
     let equipmentViewMode = localStorage.getItem('equipment_view_mode') || 'list';
+    let equipmentSortMode = localStorage.getItem('equipment_sort_mode') || 'date';
     let monthlyViewMode = localStorage.getItem('monthly_view_mode') || 'list';
+    let monthlySortMode = localStorage.getItem('monthly_sort_mode') || 'date';
     let selectedMonthlyId = '';
     let selectedMonthlySideId = '';
     let openMonthlyModelGroups = new Set();
@@ -3103,7 +3113,7 @@ SN번호복사 / 텍스트
     }
 
     function monthlySortRows(rows) {
-      const sortValue = $("#monthlySortFilter")?.value || "date";
+      const sortValue = monthlySortMode || "date";
       const arr = [...rows];
 
       if (sortValue === "date") {
@@ -3164,19 +3174,17 @@ SN번호복사 / 텍스트
       const q = $("#equipmentSearch").value.trim().toLowerCase();
       const location = $("#equipmentLocationFilter").value;
       const year = $("#equipmentYearFilter")?.value || "";
-      const modelId = $("#equipmentModelFilter")?.value || "";
       const status = $("#equipmentStatusFilter").value;
 
       const rows = equipmentRows.filter(row => {
         const matchQ = !q || `${row.장비명 || ""} ${row.SN번호 || ""} ${row.자체일련번호 || ""} ${row.규격 || ""} ${modelName(row) || ""}`.toLowerCase().includes(q);
         const matchLocation = matchesLocationFilter(row.배치장소, location, row.장비상태등);
         const matchYear = !year || equipmentYearValue(row) === year;
-        const matchModel = !modelId || (row.장비모델 || "") === modelId;
         const matchStatus = !status || row.장비상태등 === status;
-        return matchQ && matchLocation && matchYear && matchModel && matchStatus;
+        return matchQ && matchLocation && matchYear && matchStatus;
       });
 
-      return sortEquipmentLike(rows, $("#equipmentSortFilter")?.value || "date");
+      return sortEquipmentLike(rows, equipmentSortMode || "date");
     }
 
     async function loadEquipment() {
@@ -3218,9 +3226,25 @@ SN번호복사 / 텍스트
     }
 
 
+    function setEquipmentSortMode(mode) {
+      equipmentSortMode = mode || "";
+      localStorage.setItem("equipment_sort_mode", equipmentSortMode);
+
+      $$("#equipmentSortToggle button").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.sort === equipmentSortMode);
+      });
+
+      renderEquipmentList();
+      renderEquipmentDetail();
+    }
+
     function setEquipmentViewMode(mode) {
       equipmentViewMode = mode === "model" ? "model" : "list";
       localStorage.setItem("equipment_view_mode", equipmentViewMode);
+
+      $$("#equipmentSortToggle button").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.sort === equipmentSortMode);
+      });
 
       $$("#equipmentModeToggle button").forEach(btn => {
         btn.classList.toggle("active", btn.dataset.mode === equipmentViewMode);
@@ -3714,6 +3738,17 @@ SN번호복사 / 텍스트
       select.value = [...modelMap.keys()].includes(current) ? current : "";
     }
 
+    function setMonthlySortMode(mode) {
+      monthlySortMode = mode || "";
+      localStorage.setItem("monthly_sort_mode", monthlySortMode);
+
+      $$("#monthlySortToggle button").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.sort === monthlySortMode);
+      });
+
+      renderMonthlyList();
+    }
+
     function setMonthlyViewMode(mode) {
       monthlyViewMode = mode === "model" ? "model" : "list";
       localStorage.setItem("monthly_view_mode", monthlyViewMode);
@@ -3721,6 +3756,10 @@ SN번호복사 / 텍스트
       if (monthlyViewMode !== "model") {
         openMonthlyModelGroups.clear();
       }
+
+      $$("#monthlySortToggle button").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.sort === monthlySortMode);
+      });
 
       $$("#monthlyModeToggle button").forEach(btn => {
         btn.classList.toggle("active", btn.dataset.mode === monthlyViewMode);
@@ -3875,7 +3914,6 @@ SN번호복사 / 텍스트
     function renderMonthlyList() {
       const q = ($("#monthlySearch")?.value || "").trim().toLowerCase();
       const location = $("#monthlyLocationFilter").value;
-      const modelId = $("#monthlyModelFilter")?.value || "";
       const checkedFilter = $("#monthlyCheckedFilter").value;
 
       let rows = [...monthlyRows];
@@ -3896,7 +3934,6 @@ SN번호복사 / 텍스트
         });
       }
       if (location) rows = rows.filter(row => matchesLocationFilter(row.이번달위치, location, row.이번달상태));
-      if (modelId) rows = rows.filter(row => monthlyModelId(row) === modelId);
       if (checkedFilter === "checked") rows = rows.filter(row => row.확인여부);
       if (checkedFilter === "unchecked") rows = rows.filter(row => !row.확인여부);
       if (checkedFilter === "issue") rows = rows.filter(monthlyIsIssue);
@@ -5363,18 +5400,13 @@ SN번호복사 / 텍스트
         renderEquipmentDetail();
       });
 
-      onIfExists("#equipmentModelFilter", "change", () => {
-        renderEquipmentList();
-        renderEquipmentDetail();
-      });
-
       onIfExists("#equipmentStatusFilter", "change", () => {
         renderEquipmentList();
         renderEquipmentDetail();
       });
-      onIfExists("#equipmentSortFilter", "change", () => {
-        renderEquipmentList();
-        renderEquipmentDetail();
+
+      $$("#equipmentSortToggle button").forEach(button => {
+        button.addEventListener("click", () => setEquipmentSortMode(button.dataset.sort));
       });
 
       $$("#equipmentModeToggle button").forEach(button => {
@@ -5384,9 +5416,10 @@ SN번호복사 / 텍스트
       onIfExists("#monthlyReloadBtn", "click", () => loadMonthly(true));
       onIfExists("#monthlySearch", "input", renderMonthlyList);
       onIfExists("#monthlyLocationFilter", "change", renderMonthlyList);
-      onIfExists("#monthlyModelFilter", "change", renderMonthlyList);
       onIfExists("#monthlyCheckedFilter", "change", renderMonthlyList);
-      onIfExists("#monthlySortFilter", "change", renderMonthlyList);
+      $$("#monthlySortToggle button").forEach(button => {
+        button.addEventListener("click", () => setMonthlySortMode(button.dataset.sort));
+      });
       $$("#monthlyModeToggle button").forEach(button => {
         button.addEventListener("click", () => setMonthlyViewMode(button.dataset.mode));
       });
@@ -5438,12 +5471,9 @@ SN번호복사 / 텍스트
     function initSelects() {
       setHtmlIfExists("#equipmentLocationFilter", optionHtml([], "", "배치장소 전체"));
       setHtmlIfExists("#equipmentYearFilter", `<option value="">년도 전체</option>`);
-      setHtmlIfExists("#equipmentModelFilter", `<option value="">장비모델 전체</option>`);
       setHtmlIfExists("#equipmentStatusFilter", optionHtml(statuses, "", "상태 전체"));
-      setValueIfExists("#equipmentSortFilter", "date");
       setHtmlIfExists("#monthlyLocationFilter", optionHtml(locations, "", "위치 전체"));
-      setHtmlIfExists("#monthlyModelFilter", `<option value="">장비모델 전체</option>`);
-      setValueIfExists("#monthlySortFilter", "date");
+
       setHtmlIfExists("#photoReviewLocationFilter", optionHtml(locations, "", "위치 전체"));
       setHtmlIfExists("#photoReviewStatusFilter", optionHtml(statuses, "", "상태 전체"));
       setHtmlIfExists("#newLocation", optionHtml(locations, "XR실"));
