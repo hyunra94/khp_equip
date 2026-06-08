@@ -1564,6 +1564,128 @@
       gap: 8px;
     }
 
+
+    .maintenance-card,
+    .equipment-maintenance-card {
+      position: relative;
+    }
+
+    .maintenance-card-actions {
+      position: relative;
+      display: inline-flex;
+      align-items: flex-start;
+      gap: 6px;
+      margin-left: auto;
+    }
+
+    .maintenance-menu-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: #fff;
+      color: var(--sub);
+      border: 1px solid var(--line);
+      font-size: 18px;
+      font-weight: 900;
+      line-height: 1;
+      display: inline-grid;
+      place-items: center;
+      opacity: 0;
+      transition: .12s ease-out;
+    }
+
+    .maintenance-card:hover .maintenance-menu-btn,
+    .equipment-maintenance-card:hover .maintenance-menu-btn,
+    .maintenance-menu-btn.active {
+      opacity: 1;
+    }
+
+    .maintenance-action-menu {
+      position: absolute;
+      top: 36px;
+      right: 0;
+      min-width: 96px;
+      padding: 6px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: 0 14px 34px rgba(31, 41, 55, .14);
+      z-index: 40;
+      display: none;
+    }
+
+    .maintenance-action-menu.open {
+      display: grid;
+      gap: 4px;
+    }
+
+    .maintenance-action-menu button {
+      width: 100%;
+      text-align: left;
+      border-radius: 8px;
+      padding: 8px 9px;
+      background: #fff;
+      color: var(--text);
+      font-weight: 850;
+    }
+
+    .maintenance-action-menu button:hover {
+      background: var(--gray-soft);
+    }
+
+    .maintenance-action-menu button.danger-text {
+      color: var(--danger);
+    }
+
+    .maintenance-edit-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, .32);
+      z-index: 200;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+    }
+
+    .maintenance-edit-modal {
+      width: min(620px, 100%);
+      max-height: calc(100vh - 40px);
+      overflow: auto;
+      background: #fff;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      box-shadow: 0 28px 70px rgba(15, 23, 42, .24);
+      padding: 18px;
+    }
+
+    .maintenance-edit-modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .maintenance-edit-modal-head strong {
+      display: block;
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+    }
+
+    @media (max-width: 840px) {
+      .maintenance-menu-btn {
+        opacity: 1;
+      }
+
+      .maintenance-action-menu {
+        position: fixed;
+        top: auto;
+        right: 18px;
+        min-width: 128px;
+      }
+    }
+
     .maintenance-head {
       display: flex;
       justify-content: space-between;
@@ -2034,17 +2156,17 @@
     .equipment-toolbar {
       display: grid;
       grid-template-areas:
-        "search loc year status refresh"
-        "sort sort sort sort sort"
-        "mode mode mode mode mode";
-      grid-template-columns: minmax(190px, 1.3fr) minmax(145px, .8fr) minmax(120px, .65fr) minmax(130px, .7fr) 104px;
+        "search loc status refresh"
+        "year sort mode mode";
+      grid-template-columns: minmax(220px, 1.25fr) minmax(160px, .72fr) minmax(150px, .72fr) 104px;
       gap: 10px;
       align-items: center;
     }
 
     .equipment-toolbar #equipmentSearch { grid-area: search; }
     .equipment-toolbar #equipmentLocationFilter { grid-area: loc; }
-    .equipment-toolbar #equipmentYearFilter { grid-area: year; }
+    .equipment-toolbar #equipmentYearFilter { display: none; }
+    .equipment-toolbar #equipmentYearToggle { grid-area: year; justify-self: start; }
     .equipment-toolbar #equipmentStatusFilter { grid-area: status; }
     .equipment-toolbar #equipmentSortToggle { grid-area: sort; justify-self: start; }
     .equipment-toolbar #equipmentReloadBtn { grid-area: refresh; }
@@ -2056,12 +2178,22 @@
       width: 100%;
     }
 
+    .equipment-toolbar .mode-toggle {
+      max-width: 100%;
+      overflow-x: auto;
+      scrollbar-width: thin;
+    }
+
+    .equipment-toolbar .mode-toggle button {
+      white-space: nowrap;
+    }
+
     @media (max-width: 1320px) {
       .equipment-toolbar {
         grid-template-areas:
           "search refresh"
-          "loc year"
-          "status status"
+          "loc status"
+          "year year"
           "sort sort"
           "mode mode";
         grid-template-columns: minmax(190px, 1fr) 104px;
@@ -2073,16 +2205,24 @@
         grid-template-areas:
           "search"
           "loc"
-          "year"
           "status"
+          "year"
           "sort"
-          "refresh"
-          "mode";
+          "mode"
+          "refresh";
         grid-template-columns: 1fr;
       }
 
+      .equipment-toolbar #equipmentYearToggle,
+      .equipment-toolbar #equipmentSortToggle,
       .equipment-toolbar #equipmentModeToggle {
         width: 100%;
+      }
+
+      .equipment-toolbar #equipmentYearToggle button,
+      .equipment-toolbar #equipmentSortToggle button,
+      .equipment-toolbar #equipmentModeToggle button {
+        flex: 1 0 auto;
       }
     }
 
@@ -2370,6 +2510,9 @@
                   <input class="input" id="equipmentSearch" placeholder="장비명, SN번호, 자체일련번호 검색" />
                   <select class="select" id="equipmentLocationFilter"></select>
                   <select class="select" id="equipmentYearFilter"></select>
+                  <div class="mode-toggle year-toggle" id="equipmentYearToggle" title="입고년도 필터">
+                    <button type="button" data-year="" class="active">년도 전체</button>
+                  </div>
                   <select class="select" id="equipmentStatusFilter"></select>
                   <button class="btn refresh" id="equipmentReloadBtn">새로고침</button>
                   <div class="mode-toggle sort-toggle" id="equipmentSortToggle" title="정렬 방식">
@@ -2813,6 +2956,7 @@ SN번호복사 / 텍스트
     let openMonthlyModelGroups = new Set();
     let monthlyRows = [];
     let maintenanceRows = [];
+    const maintenanceRowCache = new Map();
     let selectedDepreciationId = "";
     let selectedEquipmentId = "";
 
@@ -3045,17 +3189,38 @@ SN번호복사 / 텍스트
 
     function refreshEquipmentYearOptions() {
       const select = $("#equipmentYearFilter");
+      const toggle = $("#equipmentYearToggle");
       if (!select) return;
 
       const current = select.value;
       const years = [...new Set(equipmentRows.map(equipmentYearValue).filter(Boolean))]
-        .sort((a, b) => b.localeCompare(a));
+        .sort((a, b) => a.localeCompare(b));
+      const nextValue = years.includes(current) ? current : "";
 
       select.innerHTML = `<option value="">년도 전체</option>` + years.map(year => `
         <option value="${escapeHtml(year)}">${escapeHtml(year)}년</option>
       `).join("");
+      select.value = nextValue;
 
-      select.value = years.includes(current) ? current : "";
+      if (toggle) {
+        toggle.innerHTML = ["", ...years].map(year => `
+          <button type="button" data-year="${escapeHtml(year)}" class="${year === nextValue ? "active" : ""}">${year ? `${escapeHtml(year)}년` : "년도 전체"}</button>
+        `).join("");
+      }
+    }
+
+
+    function setEquipmentYearFilter(year) {
+      const value = String(year || "");
+      const select = $("#equipmentYearFilter");
+      if (select) select.value = value;
+
+      $$("#equipmentYearToggle button").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.year === value);
+      });
+
+      renderEquipmentList();
+      renderEquipmentDetail();
     }
 
 
@@ -5020,6 +5185,182 @@ SN번호복사 / 텍스트
       setTimeout(() => document.body.classList.remove("print-report"), 500);
     }
 
+
+    function registerMaintenanceRows(rows = []) {
+      rows.forEach(row => {
+        if (row?.id) maintenanceRowCache.set(row.id, row);
+      });
+    }
+
+    function maintenanceActionMarkup(id) {
+      return `
+        <div class="maintenance-card-actions">
+          <button class="maintenance-menu-btn" type="button" data-maintenance-menu="${escapeHtml(id)}" aria-label="유지보수 메뉴">⋯</button>
+          <div class="maintenance-action-menu" data-maintenance-menu-panel="${escapeHtml(id)}">
+            <button type="button" class="maintenance-edit-btn" data-maintenance-id="${escapeHtml(id)}">수정</button>
+            <button type="button" class="maintenance-delete-btn danger-text" data-maintenance-id="${escapeHtml(id)}">삭제</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function closeMaintenanceMenus() {
+      $$(".maintenance-action-menu.open").forEach(menu => menu.classList.remove("open"));
+      $$(".maintenance-menu-btn.active").forEach(btn => btn.classList.remove("active"));
+    }
+
+    function optionSelected(value, target) {
+      return String(value || "") === String(target || "") ? "selected" : "";
+    }
+
+    function openMaintenanceEditModal(row) {
+      if (!row?.id) return;
+      closeMaintenanceMenus();
+      $("#maintenanceEditBackdrop")?.remove();
+
+      const backdrop = document.createElement("div");
+      backdrop.className = "maintenance-edit-backdrop";
+      backdrop.id = "maintenanceEditBackdrop";
+      backdrop.innerHTML = `
+        <div class="maintenance-edit-modal" role="dialog" aria-modal="true">
+          <div class="maintenance-edit-modal-head">
+            <div>
+              <strong>유지보수 내역 수정</strong>
+              <div class="small" style="color:var(--sub);font-size:13px;margin-top:4px;">${escapeHtml(row.장비명 || "")}</div>
+            </div>
+            <button class="btn" type="button" data-maintenance-close>닫기</button>
+          </div>
+          <form id="maintenanceEditForm" class="maintenance-form-grid">
+            <label>일자
+              <input class="input" type="date" name="일자" value="${escapeHtml(row.일자 || "")}" />
+            </label>
+            <label>구분
+              <select class="select" name="구분">
+                <option ${optionSelected(row.구분, "유지보수")}>유지보수</option>
+                <option ${optionSelected(row.구분, "수리")}>수리</option>
+                <option ${optionSelected(row.구분, "점검")}>점검</option>
+                <option ${optionSelected(row.구분, "교체")}>교체</option>
+                <option ${optionSelected(row.구분, "기타")}>기타</option>
+              </select>
+            </label>
+            <label>상태
+              <select class="select" name="상태">
+                <option ${optionSelected(row.상태, "접수")}>접수</option>
+                <option ${optionSelected(row.상태, "진행중")}>진행중</option>
+                <option ${optionSelected(row.상태, "완료")}>완료</option>
+                <option ${optionSelected(row.상태, "보류")}>보류</option>
+              </select>
+            </label>
+            <label>비용
+              <input class="input" type="number" name="비용" value="${escapeHtml(row.비용 ?? "")}" />
+            </label>
+            <label class="full">내용
+              <textarea class="textarea" name="내용">${escapeHtml(row.내용 || "")}</textarea>
+            </label>
+            <label class="full">처리결과
+              <textarea class="textarea" name="처리결과">${escapeHtml(row.처리결과 || "")}</textarea>
+            </label>
+            <label class="full">비고
+              <input class="input" name="비고" value="${escapeHtml(row.비고 || "")}" />
+            </label>
+            <div class="full" style="display:flex;justify-content:flex-end;gap:8px;">
+              <button class="btn" type="button" data-maintenance-close>취소</button>
+              <button class="btn primary" type="submit">수정 저장</button>
+            </div>
+          </form>
+        </div>
+      `;
+
+      document.body.appendChild(backdrop);
+      backdrop.addEventListener("click", event => {
+        if (event.target === backdrop || event.target.closest("[data-maintenance-close]")) backdrop.remove();
+      });
+
+      $("#maintenanceEditForm").addEventListener("submit", async event => {
+        event.preventDefault();
+        const form = event.currentTarget;
+        const button = form.querySelector("button[type='submit']");
+        const payload = Object.fromEntries(new FormData(form).entries());
+        payload.장비 = row.장비 || "";
+        payload.유지보수명 = row.유지보수명 || "";
+
+        button.disabled = true;
+        button.textContent = "저장 중";
+        try {
+          await api(`/api/maintenance/${encodeURIComponent(row.id)}`, {
+            method: "PATCH",
+            body: JSON.stringify(payload)
+          });
+          backdrop.remove();
+          await refreshMaintenanceAfterChange(row);
+        } catch (error) {
+          alert(error.message);
+        } finally {
+          button.disabled = false;
+          button.textContent = "수정 저장";
+        }
+      });
+    }
+
+    async function deleteMaintenanceRow(row) {
+      if (!row?.id) return;
+      closeMaintenanceMenus();
+      if (!confirm("이 유지보수 내역을 삭제할까요?")) return;
+
+      try {
+        await api(`/api/maintenance/${encodeURIComponent(row.id)}`, { method: "DELETE" });
+        await refreshMaintenanceAfterChange(row);
+      } catch (error) {
+        alert(error.message);
+      }
+    }
+
+    async function refreshMaintenanceAfterChange(row = {}) {
+      maintenanceRowCache.delete(row.id);
+
+      if ($("#maintenanceView")?.classList.contains("active")) {
+        await loadMaintenance();
+      }
+
+      if (selectedEquipmentId && (!row.장비 || row.장비 === selectedEquipmentId)) {
+        await loadSelectedEquipmentMaintenance();
+      }
+    }
+
+    function handleMaintenanceActionClick(event) {
+      const menuBtn = event.target.closest(".maintenance-menu-btn");
+      if (menuBtn) {
+        event.stopPropagation();
+        const id = menuBtn.dataset.maintenanceMenu;
+        const menu = document.querySelector(`[data-maintenance-menu-panel="${CSS.escape(id)}"]`);
+        const willOpen = !menu?.classList.contains("open");
+        closeMaintenanceMenus();
+        if (willOpen && menu) {
+          menu.classList.add("open");
+          menuBtn.classList.add("active");
+        }
+        return;
+      }
+
+      const editBtn = event.target.closest(".maintenance-edit-btn");
+      if (editBtn) {
+        event.stopPropagation();
+        const row = maintenanceRowCache.get(editBtn.dataset.maintenanceId);
+        if (row) openMaintenanceEditModal(row);
+        return;
+      }
+
+      const deleteBtn = event.target.closest(".maintenance-delete-btn");
+      if (deleteBtn) {
+        event.stopPropagation();
+        const row = maintenanceRowCache.get(deleteBtn.dataset.maintenanceId);
+        if (row) deleteMaintenanceRow(row);
+        return;
+      }
+
+      if (!event.target.closest(".maintenance-card-actions")) closeMaintenanceMenus();
+    }
+
     function maintenanceDateKey(item) {
       return String(item?.일자 || "0000-00-00").slice(0, 10);
     }
@@ -5043,6 +5384,7 @@ SN번호복사 / 텍스트
     }
 
     function renderEquipmentMaintenanceArea(row, area, rows = []) {
+      registerMaintenanceRows(rows);
       area.innerHTML = `
         <div class="kv"><div class="k">⑮ 유지보수 내역</div><div class="v">${rows.length}건</div></div>
 
@@ -5055,7 +5397,10 @@ SN번호복사 / 텍스트
                   ${escapeHtml(item.일자 || "-")} · ${escapeHtml(item.구분 || "-")}
                 </div>
               </div>
-              <span class="badge ${item.상태 === "완료" ? "normal" : item.상태 === "진행중" ? "loan" : "need"}">${escapeHtml(item.상태 || "-")}</span>
+              <div style="display:flex;align-items:flex-start;gap:8px;">
+                <span class="badge ${item.상태 === "완료" ? "normal" : item.상태 === "진행중" ? "loan" : "need"}">${escapeHtml(item.상태 || "-")}</span>
+                ${maintenanceActionMarkup(item.id)}
+              </div>
             </div>
             ${item.내용 ? `<div class="small"><b>내용</b> ${escapeHtml(item.내용)}</div>` : ""}
             ${item.처리결과 ? `<div class="small"><b>처리결과</b> ${escapeHtml(item.처리결과)}</div>` : ""}
@@ -5149,6 +5494,7 @@ SN번호복사 / 텍스트
       if (!area) return;
 
       const rows = sortMaintenanceDesc(maintenanceRows.filter(item => item.장비 === row.id));
+      registerMaintenanceRows(rows);
 
       area.innerHTML = `
         <div class="kv"><div class="k">⑮ 유지보수 내역</div><div class="v">${rows.length}건</div></div>
@@ -5162,7 +5508,10 @@ SN번호복사 / 텍스트
                   ${escapeHtml(item.일자 || "-")} · ${escapeHtml(item.구분 || "-")}
                 </div>
               </div>
-              <span class="badge ${item.상태 === "완료" ? "normal" : item.상태 === "진행중" ? "loan" : "need"}">${escapeHtml(item.상태 || "-")}</span>
+              <div style="display:flex;align-items:flex-start;gap:8px;">
+                <span class="badge ${item.상태 === "완료" ? "normal" : item.상태 === "진행중" ? "loan" : "need"}">${escapeHtml(item.상태 || "-")}</span>
+                ${maintenanceActionMarkup(item.id)}
+              </div>
             </div>
             ${item.내용 ? `<div class="small"><b>내용</b> ${escapeHtml(item.내용)}</div>` : ""}
             ${item.처리결과 ? `<div class="small"><b>처리결과</b> ${escapeHtml(item.처리결과)}</div>` : ""}
@@ -5250,6 +5599,7 @@ SN번호복사 / 텍스트
       try {
         const data = await api("/api/maintenance");
         maintenanceRows = data.rows || [];
+        registerMaintenanceRows(maintenanceRows);
         renderMaintenanceList();
       } catch (error) {
         $("#maintenanceList").innerHTML = `<div class="notice error">${escapeHtml(error.message)}</div>`;
@@ -5262,6 +5612,7 @@ SN번호복사 / 텍스트
       const status = $("#maintenanceStatusFilter")?.value || "";
 
       let rows = sortMaintenanceDesc(maintenanceRows);
+      registerMaintenanceRows(rows);
 
       if (q) {
         rows = rows.filter(row => {
@@ -5293,7 +5644,10 @@ SN번호복사 / 텍스트
                   ${escapeHtml(row.일자 || "-")} · ${escapeHtml(row.장비명 || "-")}
                 </div>
               </div>
-              <span class="badge ${row.상태 === "완료" ? "normal" : row.상태 === "진행중" ? "loan" : "need"}">${escapeHtml(row.상태 || "-")}</span>
+              <div style="display:flex;align-items:flex-start;gap:8px;">
+                <span class="badge ${row.상태 === "완료" ? "normal" : row.상태 === "진행중" ? "loan" : "need"}">${escapeHtml(row.상태 || "-")}</span>
+                ${maintenanceActionMarkup(row.id)}
+              </div>
             </div>
             <div class="maintenance-meta">
               ${row.구분 ? `<span class="badge gray">${escapeHtml(row.구분)}</span>` : ""}
@@ -5410,8 +5764,13 @@ SN번호복사 / 텍스트
       });
 
       onIfExists("#equipmentYearFilter", "change", () => {
-        renderEquipmentList();
-        renderEquipmentDetail();
+        setEquipmentYearFilter($("#equipmentYearFilter")?.value || "");
+      });
+
+      onIfExists("#equipmentYearToggle", "click", event => {
+        const button = event.target.closest("button[data-year]");
+        if (!button) return;
+        setEquipmentYearFilter(button.dataset.year || "");
       });
 
       onIfExists("#equipmentStatusFilter", "change", () => {
@@ -5457,6 +5816,7 @@ SN번호복사 / 텍스트
       onIfExists("#maintenanceEquipmentFilter", "change", renderMaintenanceList);
       onIfExists("#maintenanceStatusFilter", "change", renderMaintenanceList);
       onIfExists("#maintenanceForm", "submit", submitMaintenance);
+      document.addEventListener("click", handleMaintenanceActionClick);
 
       onIfExists("#depreciationReloadBtn", "click", renderDepreciation);
       onIfExists("#depreciationYear", "input", renderDepreciation);
@@ -5485,6 +5845,7 @@ SN번호복사 / 텍스트
     function initSelects() {
       setHtmlIfExists("#equipmentLocationFilter", optionHtml([], "", "배치장소 전체"));
       setHtmlIfExists("#equipmentYearFilter", `<option value="">년도 전체</option>`);
+      setHtmlIfExists("#equipmentYearToggle", `<button type="button" data-year="" class="active">년도 전체</button>`);
       setHtmlIfExists("#equipmentStatusFilter", optionHtml(statuses, "", "상태 전체"));
       setHtmlIfExists("#monthlyLocationFilter", optionHtml(locations, "", "위치 전체"));
 
