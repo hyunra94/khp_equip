@@ -3744,12 +3744,9 @@ SN번호복사 / 텍스트
           </div>
           ${cover}
 
-          ${model ? `<div class="notice" style="margin-top:0;margin-bottom:12px;">연결 모델: ${escapeHtml(model.모델명 || "-")}</div>` : ""}
-
           <div class="kv"><div class="k">① SN번호</div><div class="v">${escapeHtml(row.SN번호 || "-")}</div></div>
           <div class="kv"><div class="k">② 작성년월일</div><div class="v">${escapeHtml(row.작성년월일 || "-")}</div></div>
           <div class="kv"><div class="k">③ 장비명</div><div class="v">${escapeHtml(row.장비명 || "-")}</div></div>
-          <div class="kv"><div class="k">장비모델</div><div class="v">${escapeHtml(modelName(row) || "-")}</div></div>
           <div class="kv"><div class="k">④ 제작회사</div><div class="v">${escapeHtml(effectiveMaker(row) || "-")}</div></div>
           <div class="kv"><div class="k">⑤ 배치장소</div><div class="v">${escapeHtml(row.배치장소 || "-")}${row.세부위치 ? " / " + escapeHtml(row.세부위치) : ""}</div></div>
           <div class="kv"><div class="k">⑥ 규격</div><div class="v">${escapeHtml(effectiveSpec(row) || "-")}</div></div>
@@ -3849,7 +3846,7 @@ SN번호복사 / 텍스트
             <div class="eq-cell eq-name">
               <span class="eq-label">장비명</span>
               <span class="eq-value">${escapeHtml(row.장비명 || "-")}</span>
-              <span class="eq-sub">${modelName(row) ? "모델 " + escapeHtml(modelName(row)) + " · " : ""}SN ${escapeHtml(row.SN번호 || "-")}</span>
+              <span class="eq-sub">SN ${escapeHtml(row.SN번호 || "-")}</span>
             </div>
           </div>
 
@@ -3916,7 +3913,6 @@ SN번호복사 / 텍스트
         <div class="kv"><div class="k">① SN번호</div><div class="v">${escapeHtml(row.SN번호 || "-")}</div></div>
         <div class="kv"><div class="k">② 작성년월일</div><div class="v">${escapeHtml(row.작성년월일 || "-")}</div></div>
         <div class="kv"><div class="k">③ 장비명</div><div class="v">${escapeHtml(row.장비명 || "-")}</div></div>
-        <div class="kv"><div class="k">장비모델</div><div class="v">${escapeHtml(modelName(row) || "-")}</div></div>
         <div class="kv"><div class="k">④ 제작회사</div><div class="v">${escapeHtml(effectiveMaker(row) || "-")}</div></div>
         <div class="kv"><div class="k">⑤ 배치장소</div><div class="v">${escapeHtml(row.배치장소 || "-")}${row.세부위치 ? " / " + escapeHtml(row.세부위치) : ""}</div></div>
         <div class="kv"><div class="k">⑥ 규격</div><div class="v">${escapeHtml(effectiveSpec(row) || "-")}</div></div>
