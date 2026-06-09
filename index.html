@@ -3001,6 +3001,10 @@ SN번호복사 / 텍스트
       return currentUser?.role === "readonly";
     }
 
+    function isAdminUser() {
+      return currentUser?.role === "admin";
+    }
+
     function roleLabel(role) {
       if (role === "admin") return "관리자";
       if (role === "readonly") return "조회전용";
@@ -3677,7 +3681,7 @@ SN번호복사 / 텍스트
             <button class="btn primary load-inline-photos-btn" type="button" data-id="${escapeHtml(row.id)}">▼ ⑭ 장비사진 보기</button>
             ${model ? `<button class="btn ghost load-inline-model-photos-btn" type="button" data-id="${escapeHtml(model.id)}">▼ 모델 공통사진 보기</button>` : ""}
             <button class="btn ghost load-inline-maintenance-btn" type="button" data-id="${escapeHtml(row.id)}">▼ ⑮ 유지보수 내역</button>
-            ${row.url ? `<a class="btn ghost" href="${escapeHtml(row.url)}" target="_blank" rel="noreferrer">노션에서 열기</a>` : ""}
+            ${isAdminUser() && row.url ? `<a class="btn ghost" href="${escapeHtml(row.url)}" target="_blank" rel="noreferrer">노션에서 열기</a>` : ""}
           </div>
           <div class="inline-photos-area"></div>
           <div class="inline-model-photos-area"></div>
@@ -3841,7 +3845,7 @@ SN번호복사 / 텍스트
           <button class="btn primary" id="loadPhotosBtn">▼ ⑭ 장비사진 보기</button>
           ${model ? `<button class="btn ghost" id="loadModelPhotosBtn">▼ 모델 공통사진 보기</button>` : ""}
           <button class="btn ghost" id="loadMaintenanceBtn">▼ ⑮ 유지보수 내역</button>
-          ${row.url ? `<a class="btn ghost" href="${escapeHtml(row.url)}" target="_blank" rel="noreferrer">노션에서 열기</a>` : ""}
+          ${isAdminUser() && row.url ? `<a class="btn ghost" href="${escapeHtml(row.url)}" target="_blank" rel="noreferrer">노션에서 열기</a>` : ""}
         </div>
         <div id="photosArea"></div>
         <div id="modelPhotosArea"></div>
