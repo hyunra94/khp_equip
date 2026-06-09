@@ -875,6 +875,23 @@
       background: #fbfdff;
     }
 
+    .monthly-card.monthly-disabled {
+      background: #f8fafc;
+      opacity: .68;
+    }
+
+    .monthly-card.monthly-disabled .monthly-check-row {
+      cursor: default;
+    }
+
+    .monthly-card.monthly-disabled .monthly-inline-location,
+    .monthly-card.monthly-disabled .monthly-status,
+    .monthly-card.monthly-disabled .monthly-memo,
+    .monthly-card.monthly-disabled .monthly-photo-file {
+      cursor: not-allowed;
+      background: #f3f4f6;
+    }
+
     @media (max-width: 840px) {
       .monthly-check-row {
         grid-template-columns: 30px 50px minmax(0, 1fr) 38px;
@@ -4004,6 +4021,11 @@ SN번호복사 / 텍스트
       return !row.확인여부 || row.이번달위치 !== row.원장기준배치장소 || row.이번달상태 !== "정상" || Boolean((row.메모 || "").trim());
     }
 
+    function monthlyDisabled(row) {
+      const eq = equipmentForMonthly(row);
+      return eq?.월별현황포함 === false;
+    }
+
 
     function equipmentForMonthly(row) {
       return equipmentRows.find(eq => eq.id === row.장비) || null;
@@ -4251,8 +4273,9 @@ SN번호복사 / 텍스트
       }
 
       const checkedCount = rows.filter(row => row.확인여부).length;
+      const disabledCount = rows.filter(monthlyDisabled).length;
       const modelCount = groupMonthlyRowsByModel(rows).length;
-      $("#monthlySummary").textContent = `조회 결과 ${rows.length}건 · 모델 ${modelCount}개 · 확인완료 ${checkedCount}건 · 미확인 ${rows.length - checkedCount}건`;
+      $("#monthlySummary").textContent = `조회 결과 ${rows.length}건 · 모델 ${modelCount}개 · 확인완료 ${checkedCount}건 · 미확인 ${rows.length - checkedCount}건${disabledCount ? ` · 월별점검 제외 ${disabledCount}건` : ""}`;
 
       $$("#monthlyModeToggle button").forEach(btn => {
         btn.classList.toggle("active", btn.dataset.mode === monthlyViewMode);
@@ -4318,27 +4341,30 @@ SN번호복사 / 텍스트
 
       const isOpen = selectedMonthlyId === row.id;
       const status = row.이번달상태 || "정상";
+      const isDisabled = monthlyDisabled(row);
+      const disabledAttr = isDisabled ? "disabled" : "";
+      const disabledBadge = isDisabled ? `<span class="badge gray">월별점검 제외</span>` : "";
       const detailHtml = isOpen ? `
           <div class="monthly-detail">
             <div class="monthly-detail-grid">
               <label>이번달 상태
-                <select class="select monthly-status">
+                <select class="select monthly-status" ${disabledAttr}>
                   ${optionHtml(statuses, status)}
                 </select>
               </label>
               <label>메모
-                <input class="input monthly-memo" value="${escapeHtml(row.메모 || "")}" placeholder="필요한 경우만 입력" />
+                <input class="input monthly-memo" value="${escapeHtml(row.메모 || "")}" placeholder="필요한 경우만 입력" ${disabledAttr} />
               </label>
               <label class="full">점검사진
-                <input class="input monthly-photo-file" type="file" accept="image/*" multiple />
+                <input class="input monthly-photo-file" type="file" accept="image/*" multiple ${disabledAttr} />
               </label>
             </div>
 
             <div class="small" style="color:var(--sub);font-size:13px;">확인자: ${escapeHtml(row.확인자명복사 || "-")} · 확인일: ${escapeHtml(row.확인일 || "-")}</div>
 
             <div class="monthly-photo-actions">
-              <button class="btn primary save-monthly-detail-btn" type="button">상세 저장</button>
-              <button class="btn ghost upload-monthly-photo-btn" type="button">점검사진 업로드</button>
+              <button class="btn primary save-monthly-detail-btn" type="button" ${disabledAttr}>상세 저장</button>
+              <button class="btn ghost upload-monthly-photo-btn" type="button" ${disabledAttr}>점검사진 업로드</button>
               <button class="btn" type="button" data-photo-target="${escapeHtml(row.id)}">점검사진 보기</button>
             </div>
             <div class="monthly-photos-area"></div>
@@ -4346,10 +4372,10 @@ SN번호복사 / 텍스트
         ` : "";
 
       return `
-        <article class="monthly-card ${isOpen ? "open" : ""}" data-id="${escapeHtml(row.id)}">
+        <article class="monthly-card ${isOpen ? "open" : ""} ${isDisabled ? "monthly-disabled" : ""}" data-id="${escapeHtml(row.id)}" data-disabled="${isDisabled ? "true" : "false"}">
           <div class="monthly-check-row">
             <div class="check-wrap">
-              <input class="quick-monthly-check" type="checkbox" ${row.확인여부 ? "checked" : ""} title="정상 확인" />
+              <input class="quick-monthly-check" type="checkbox" ${row.확인여부 ? "checked" : ""} ${disabledAttr} title="정상 확인" />
             </div>
             <button class="monthly-thumb-button monthly-side-open-btn" type="button" data-monthly-side-id="${escapeHtml(row.id)}" title="점검 상세 보기">
               ${photo}
@@ -4367,7 +4393,7 @@ SN번호복사 / 텍스트
 
             <div class="monthly-cell monthly-location-cell">
               <span class="cell-label">이번달 위치</span>
-              <select class="monthly-inline-location monthly-location">
+              <select class="monthly-inline-location monthly-location" ${disabledAttr}>
                 ${optionHtml(locations, row.이번달위치)}
               </select>
             </div>
@@ -4375,6 +4401,7 @@ SN번호복사 / 텍스트
             <div class="monthly-cell monthly-status-cell">
               <span class="cell-label">상태</span>
               <span class="badge ${statusClass(status)}">${escapeHtml(status)}</span>
+              ${disabledBadge}
             </div>
 
             <button class="btn monthly-toggle-detail-btn toggle-monthly-detail-btn" type="button">${isOpen ? "▼" : "▶"}</button>
@@ -4401,6 +4428,11 @@ SN번호복사 / 텍스트
 
     async function uploadMonthlyPhotos(card) {
       const id = card.dataset.id;
+      const row = monthlyRows.find(item => item.id === id);
+      if (row && monthlyDisabled(row)) {
+        alert("월별현황포함이 해제된 장비는 점검사진을 업로드할 수 없습니다.");
+        return;
+      }
       const fileInput = card.querySelector(".monthly-photo-file");
       const files = fileInput?.files || [];
       const area = card.querySelector(".monthly-photos-area");
@@ -4454,6 +4486,11 @@ SN번호복사 / 텍스트
       const checkbox = card.querySelector(".quick-monthly-check");
       const id = card.dataset.id;
       const row = monthlyRows.find(item => item.id === id);
+      if (row && monthlyDisabled(row)) {
+        alert("월별현황포함이 해제된 장비는 월별점검에서 수정할 수 없습니다.");
+        renderMonthlyList();
+        return;
+      }
       const groupId = row ? monthlyGroupIdForRow(row) : "";
 
       if (groupId) openMonthlyModelGroups.add(groupId);
@@ -4487,6 +4524,11 @@ SN번호복사 / 텍스트
     async function saveMonthly(card, markChecked = true) {
       const id = card.dataset.id;
       const row = monthlyRows.find(item => item.id === id);
+      if (row && monthlyDisabled(row)) {
+        alert("월별현황포함이 해제된 장비는 월별점검에서 수정할 수 없습니다.");
+        renderMonthlyList();
+        return;
+      }
       const groupId = row ? monthlyGroupIdForRow(row) : "";
       const button = card.querySelector(".save-monthly-detail-btn");
 
