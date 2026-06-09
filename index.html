@@ -2157,20 +2157,18 @@
       display: grid;
       grid-template-areas:
         "search loc status refresh"
-        "year sort mode mode";
+        "tabs tabs tabs tabs";
       grid-template-columns: minmax(220px, 1.25fr) minmax(160px, .72fr) minmax(150px, .72fr) 104px;
-      gap: 10px;
+      gap: 12px;
       align-items: center;
     }
 
     .equipment-toolbar #equipmentSearch { grid-area: search; }
     .equipment-toolbar #equipmentLocationFilter { grid-area: loc; }
     .equipment-toolbar #equipmentYearFilter { display: none; }
-    .equipment-toolbar #equipmentYearToggle { grid-area: year; justify-self: start; }
     .equipment-toolbar #equipmentStatusFilter { grid-area: status; }
-    .equipment-toolbar #equipmentSortToggle { grid-area: sort; justify-self: start; }
     .equipment-toolbar #equipmentReloadBtn { grid-area: refresh; }
-    .equipment-toolbar #equipmentModeToggle { grid-area: mode; justify-self: start; }
+    .equipment-toolbar .equipment-filter-tabs { grid-area: tabs; }
 
     .equipment-toolbar > .input,
     .equipment-toolbar > .select,
@@ -2178,14 +2176,39 @@
       width: 100%;
     }
 
-    .equipment-toolbar .mode-toggle {
+    .equipment-filter-tabs {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .equipment-filter-tabs .mode-toggle {
       max-width: 100%;
       overflow-x: auto;
       scrollbar-width: thin;
+      flex: 0 0 auto;
     }
 
-    .equipment-toolbar .mode-toggle button {
+    .equipment-filter-tabs #equipmentYearToggle {
+      flex: 1 1 auto;
+      min-width: 180px;
+    }
+
+    .equipment-filter-tabs #equipmentSortToggle,
+    .equipment-filter-tabs #equipmentModeToggle {
+      flex: 0 0 auto;
+    }
+
+    .equipment-filter-tabs .mode-toggle button {
       white-space: nowrap;
+    }
+
+    .eq-status-badges {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
     }
 
     @media (max-width: 1320px) {
@@ -2193,10 +2216,16 @@
         grid-template-areas:
           "search refresh"
           "loc status"
-          "year year"
-          "sort sort"
-          "mode mode";
+          "tabs tabs";
         grid-template-columns: minmax(190px, 1fr) 104px;
+      }
+
+      .equipment-filter-tabs {
+        flex-wrap: wrap;
+      }
+
+      .equipment-filter-tabs #equipmentYearToggle {
+        flex: 1 1 100%;
       }
     }
 
@@ -2206,22 +2235,26 @@
           "search"
           "loc"
           "status"
-          "year"
-          "sort"
-          "mode"
-          "refresh";
+          "refresh"
+          "tabs";
         grid-template-columns: 1fr;
       }
 
-      .equipment-toolbar #equipmentYearToggle,
-      .equipment-toolbar #equipmentSortToggle,
-      .equipment-toolbar #equipmentModeToggle {
+      .equipment-filter-tabs {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .equipment-filter-tabs #equipmentYearToggle,
+      .equipment-filter-tabs #equipmentSortToggle,
+      .equipment-filter-tabs #equipmentModeToggle {
         width: 100%;
       }
 
-      .equipment-toolbar #equipmentYearToggle button,
-      .equipment-toolbar #equipmentSortToggle button,
-      .equipment-toolbar #equipmentModeToggle button {
+      .equipment-filter-tabs #equipmentYearToggle button,
+      .equipment-filter-tabs #equipmentSortToggle button,
+      .equipment-filter-tabs #equipmentModeToggle button {
         flex: 1 0 auto;
       }
     }
@@ -2544,20 +2577,22 @@
                   <input class="input" id="equipmentSearch" placeholder="장비명, SN번호, 자체일련번호 검색" />
                   <select class="select" id="equipmentLocationFilter"></select>
                   <select class="select" id="equipmentYearFilter"></select>
-                  <div class="mode-toggle year-toggle" id="equipmentYearToggle" title="입고년도 필터">
-                    <button type="button" data-year="" class="active">년도 전체</button>
-                  </div>
                   <select class="select" id="equipmentStatusFilter"></select>
                   <button class="btn refresh" id="equipmentReloadBtn">새로고침</button>
-                  <div class="mode-toggle sort-toggle" id="equipmentSortToggle" title="정렬 방식">
-                    <button type="button" data-sort="date" class="active">입고일</button>
-                    <button type="button" data-sort="model">모델명</button>
-                    <button type="button" data-sort="serial">관리번호</button>
-                    <button type="button" data-sort="">입력순</button>
-                  </div>
-                  <div class="mode-toggle" id="equipmentModeToggle">
-                    <button type="button" data-mode="list" class="active">개별 장비</button>
-                    <button type="button" data-mode="model">모델별</button>
+                  <div class="equipment-filter-tabs" aria-label="장비 원장 보기 옵션">
+                    <div class="mode-toggle year-toggle" id="equipmentYearToggle" title="입고년도 필터">
+                      <button type="button" data-year="" class="active">년도 전체</button>
+                    </div>
+                    <div class="mode-toggle sort-toggle" id="equipmentSortToggle" title="정렬 방식">
+                      <button type="button" data-sort="date" class="active">입고일</button>
+                      <button type="button" data-sort="model">모델명</button>
+                      <button type="button" data-sort="serial">관리번호</button>
+                      <button type="button" data-sort="">입력순</button>
+                    </div>
+                    <div class="mode-toggle" id="equipmentModeToggle">
+                      <button type="button" data-mode="list" class="active">개별 장비</button>
+                      <button type="button" data-mode="model">모델별</button>
+                    </div>
                   </div>
                 </div>
                 <div class="list-summary" id="equipmentSummary"></div>
@@ -3215,6 +3250,7 @@ SN번호복사 / 텍스트
 
       await loadModels();
       await loadEquipment();
+      await loadMaintenance();
       monthlyRows = [];
       renderDashboard();
     }
@@ -3558,8 +3594,9 @@ SN번호복사 / 텍스트
                   <span class="cell-main">${escapeHtml(row.취득년월일 || "-")}</span>
                   <span class="cell-sub">${money(row.취득가격)}</span>
                 </div>
-                <div>
+                <div class="eq-status-badges">
                   <span class="badge ${statusClass(row.장비상태등)}">${escapeHtml(row.장비상태등 || "-")}</span>
+                  ${maintenanceBadgeHtml(row.id)}
                 </div>
               </div>
               ${row.id === selectedEquipmentId ? equipmentInlineDetailHtml(row) : ""}
@@ -3680,7 +3717,7 @@ SN번호복사 / 텍스트
           <div class="toolbar" style="margin-top:16px;">
             <button class="btn primary load-inline-photos-btn" type="button" data-id="${escapeHtml(row.id)}">▼ ⑭ 장비사진 보기</button>
             ${model ? `<button class="btn ghost load-inline-model-photos-btn" type="button" data-id="${escapeHtml(model.id)}">▼ 모델 공통사진 보기</button>` : ""}
-            <button class="btn ghost load-inline-maintenance-btn" type="button" data-id="${escapeHtml(row.id)}">▼ ⑮ 유지보수 내역</button>
+            <button class="btn ghost load-inline-maintenance-btn" type="button" data-id="${escapeHtml(row.id)}">▼ ⑮ 유지보수 내역${maintenanceCountForEquipment(row.id) ? ` (${maintenanceCountForEquipment(row.id)}건)` : ""}</button>
             ${isAdminUser() && row.url ? `<a class="btn ghost" href="${escapeHtml(row.url)}" target="_blank" rel="noreferrer">노션에서 열기</a>` : ""}
           </div>
           <div class="inline-photos-area"></div>
@@ -3792,7 +3829,10 @@ SN번호복사 / 텍스트
 
           <div class="eq-cell">
             <span class="eq-label">상태</span>
-            <span class="badge ${statusClass(row.장비상태등)}">${escapeHtml(row.장비상태등 || "-")}</span>
+            <div class="eq-status-badges">
+              <span class="badge ${statusClass(row.장비상태등)}">${escapeHtml(row.장비상태등 || "-")}</span>
+              ${maintenanceBadgeHtml(row.id)}
+            </div>
           </div>
         </article>
       `;
@@ -3844,7 +3884,7 @@ SN번호복사 / 텍스트
         <div class="toolbar" style="margin-top:16px;">
           <button class="btn primary" id="loadPhotosBtn">▼ ⑭ 장비사진 보기</button>
           ${model ? `<button class="btn ghost" id="loadModelPhotosBtn">▼ 모델 공통사진 보기</button>` : ""}
-          <button class="btn ghost" id="loadMaintenanceBtn">▼ ⑮ 유지보수 내역</button>
+          <button class="btn ghost" id="loadMaintenanceBtn">▼ ⑮ 유지보수 내역${maintenanceCountForEquipment(row.id) ? ` (${maintenanceCountForEquipment(row.id)}건)` : ""}</button>
           ${isAdminUser() && row.url ? `<a class="btn ghost" href="${escapeHtml(row.url)}" target="_blank" rel="noreferrer">노션에서 열기</a>` : ""}
         </div>
         <div id="photosArea"></div>
@@ -5425,6 +5465,16 @@ SN번호복사 / 텍스트
       return [...rows].sort((a, b) => maintenanceDateKey(b).localeCompare(maintenanceDateKey(a)));
     }
 
+    function maintenanceCountForEquipment(equipmentId) {
+      if (!equipmentId) return 0;
+      return maintenanceRows.filter(item => item.장비 === equipmentId).length;
+    }
+
+    function maintenanceBadgeHtml(equipmentId) {
+      const count = maintenanceCountForEquipment(equipmentId);
+      return count > 0 ? `<span class="badge need">유지보수 ${count}건</span>` : "";
+    }
+
     async function loadEquipmentMaintenanceForArea(row, area) {
       if (!row || !area) return;
 
@@ -5665,6 +5715,10 @@ SN번호복사 / 텍스트
         maintenanceRows = data.rows || [];
         registerMaintenanceRows(maintenanceRows);
         renderMaintenanceList();
+        if (equipmentRows.length) {
+          renderEquipmentList();
+          renderEquipmentDetail();
+        }
       } catch (error) {
         $("#maintenanceList").innerHTML = `<div class="notice error">${escapeHtml(error.message)}</div>`;
       }
