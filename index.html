@@ -2378,6 +2378,40 @@
       .card-body { padding: 16px; }
       .toolbar .input, .toolbar .select, .toolbar .btn { flex-basis: 100%; }
     }
+
+    /* 조회전용 권한: 수정/등록/삭제 UI 숨김 */
+    .readonly-mode .admin-only,
+    .readonly-mode #addNavBtn,
+    .readonly-mode #generateMonthlyBtn,
+    .readonly-mode .save-monthly-detail-btn,
+    .readonly-mode .upload-monthly-photo-btn,
+    .readonly-mode .maintenance-card-actions,
+    .readonly-mode .equipment-maintenance-form,
+    .readonly-mode #maintenanceForm,
+    .readonly-mode #addView {
+      display: none !important;
+    }
+
+    .readonly-mode .quick-monthly-check,
+    .readonly-mode .monthly-inline-location,
+    .readonly-mode .monthly-detail input,
+    .readonly-mode .monthly-detail select,
+    .readonly-mode .monthly-detail textarea {
+      pointer-events: none;
+      opacity: .72;
+      background: #f8fafc;
+    }
+
+    .readonly-notice {
+      margin: 0 0 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: var(--info-soft);
+      color: var(--primary);
+      font-size: 13px;
+      font-weight: 850;
+    }
+
   </style>
 </head>
 <body>
@@ -2963,6 +2997,16 @@ SN번호복사 / 텍스트
     const $ = (selector) => document.querySelector(selector);
     const $$ = (selector) => [...document.querySelectorAll(selector)];
 
+    function isReadonlyUser() {
+      return currentUser?.role === "readonly";
+    }
+
+    function roleLabel(role) {
+      if (role === "admin") return "관리자";
+      if (role === "readonly") return "조회전용";
+      return "직원";
+    }
+
     function monthNow() {
       const d = new Date();
       return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
@@ -3043,6 +3087,11 @@ SN번호복사 / 텍스트
     }
 
     async function api(path, options = {}) {
+      const method = String(options.method || "GET").toUpperCase();
+      if (isReadonlyUser() && !["GET", "HEAD"].includes(method)) {
+        throw new Error("조회전용 계정은 수정할 수 없습니다.");
+      }
+
       const token = localStorage.getItem("eq_token") || "";
       const response = await fetch(`${API_BASE}${path}`, {
         ...options,
@@ -3092,11 +3141,13 @@ SN번호복사 / 텍스트
       currentUser = user;
       $("#loginPage").classList.add("hidden");
       $("#app").classList.remove("hidden");
-      if ($("#roleChip")) $("#roleChip").textContent = user.role === "admin" ? "관리자" : "직원";
-      if ($("#sideUserText")) $("#sideUserText").textContent = `${user.name} · ${user.role === "admin" ? "관리자" : "직원"}`;
+      const label = roleLabel(user.role);
+      if ($("#roleChip")) $("#roleChip").textContent = label;
+      if ($("#sideUserText")) $("#sideUserText").textContent = `${user.name} · ${label}`;
 
+      $("#app")?.classList.toggle("readonly-mode", user.role === "readonly");
       $$(".admin-only").forEach(el => el.classList.toggle("hidden", user.role !== "admin"));
-      $("#addNavBtn").classList.toggle("hidden", user.role !== "admin");
+      $("#addNavBtn")?.classList.toggle("hidden", user.role !== "admin");
 
       loadInitialData();
     }
@@ -5193,6 +5244,7 @@ SN번호복사 / 텍스트
     }
 
     function maintenanceActionMarkup(id) {
+      if (isReadonlyUser()) return "";
       return `
         <div class="maintenance-card-actions">
           <button class="maintenance-menu-btn" type="button" data-maintenance-menu="${escapeHtml(id)}" aria-label="유지보수 메뉴">⋯</button>
@@ -5458,6 +5510,10 @@ SN번호복사 / 텍스트
 
     async function submitEquipmentMaintenanceForArea(event, row, area) {
       event.preventDefault();
+      if (isReadonlyUser()) {
+        alert("조회전용 계정은 수정할 수 없습니다.");
+        return;
+      }
 
       const form = event.currentTarget;
       const button = form.querySelector("button[type='submit']");
@@ -5568,6 +5624,10 @@ SN번호복사 / 텍스트
 
     async function submitSelectedEquipmentMaintenance(event, row) {
       event.preventDefault();
+      if (isReadonlyUser()) {
+        alert("조회전용 계정은 수정할 수 없습니다.");
+        return;
+      }
 
       const form = event.currentTarget;
       const button = form.querySelector("button[type='submit']");
@@ -5663,6 +5723,10 @@ SN번호복사 / 텍스트
 
     async function submitMaintenance(event) {
       event.preventDefault();
+      if (isReadonlyUser()) {
+        showNotice($("#maintenanceMsg"), "조회전용 계정은 수정할 수 없습니다.", true);
+        return;
+      }
 
       const form = event.currentTarget;
       const button = form.querySelector("button[type='submit']");
