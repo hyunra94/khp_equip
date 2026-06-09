@@ -2199,7 +2199,8 @@
     }
 
     .equipment-filter-tabs #equipmentSortToggle,
-    .equipment-filter-tabs #equipmentModeToggle {
+    .equipment-filter-tabs #equipmentModeToggle,
+    .equipment-filter-tabs #equipmentMaintenanceOnlyToggle {
       flex: 0 0 auto;
     }
 
@@ -2238,13 +2239,15 @@
     @media (min-width: 761px) and (max-width: 840px) {
       .equipment-filter-tabs #equipmentYearToggle,
       .equipment-filter-tabs #equipmentSortToggle,
-      .equipment-filter-tabs #equipmentModeToggle {
+      .equipment-filter-tabs #equipmentModeToggle,
+      .equipment-filter-tabs #equipmentMaintenanceOnlyToggle {
         width: fit-content;
       }
 
       .equipment-filter-tabs #equipmentYearToggle button,
       .equipment-filter-tabs #equipmentSortToggle button,
-      .equipment-filter-tabs #equipmentModeToggle button {
+      .equipment-filter-tabs #equipmentModeToggle button,
+      .equipment-filter-tabs #equipmentMaintenanceOnlyToggle button {
         flex: 0 0 auto;
       }
     }
@@ -2268,13 +2271,15 @@
 
       .equipment-filter-tabs #equipmentYearToggle,
       .equipment-filter-tabs #equipmentSortToggle,
-      .equipment-filter-tabs #equipmentModeToggle {
+      .equipment-filter-tabs #equipmentModeToggle,
+      .equipment-filter-tabs #equipmentMaintenanceOnlyToggle {
         width: 100%;
       }
 
       .equipment-filter-tabs #equipmentYearToggle button,
       .equipment-filter-tabs #equipmentSortToggle button,
-      .equipment-filter-tabs #equipmentModeToggle button {
+      .equipment-filter-tabs #equipmentModeToggle button,
+      .equipment-filter-tabs #equipmentMaintenanceOnlyToggle button {
         flex: 1 0 auto;
       }
     }
@@ -2612,6 +2617,9 @@
                     <div class="mode-toggle" id="equipmentModeToggle">
                       <button type="button" data-mode="list" class="active">개별 장비</button>
                       <button type="button" data-mode="model">모델별</button>
+                    </div>
+                    <div class="mode-toggle" id="equipmentMaintenanceOnlyToggle" title="유지보수 내역이 있는 장비만 보기">
+                      <button type="button" data-maintenance-only="true">유지보수 내역</button>
                     </div>
                   </div>
                 </div>
@@ -3037,6 +3045,7 @@ SN번호복사 / 텍스트
     let equipmentLastLoadedAt = '';
     let modelRows = [];
     let equipmentViewMode = localStorage.getItem('equipment_view_mode') || 'list';
+    let equipmentMaintenanceOnly = localStorage.getItem('equipment_maintenance_only') === 'true';
     let equipmentSortMode = localStorage.getItem('equipment_sort_mode') || 'date';
     let monthlyViewMode = localStorage.getItem('monthly_view_mode') || 'list';
     let monthlySortMode = localStorage.getItem('monthly_sort_mode') || 'date';
@@ -3451,13 +3460,15 @@ SN번호복사 / 텍스트
       const location = $("#equipmentLocationFilter").value;
       const year = $("#equipmentYearFilter")?.value || "";
       const status = $("#equipmentStatusFilter").value;
+      const maintenanceOnly = equipmentMaintenanceOnly;
 
       const rows = equipmentRows.filter(row => {
         const matchQ = !q || `${row.장비명 || ""} ${row.SN번호 || ""} ${row.자체일련번호 || ""} ${row.규격 || ""} ${modelName(row) || ""}`.toLowerCase().includes(q);
         const matchLocation = matchesLocationFilter(row.배치장소, location, row.장비상태등);
         const matchYear = !year || equipmentYearValue(row) === year;
         const matchStatus = !status || row.장비상태등 === status;
-        return matchQ && matchLocation && matchYear && matchStatus;
+        const matchMaintenance = !maintenanceOnly || maintenanceCountForEquipment(row.id) > 0;
+        return matchQ && matchLocation && matchYear && matchStatus && matchMaintenance;
       });
 
       return sortEquipmentLike(rows, equipmentSortMode || "date");
@@ -3524,6 +3535,22 @@ SN번호복사 / 텍스트
 
       $$("#equipmentModeToggle button").forEach(btn => {
         btn.classList.toggle("active", btn.dataset.mode === equipmentViewMode);
+      });
+      $$("#equipmentMaintenanceOnlyToggle button").forEach(btn => {
+        btn.classList.toggle("active", equipmentMaintenanceOnly);
+      });
+
+      selectedEquipmentId = "";
+      renderEquipmentList();
+      renderEquipmentDetail();
+    }
+
+    function setEquipmentMaintenanceOnly(value) {
+      equipmentMaintenanceOnly = Boolean(value);
+      localStorage.setItem("equipment_maintenance_only", equipmentMaintenanceOnly ? "true" : "false");
+
+      $$("#equipmentMaintenanceOnlyToggle button").forEach(btn => {
+        btn.classList.toggle("active", equipmentMaintenanceOnly);
       });
 
       selectedEquipmentId = "";
@@ -3635,9 +3662,10 @@ SN번호복사 / 텍스트
 
       const includeCount = rows.filter(row => row.월별현황포함).length;
       const modelCount = groupRowsByModel(rows).length;
+      const maintenanceFilterText = equipmentMaintenanceOnly ? " · 유지보수 내역 있음만" : "";
       $("#equipmentSummary").textContent = selectedEquipmentId
-        ? `조회 결과 ${rows.length}건 · 모델 ${modelCount}개 · 월별현황 포함 ${includeCount}건 · 상세 열림`
-        : `조회 결과 ${rows.length}건 · 모델 ${modelCount}개 · 월별현황 포함 ${includeCount}건`;
+        ? `조회 결과 ${rows.length}건 · 모델 ${modelCount}개 · 월별현황 포함 ${includeCount}건${maintenanceFilterText} · 상세 열림`
+        : `조회 결과 ${rows.length}건 · 모델 ${modelCount}개 · 월별현황 포함 ${includeCount}건${maintenanceFilterText}`;
 
       $("#equipmentSyncNote").textContent = equipmentLastLoadedAt
         ? `마지막 동기화: ${equipmentLastLoadedAt} · 필터/검색은 저장된 목록 안에서 즉시 적용됩니다. 기본 정렬은 입고일/취득일 순입니다. Notion 변경사항은 새로고침 버튼을 눌러 반영하세요.`
@@ -5928,6 +5956,12 @@ SN번호복사 / 텍스트
         button.addEventListener("click", () => setEquipmentViewMode(button.dataset.mode));
       });
 
+      onIfExists("#equipmentMaintenanceOnlyToggle", "click", event => {
+        const button = event.target.closest("button[data-maintenance-only]");
+        if (!button) return;
+        setEquipmentMaintenanceOnly(!equipmentMaintenanceOnly);
+      });
+
       onIfExists("#monthlyReloadBtn", "click", () => loadMonthly(true));
       onIfExists("#monthlySearch", "input", renderMonthlyList);
       onIfExists("#monthlyLocationFilter", "change", renderMonthlyList);
@@ -5988,6 +6022,7 @@ SN번호복사 / 텍스트
       setHtmlIfExists("#equipmentLocationFilter", optionHtml([], "", "배치장소 전체"));
       setHtmlIfExists("#equipmentYearFilter", `<option value="">년도 전체</option>`);
       setHtmlIfExists("#equipmentYearToggle", `<button type="button" data-year="" class="active">년도 전체</button>`);
+      setHtmlIfExists("#equipmentMaintenanceOnlyToggle", `<button type="button" data-maintenance-only="true" class="${equipmentMaintenanceOnly ? "active" : ""}">유지보수 내역</button>`);
       setHtmlIfExists("#equipmentStatusFilter", optionHtml(statuses, "", "상태 전체"));
       setHtmlIfExists("#monthlyLocationFilter", optionHtml(locations, "", "위치 전체"));
 
