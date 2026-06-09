@@ -2184,6 +2184,7 @@
     }
 
     .equipment-filter-tabs .mode-toggle {
+      width: auto;
       max-width: 100%;
       overflow-x: auto;
       scrollbar-width: thin;
@@ -2191,8 +2192,10 @@
     }
 
     .equipment-filter-tabs #equipmentYearToggle {
-      flex: 1 1 auto;
-      min-width: 180px;
+      flex: 0 1 auto;
+      min-width: 0;
+      width: fit-content;
+      max-width: 100%;
     }
 
     .equipment-filter-tabs #equipmentSortToggle,
@@ -2225,7 +2228,24 @@
       }
 
       .equipment-filter-tabs #equipmentYearToggle {
-        flex: 1 1 100%;
+        flex: 0 1 auto;
+        width: fit-content;
+        max-width: 100%;
+      }
+    }
+
+
+    @media (min-width: 761px) and (max-width: 840px) {
+      .equipment-filter-tabs #equipmentYearToggle,
+      .equipment-filter-tabs #equipmentSortToggle,
+      .equipment-filter-tabs #equipmentModeToggle {
+        width: fit-content;
+      }
+
+      .equipment-filter-tabs #equipmentYearToggle button,
+      .equipment-filter-tabs #equipmentSortToggle button,
+      .equipment-filter-tabs #equipmentModeToggle button {
+        flex: 0 0 auto;
       }
     }
 
