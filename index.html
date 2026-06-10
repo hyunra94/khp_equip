@@ -3604,16 +3604,22 @@ SN번호복사 / 텍스트
       return [...map.entries()].sort((a, b) => b[1] - a[1]);
     }
 
+    function isSimpleModelGroupName(name) {
+      const value = String(name || "").trim();
+      return value === "기타" || value === "단일";
+    }
+
     function modelGroupHtml(group) {
       const model = group.model;
       const rows = group.rows;
-      const photoUrl = model?.대표사진URL || effectivePhotoUrl(rows[0]);
+      const simpleModelGroup = isSimpleModelGroupName(group.name);
+      const photoUrl = simpleModelGroup ? "" : (model?.대표사진URL || effectivePhotoUrl(rows[0]));
       const photo = photoUrl
         ? `<img class="model-photo" src="${escapeHtml(photoUrl)}" alt="">`
         : `<div class="model-photo">MODEL</div>`;
 
-      const locations = summarizeBy(rows, "배치장소").slice(0, 3);
-      const statuses = summarizeBy(rows, "장비상태등", "상태없음").slice(0, 3);
+      const locations = simpleModelGroup ? [] : summarizeBy(rows, "배치장소").slice(0, 3);
+      const statuses = simpleModelGroup ? [] : summarizeBy(rows, "장비상태등", "상태없음").slice(0, 3);
 
       const isOpen = openEquipmentModelGroups.has(group.id);
 
@@ -3623,12 +3629,14 @@ SN번호복사 / 텍스트
             ${photo}
             <div class="model-title">
               <strong>${escapeHtml(group.name)}</strong>
-              <span>${escapeHtml(model?.제작회사 || "-")} · ${escapeHtml(model?.규격 || "-")}</span>
+              ${simpleModelGroup
+                ? `<span>전체 ${rows.length}개</span>`
+                : `<span>${escapeHtml(model?.제작회사 || "-")} · ${escapeHtml(model?.규격 || "-")}</span>`}
             </div>
             <div class="model-summary">
               <span class="badge dark">전체 ${rows.length}개</span>
-              ${locations.map(([name, count]) => `<span class="badge gray">${escapeHtml(name)} ${count}</span>`).join("")}
-              ${statuses.map(([name, count]) => `<span class="badge ${statusClass(name)}">${escapeHtml(name)} ${count}</span>`).join("")}
+              ${simpleModelGroup ? "" : locations.map(([name, count]) => `<span class="badge gray">${escapeHtml(name)} ${count}</span>`).join("")}
+              ${simpleModelGroup ? "" : statuses.map(([name, count]) => `<span class="badge ${statusClass(name)}">${escapeHtml(name)} ${count}</span>`).join("")}
               <span class="model-open-hint">클릭해서 펼치기</span>
             </div>
           </summary>
