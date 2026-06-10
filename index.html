@@ -2490,7 +2490,7 @@
   </style>
 </head>
 <body>
-  <section class="login-page" id="loginPage">
+  <section class="login-page hidden" id="loginPage">
     <div class="login-card">
       <div class="login-brand">
         <div class="brand-mark">EQ</div>
@@ -3680,6 +3680,18 @@ SN번호복사 / 텍스트
     }
 
     function renderEquipmentList() {
+      const equipmentScrollBox = document.querySelector("#equipmentView .equipment-list-panel .card-body");
+      const keepEquipmentScrollTop = equipmentScrollBox ? equipmentScrollBox.scrollTop : 0;
+      const keepWindowScrollY = window.scrollY || 0;
+
+      const restoreEquipmentScroll = () => {
+        requestAnimationFrame(() => {
+          const box = document.querySelector("#equipmentView .equipment-list-panel .card-body");
+          if (box) box.scrollTop = keepEquipmentScrollTop;
+          window.scrollTo({ top: keepWindowScrollY, left: window.scrollX || 0, behavior: "auto" });
+        });
+      };
+
       const rows = filteredEquipmentRows();
 
       if (selectedEquipmentId && !rows.some(row => row.id === selectedEquipmentId)) {
@@ -3704,6 +3716,7 @@ SN번호복사 / 텍스트
 
       if (!rows.length) {
         $("#equipmentList").innerHTML = `<div class="empty">조회된 장비가 없습니다.</div>`;
+        restoreEquipmentScroll();
         return;
       }
 
@@ -3746,6 +3759,7 @@ SN번호복사 / 텍스트
       }
 
       bindInlineDetailButtons();
+      restoreEquipmentScroll();
     }
 
     function modelOf(row) {
@@ -6117,15 +6131,20 @@ SN번호복사 / 텍스트
         try {
           const data = await api("/api/me");
           setLoggedIn(data.user);
+          return;
         } catch {
           localStorage.removeItem("eq_token");
-          $("#loginPage").classList.remove("hidden");
         }
       }
+
+      $("#app")?.classList.add("hidden");
+      $("#loginPage")?.classList.remove("hidden");
     }
 
     boot().catch(error => {
       console.error(error);
+      $("#app")?.classList.add("hidden");
+      $("#loginPage")?.classList.remove("hidden");
       const msg = document.getElementById("loginMsg");
       if (msg) {
         msg.classList.remove("hidden");
