@@ -3069,6 +3069,7 @@ SN번호복사 / 텍스트
     let selectedMonthlyId = '';
     let selectedMonthlySideId = '';
     let openMonthlyModelGroups = new Set();
+    let openEquipmentModelGroups = new Set();
     let monthlyRows = [];
     let maintenanceRows = [];
     const maintenanceRowCache = new Map();
@@ -3614,10 +3615,10 @@ SN번호복사 / 텍스트
       const locations = summarizeBy(rows, "배치장소").slice(0, 3);
       const statuses = summarizeBy(rows, "장비상태등", "상태없음").slice(0, 3);
 
-      const isOpen = openMonthlyModelGroups.has(group.id);
+      const isOpen = openEquipmentModelGroups.has(group.id);
 
       return `
-        <details class="model-group-card" data-monthly-group-id="${escapeHtml(group.id)}" ${isOpen ? "open" : ""}>
+        <details class="model-group-card" data-equipment-group-id="${escapeHtml(group.id)}" ${isOpen ? "open" : ""}>
           <summary class="model-group-head">
             ${photo}
             <div class="model-title">
@@ -3701,8 +3702,20 @@ SN번호복사 / 텍스트
       if (equipmentViewMode === "model") {
         $("#equipmentList").innerHTML = `<div class="model-group-list">${groupRowsByModel(rows).map(modelGroupHtml).join("")}</div>`;
 
+        $$("#equipmentList .model-group-card").forEach(details => {
+          details.addEventListener("toggle", () => {
+            const id = details.dataset.equipmentGroupId;
+            if (!id) return;
+            if (details.open) openEquipmentModelGroups.add(id);
+            else openEquipmentModelGroups.delete(id);
+          });
+        });
+
         $$("#equipmentList .model-equipment-row").forEach(rowEl => {
           rowEl.addEventListener("click", () => {
+            const row = equipmentRows.find(item => item.id === rowEl.dataset.id);
+            const groupId = row ? (row.장비모델 || "__none__") : "";
+            if (groupId) openEquipmentModelGroups.add(groupId);
             selectedEquipmentId = selectedEquipmentId === rowEl.dataset.id ? "" : rowEl.dataset.id;
             renderEquipmentList();
             renderEquipmentDetail();
