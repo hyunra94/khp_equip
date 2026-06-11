@@ -555,6 +555,111 @@
       letter-spacing: -0.06em;
     }
 
+
+    .photo-zoom-wrap {
+      position: relative;
+      overflow: hidden;
+      border-radius: 14px;
+    }
+
+    .detail-cover-wrap {
+      margin-bottom: 16px;
+      border: 1px solid var(--line);
+      background: #eef4fb;
+    }
+
+    .photo-zoom-wrap .detail-cover {
+      margin-bottom: 0;
+      border: 0;
+      border-radius: 14px;
+    }
+
+    .photo-zoom-wrap.grid-photo {
+      border: 1px solid var(--line);
+      background: #f8fafc;
+    }
+
+    .photos-grid .photo-zoom-wrap.grid-photo img {
+      border: 0;
+      border-radius: 12px;
+      display: block;
+    }
+
+    .photo-zoom-btn {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      min-height: 32px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(17, 24, 39, .78);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 900;
+      box-shadow: 0 8px 20px rgba(17, 24, 39, .18);
+      opacity: 0;
+      transform: translateY(-2px);
+      transition: .12s ease-out;
+      z-index: 3;
+    }
+
+    .photo-zoom-wrap:hover .photo-zoom-btn,
+    .photo-zoom-btn:focus-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .photo-lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      background: rgba(15, 23, 42, .78);
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .photo-lightbox.hidden {
+      display: none !important;
+    }
+
+    .photo-lightbox-card {
+      position: relative;
+      width: min(1040px, 96vw);
+      max-height: 92vh;
+      background: #fff;
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 28px 80px rgba(0, 0, 0, .34);
+      display: grid;
+      gap: 12px;
+    }
+
+    .photo-lightbox-head {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .photo-lightbox-img {
+      width: 100%;
+      max-height: calc(92vh - 92px);
+      object-fit: contain;
+      border-radius: 14px;
+      background: #f8fafc;
+    }
+
+    @media (max-width: 840px) {
+      .photo-zoom-btn {
+        opacity: 1;
+        transform: none;
+      }
+
+      .photo-lightbox {
+        padding: 12px;
+      }
+    }
+
     .kv {
       display: grid;
       grid-template-columns: 132px 1fr;
@@ -3048,6 +3153,16 @@ SN번호복사 / 텍스트
     </aside>
   </section>
 
+
+  <div class="photo-lightbox hidden" id="photoLightbox" role="dialog" aria-modal="true" aria-label="사진 크게 보기">
+    <div class="photo-lightbox-card">
+      <div class="photo-lightbox-head">
+        <button class="btn" type="button" id="photoLightboxClose">닫기</button>
+      </div>
+      <img class="photo-lightbox-img" id="photoLightboxImg" alt="확대 사진" />
+    </div>
+  </div>
+
   <script>
     const API_BASE = "https://equip.hyunra94.workers.dev";
 
@@ -3075,9 +3190,62 @@ SN번호복사 / 텍스트
     const maintenanceRowCache = new Map();
     let selectedDepreciationId = "";
     let selectedEquipmentId = "";
+    let pendingEquipmentAnchorId = "";
+    let pendingEquipmentAbsoluteScroll = null;
 
     const $ = (selector) => document.querySelector(selector);
     const $$ = (selector) => [...document.querySelectorAll(selector)];
+
+
+    function zoomButtonHtml(url) {
+      return `<button class="photo-zoom-btn" type="button" data-zoom-src="${escapeHtml(url)}">확대</button>`;
+    }
+
+    function zoomableImageHtml(url, className = "detail-cover", alt = "") {
+      return `<div class="photo-zoom-wrap ${className === "detail-cover" ? "detail-cover-wrap" : "grid-photo"}"><img class="${escapeHtml(className)}" src="${escapeHtml(url)}" alt="${escapeHtml(alt)}">${zoomButtonHtml(url)}</div>`;
+    }
+
+    function photoGridHtml(photos = []) {
+      return `<div class="photos-grid">${photos.map(photo => zoomableImageHtml(photo.url, "", "")).join("")}</div>`;
+    }
+
+    function openPhotoLightbox(src) {
+      if (!src) return;
+      const box = $("#photoLightbox");
+      const img = $("#photoLightboxImg");
+      if (!box || !img) return;
+      img.src = src;
+      box.classList.remove("hidden");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closePhotoLightbox() {
+      const box = $("#photoLightbox");
+      const img = $("#photoLightboxImg");
+      if (!box || !img) return;
+      box.classList.add("hidden");
+      img.src = "";
+      document.body.style.overflow = "";
+    }
+
+    document.addEventListener("click", (event) => {
+      const zoomButton = event.target.closest("[data-zoom-src]");
+      if (zoomButton) {
+        event.preventDefault();
+        event.stopPropagation();
+        openPhotoLightbox(zoomButton.dataset.zoomSrc || "");
+        return;
+      }
+
+      if (event.target.id === "photoLightbox" || event.target.id === "photoLightboxClose") {
+        event.preventDefault();
+        closePhotoLightbox();
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closePhotoLightbox();
+    });
 
     function isReadonlyUser() {
       return currentUser?.role === "readonly";
@@ -3111,6 +3279,11 @@ SN번호복사 / 텍스트
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
+    }
+
+
+    function escapeCssValue(value) {
+      return String(value ?? "").replaceAll("\", "\\").replaceAll('"', '\"');
     }
 
     function money(value) {
@@ -3683,10 +3856,34 @@ SN번호복사 / 텍스트
       const equipmentScrollBox = document.querySelector("#equipmentView .equipment-list-panel .card-body");
       const keepEquipmentScrollTop = equipmentScrollBox ? equipmentScrollBox.scrollTop : 0;
       const keepWindowScrollY = window.scrollY || 0;
+      const anchorId = pendingEquipmentAnchorId || selectedEquipmentId || "";
+      const anchorBefore = anchorId ? document.querySelector(`#equipmentList [data-id="${escapeCssValue(anchorId)}"]`) : null;
+      const anchorBeforeTop = anchorBefore ? anchorBefore.getBoundingClientRect().top : null;
+      pendingEquipmentAnchorId = "";
 
       const restoreEquipmentScroll = () => {
         requestAnimationFrame(() => {
           const box = document.querySelector("#equipmentView .equipment-list-panel .card-body");
+
+          if (pendingEquipmentAbsoluteScroll) {
+            const saved = pendingEquipmentAbsoluteScroll;
+            pendingEquipmentAbsoluteScroll = null;
+            if (box && Number.isFinite(saved.boxTop)) box.scrollTop = saved.boxTop;
+            if (Number.isFinite(saved.windowY)) {
+              window.scrollTo({ top: saved.windowY, left: window.scrollX || 0, behavior: "auto" });
+            }
+            return;
+          }
+
+          const anchorAfter = anchorId ? document.querySelector(`#equipmentList [data-id="${escapeCssValue(anchorId)}"]`) : null;
+
+          if (anchorAfter && anchorBeforeTop !== null) {
+            const delta = anchorAfter.getBoundingClientRect().top - anchorBeforeTop;
+            if (box) box.scrollTop += delta;
+            window.scrollTo({ top: Math.max(0, keepWindowScrollY + delta), left: window.scrollX || 0, behavior: "auto" });
+            return;
+          }
+
           if (box) box.scrollTop = keepEquipmentScrollTop;
           window.scrollTo({ top: keepWindowScrollY, left: window.scrollX || 0, behavior: "auto" });
         });
@@ -3735,6 +3932,7 @@ SN번호복사 / 텍스트
         $$("#equipmentList .model-equipment-row").forEach(rowEl => {
           rowEl.addEventListener("click", () => {
             const row = equipmentRows.find(item => item.id === rowEl.dataset.id);
+            pendingEquipmentAnchorId = rowEl.dataset.id || "";
             const groupId = row ? (row.장비모델 || "__none__") : "";
             if (groupId) openEquipmentModelGroups.add(groupId);
             selectedEquipmentId = selectedEquipmentId === rowEl.dataset.id ? "" : rowEl.dataset.id;
@@ -3747,6 +3945,7 @@ SN번호복사 / 텍스트
 
         $$("#equipmentList .equipment-card").forEach(card => {
           card.addEventListener("click", () => {
+            pendingEquipmentAnchorId = card.dataset.id || "";
             if (selectedEquipmentId === card.dataset.id) {
               selectedEquipmentId = "";
             } else {
@@ -3786,7 +3985,7 @@ SN번호복사 / 텍스트
       const model = modelOf(row);
       const photoUrl = effectivePhotoUrl(row);
       const cover = photoUrl
-        ? `<img class="detail-cover" src="${escapeHtml(photoUrl)}" alt="">`
+        ? zoomableImageHtml(photoUrl, "detail-cover", row.장비명 || "장비 사진")
         : `<div class="detail-cover">EQ</div>`;
 
       return `
@@ -3828,6 +4027,12 @@ SN번호복사 / 텍스트
       $$("#equipmentList .close-inline-detail-btn").forEach(button => {
         button.addEventListener("click", (event) => {
           event.stopPropagation();
+          const scrollBox = document.querySelector("#equipmentView .equipment-list-panel .card-body");
+          pendingEquipmentAbsoluteScroll = {
+            boxTop: scrollBox ? scrollBox.scrollTop : 0,
+            windowY: window.scrollY || 0
+          };
+          pendingEquipmentAnchorId = selectedEquipmentId || "";
           selectedEquipmentId = "";
           renderEquipmentList();
           renderEquipmentDetail();
@@ -3845,7 +4050,7 @@ SN번호복사 / 텍스트
             const data = await api(`/api/equipment/${encodeURIComponent(rowId)}/photos`);
             const photos = data.photos || [];
             area.innerHTML = photos.length
-              ? `<div class="photos-grid">${photos.map(photo => `<img src="${escapeHtml(photo.url)}" alt="">`).join("")}</div>`
+              ? photoGridHtml(photos)
               : `<div class="notice">조회된 장비사진이 없습니다. 노션 페이지 내부에 “⑭ 장비 사진” 토글이 있는지 확인하세요.</div>`;
           } catch (error) {
             area.innerHTML = `<div class="notice error">${escapeHtml(error.message)}</div>`;
@@ -3864,7 +4069,7 @@ SN번호복사 / 텍스트
             const data = await api(`/api/models/${encodeURIComponent(modelId)}/photos`);
             const photos = data.photos || [];
             area.innerHTML = photos.length
-              ? `<div class="photos-grid">${photos.map(photo => `<img src="${escapeHtml(photo.url)}" alt="">`).join("")}</div>`
+              ? photoGridHtml(photos)
               : `<div class="notice">조회된 모델 공통사진이 없습니다. 모델 페이지 내부에 “모델 공통사진” 토글이 있는지 확인하세요.</div>`;
           } catch (error) {
             area.innerHTML = `<div class="notice error">${escapeHtml(error.message)}</div>`;
@@ -3953,7 +4158,7 @@ SN번호복사 / 텍스트
       const model = modelOf(row);
       const photoUrl = effectivePhotoUrl(row);
       const cover = photoUrl
-        ? `<img class="detail-cover" src="${escapeHtml(photoUrl)}" alt="">`
+        ? zoomableImageHtml(photoUrl, "detail-cover", row.장비명 || "장비 사진")
         : `<div class="detail-cover">EQ</div>`;
 
       $("#equipmentDetail").innerHTML = `
@@ -3993,6 +4198,12 @@ SN번호복사 / 텍스트
       if (modelPhotosBtn) modelPhotosBtn.addEventListener("click", loadModelPhotos);
       $("#loadMaintenanceBtn").addEventListener("click", loadSelectedEquipmentMaintenance);
       $("#closeDetailBtn").addEventListener("click", () => {
+        const scrollBox = document.querySelector("#equipmentView .equipment-list-panel .card-body");
+        pendingEquipmentAbsoluteScroll = {
+          boxTop: scrollBox ? scrollBox.scrollTop : 0,
+          windowY: window.scrollY || 0
+        };
+        pendingEquipmentAnchorId = selectedEquipmentId || "";
         selectedEquipmentId = "";
         renderEquipmentList();
         renderEquipmentDetail();
@@ -4010,7 +4221,7 @@ SN번호복사 / 텍스트
         const photos = data.photos || [];
 
         $("#photosArea").innerHTML = photos.length
-          ? `<div class="photos-grid">${photos.map(photo => `<img src="${escapeHtml(photo.url)}" alt="">`).join("")}</div>`
+          ? photoGridHtml(photos)
           : `<div class="notice">조회된 장비사진이 없습니다. 노션 페이지 내부에 “⑭ 장비 사진” 토글이 있는지 확인하세요.</div>`;
       } catch (error) {
         $("#photosArea").innerHTML = `<div class="notice error">${escapeHtml(error.message)}</div>`;
@@ -4030,7 +4241,7 @@ SN번호복사 / 텍스트
         const photos = data.photos || [];
 
         $("#modelPhotosArea").innerHTML = photos.length
-          ? `<div class="photos-grid">${photos.map(photo => `<img src="${escapeHtml(photo.url)}" alt="">`).join("")}</div>`
+          ? photoGridHtml(photos)
           : `<div class="notice">조회된 모델 공통사진이 없습니다. 모델 페이지 내부에 “모델 공통사진” 토글이 있는지 확인하세요.</div>`;
       } catch (error) {
         $("#modelPhotosArea").innerHTML = `<div class="notice error">${escapeHtml(error.message)}</div>`;
@@ -4454,7 +4665,7 @@ SN번호복사 / 텍스트
         const data = await api(`/api/monthly/${encodeURIComponent(rowId)}/photos`);
         const photos = data.photos || [];
         area.innerHTML = photos.length
-          ? `<div class="photos-grid">${photos.map(photo => `<img src="${escapeHtml(photo.url)}" alt="">`).join("")}</div>`
+          ? photoGridHtml(photos)
           : `<div class="notice">조회된 점검사진이 없습니다.</div>`;
       } catch (error) {
         area.innerHTML = `<div class="notice error">${escapeHtml(error.message)}</div>`;
