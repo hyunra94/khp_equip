@@ -3283,7 +3283,7 @@ SN번호복사 / 텍스트
 
 
     function escapeCssValue(value) {
-      return String(value ?? "").replaceAll("\", "\\").replaceAll('"', '\"');
+      return String(value ?? "").replaceAll("\\", "\\\\").replaceAll('"', '\\"');
     }
 
     function money(value) {
