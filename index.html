@@ -2572,7 +2572,7 @@
             </div>
             <div class="toolbar" style="margin:0;">
               <input class="input" type="month" id="dashMonth" />
-              <button class="btn primary" id="dashReloadBtn">최신 정보 동기화</button>
+              <button class="btn primary" id="dashReloadBtn">노션 동기화</button>
             </div>
           </div>
 
@@ -3201,9 +3201,8 @@ SN번호복사 / 텍스트
 
 
     function escapeCssValue(value) {
-      return String(value ?? "").replaceAll("\", "\\").replaceAll('"', '\"');
+      return String(value ?? "").replaceAll("\\", "\\\\").replaceAll('"', '\"');
     }
-
     function money(value) {
       if (value === null || value === undefined || value === "") return "-";
       const number = Number(value);
