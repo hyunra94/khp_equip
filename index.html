@@ -2572,7 +2572,7 @@
             </div>
             <div class="toolbar" style="margin:0;">
               <input class="input" type="month" id="dashMonth" />
-              <button class="btn primary" id="dashReloadBtn">노션 동기화</button>
+              <button class="btn primary" id="dashReloadBtn">최신 정보 동기화</button>
             </div>
           </div>
 
@@ -2629,7 +2629,7 @@
                   <select class="select" id="equipmentLocationFilter"></select>
                   <select class="select" id="equipmentYearFilter"></select>
                   <select class="select" id="equipmentStatusFilter"></select>
-                  <button class="btn refresh" id="equipmentReloadBtn">노션 동기화</button>
+                  <button class="btn refresh" id="equipmentReloadBtn">최신 정보 동기화</button>
                   <div class="equipment-filter-tabs" aria-label="장비 원장 보기 옵션">
                     <div class="mode-toggle year-toggle" id="equipmentYearToggle" title="입고년도 필터">
                       <button type="button" data-year="" class="active">년도 전체</button>
@@ -2704,7 +2704,7 @@
                   <option value="checked">확인 완료만</option>
                   <option value="issue">조치 필요만</option>
                 </select>
-                <button class="btn" id="monthlyReloadBtn">노션 동기화</button>
+                <button class="btn" id="monthlyReloadBtn">최신 정보 동기화</button>
                 <div class="mode-toggle" id="monthlyModeToggle">
                   <button type="button" data-mode="list" class="active">개별 장비</button>
                   <button type="button" data-mode="model">모델별</button>
@@ -3627,7 +3627,7 @@ SN번호복사 / 텍스트
           renderEquipmentDetail();
           renderDashboard();
           if (selectedMonthlySideId) renderMonthlySideDetail(selectedMonthlySideId);
-          if (syncEl) syncEl.textContent = `로컬 데이터 표시 중 · 마지막 노션 동기화: ${equipmentLastLoadedAt || "기록 없음"}`;
+          if (syncEl) syncEl.textContent = `로컬 데이터 표시 중 · 마지막 동기화: ${equipmentLastLoadedAt || "기록 없음"}`;
           return;
         }
       }
@@ -3658,7 +3658,7 @@ SN번호복사 / 텍스트
         renderEquipmentDetail();
         renderDashboard();
         if (selectedMonthlySideId) renderMonthlySideDetail(selectedMonthlySideId);
-        if (syncEl) syncEl.textContent = `노션 동기화 완료 · ${equipmentLastLoadedAt}`;
+        if (syncEl) syncEl.textContent = `동기화 완료 · ${equipmentLastLoadedAt}`;
       } catch (error) {
         if (!equipmentRows.length) {
           equipmentRows = [];
@@ -3676,7 +3676,7 @@ SN번호복사 / 텍스트
           if ($("#equipmentDetail")) $("#equipmentDetail").innerHTML = `<div class="empty">장비 원장 조회 오류가 발생했습니다.</div>`;
           renderDashboard();
         } else {
-          if (syncEl) syncEl.textContent = `노션 동기화 실패 · 로컬 데이터 유지 · ${error.message}`;
+          if (syncEl) syncEl.textContent = `동기화 실패 · 로컬 데이터 유지 · ${error.message}`;
         }
       }
     }
@@ -4238,7 +4238,7 @@ SN번호복사 / 텍스트
           renderMonthlyList();
           renderDashboard();
           if (showMessage && $("#monthlyMsg")) {
-            showNotice($("#monthlyMsg"), `로컬 데이터 표시 중 · 마지막 노션 동기화: ${cacheTimeText(cached.savedAt) || "기록 없음"}`);
+            showNotice($("#monthlyMsg"), `로컬 데이터 표시 중 · 마지막 동기화: ${cacheTimeText(cached.savedAt) || "기록 없음"}`);
           }
           return;
         }
@@ -4255,7 +4255,7 @@ SN번호복사 / 텍스트
         renderMonthlyList();
         renderDashboard();
         if (showMessage && $("#monthlyMsg")) {
-          showNotice($("#monthlyMsg"), `노션 동기화 완료 · ${cacheTimeText(savedAt)}`);
+          showNotice($("#monthlyMsg"), `동기화 완료 · ${cacheTimeText(savedAt)}`);
         }
       } catch (error) {
         if (showMessage) $("#monthlyList").innerHTML = `<div class="notice error">${escapeHtml(error.message)}</div>`;
