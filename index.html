@@ -2572,7 +2572,7 @@
             </div>
             <div class="toolbar" style="margin:0;">
               <input class="input" type="month" id="dashMonth" />
-              <button class="btn primary" id="dashReloadBtn">새로고침</button>
+              <button class="btn primary" id="dashReloadBtn">최신 정보 동기화</button>
             </div>
           </div>
 
@@ -2629,7 +2629,7 @@
                   <select class="select" id="equipmentLocationFilter"></select>
                   <select class="select" id="equipmentYearFilter"></select>
                   <select class="select" id="equipmentStatusFilter"></select>
-                  <button class="btn refresh" id="equipmentReloadBtn">새로고침</button>
+                  <button class="btn refresh" id="equipmentReloadBtn">노션 동기화</button>
                   <div class="equipment-filter-tabs" aria-label="장비 원장 보기 옵션">
                     <div class="mode-toggle year-toggle" id="equipmentYearToggle" title="입고년도 필터">
                       <button type="button" data-year="" class="active">년도 전체</button>
@@ -2704,7 +2704,7 @@
                   <option value="checked">확인 완료만</option>
                   <option value="issue">조치 필요만</option>
                 </select>
-                <button class="btn" id="monthlyReloadBtn">조회</button>
+                <button class="btn" id="monthlyReloadBtn">노션 동기화</button>
                 <div class="mode-toggle" id="monthlyModeToggle">
                   <button type="button" data-mode="list" class="active">개별 장비</button>
                   <button type="button" data-mode="model">모델별</button>
@@ -3090,6 +3090,81 @@ SN번호복사 / 텍스트
     const $ = (selector) => document.querySelector(selector);
     const $$ = (selector) => [...document.querySelectorAll(selector)];
 
+    const CACHE_DB_NAME = "equipment-management-cache-v1";
+    const CACHE_STORE_NAME = "kv";
+
+    function openCacheDb() {
+      return new Promise((resolve, reject) => {
+        if (!("indexedDB" in window)) {
+          reject(new Error("이 브라우저는 IndexedDB를 지원하지 않습니다."));
+          return;
+        }
+
+        const request = indexedDB.open(CACHE_DB_NAME, 1);
+        request.onupgradeneeded = () => {
+          const db = request.result;
+          if (!db.objectStoreNames.contains(CACHE_STORE_NAME)) {
+            db.createObjectStore(CACHE_STORE_NAME, { keyPath: "key" });
+          }
+        };
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error || new Error("IndexedDB를 열 수 없습니다."));
+      });
+    }
+
+    async function cacheGet(key) {
+      try {
+        const db = await openCacheDb();
+        return await new Promise((resolve, reject) => {
+          const tx = db.transaction(CACHE_STORE_NAME, "readonly");
+          const req = tx.objectStore(CACHE_STORE_NAME).get(key);
+          req.onsuccess = () => resolve(req.result?.value ?? null);
+          req.onerror = () => reject(req.error);
+          tx.oncomplete = () => db.close();
+          tx.onerror = () => db.close();
+        });
+      } catch (error) {
+        console.warn("캐시 읽기 실패", key, error);
+        return null;
+      }
+    }
+
+    async function cacheSet(key, value) {
+      try {
+        const db = await openCacheDb();
+        await new Promise((resolve, reject) => {
+          const tx = db.transaction(CACHE_STORE_NAME, "readwrite");
+          tx.objectStore(CACHE_STORE_NAME).put({ key, value, updatedAt: Date.now() });
+          tx.oncomplete = () => { db.close(); resolve(); };
+          tx.onerror = () => { db.close(); reject(tx.error); };
+        });
+      } catch (error) {
+        console.warn("캐시 저장 실패", key, error);
+      }
+    }
+
+    function cacheScope() {
+      // 관리자 응답에는 Notion URL이 포함될 수 있어 권한별로 캐시를 분리합니다.
+      return `${API_BASE}:${currentUser?.role || "guest"}`;
+    }
+
+    function equipmentCacheKey() {
+      return `${cacheScope()}:equipment`;
+    }
+
+    function modelCacheKey() {
+      return `${cacheScope()}:models`;
+    }
+
+    function monthlyCacheKey(month) {
+      return `${cacheScope()}:monthly:${month || monthNow()}`;
+    }
+
+    function cacheTimeText(value) {
+      const ts = Number(value || 0);
+      return ts ? new Date(ts).toLocaleString("ko-KR") : "";
+    }
+
     function isReadonlyUser() {
       return currentUser?.role === "readonly";
     }
@@ -3268,16 +3343,29 @@ SN번호복사 / 텍스트
       }
     }
 
-    async function loadModels() {
+    async function loadModels(force = false) {
+      if (!force) {
+        const cached = await cacheGet(modelCacheKey());
+        if (cached?.rows?.length) {
+          modelRows = cached.rows || [];
+          refreshModelOptions();
+          refreshMaintenanceEquipmentOptions();
+          return;
+        }
+      }
+
       try {
         const data = await api("/api/models");
         modelRows = data.rows || [];
+        await cacheSet(modelCacheKey(), { rows: modelRows, savedAt: Date.now() });
         refreshModelOptions();
-      refreshMaintenanceEquipmentOptions();
+        refreshMaintenanceEquipmentOptions();
       } catch (error) {
         console.warn("장비모델 목록을 불러오지 못했습니다.", error);
-        modelRows = [];
-        refreshModelOptions();
+        if (!modelRows.length) {
+          modelRows = [];
+          refreshModelOptions();
+        }
       }
     }
 
@@ -3311,10 +3399,16 @@ SN번호복사 / 텍스트
       if ($("#monthlyMonth")) $("#monthlyMonth").value = now;
       if ($("#monthChip")) $("#monthChip").textContent = formatMonth(now);
 
-      await loadModels();
-      await loadEquipment();
+      await loadModels(false);
+      await loadEquipment({ force: false });
       await loadMaintenance();
-      monthlyRows = [];
+
+      const cachedMonthly = await cacheGet(monthlyCacheKey(now));
+      monthlyRows = cachedMonthly?.rows || [];
+      if (monthlyRows.length) {
+        refreshMonthlyModelOptions();
+        renderMonthlyList();
+      }
       renderDashboard();
     }
 
@@ -3508,13 +3602,48 @@ SN번호복사 / 텍스트
       return sortEquipmentLike(rows, equipmentSortMode || "date");
     }
 
-    async function loadEquipment() {
-      $("#equipmentList").innerHTML = `<div class="notice">장비 원장을 불러오는 중입니다. 최초 1회만 전체 데이터를 가져오고, 이후 필터는 화면 안에서 바로 적용됩니다.</div>`;
+    async function loadEquipment(options = {}) {
+      const force = Boolean(options.force);
+      const listEl = $("#equipmentList");
+      const summaryEl = $("#equipmentSummary");
+      const syncEl = $("#equipmentSyncNote");
+
+      if (!force) {
+        const cached = await cacheGet(equipmentCacheKey());
+        if (cached?.rows?.length) {
+          equipmentRows = cached.rows || [];
+          equipmentLastLoadedAt = cacheTimeText(cached.savedAt);
+
+          refreshEquipmentLocationOptions();
+          refreshEquipmentYearOptions();
+          refreshEquipmentModelOptions();
+          refreshMaintenanceEquipmentOptions();
+          refreshDepreciationModelOptions();
+
+          if (selectedEquipmentId && !equipmentRows.some(row => row.id === selectedEquipmentId)) {
+            selectedEquipmentId = "";
+          }
+
+          renderEquipmentList();
+          renderEquipmentDetail();
+          renderDashboard();
+          if (selectedMonthlySideId) renderMonthlySideDetail(selectedMonthlySideId);
+          if (syncEl) syncEl.textContent = `로컬 데이터 표시 중 · 마지막 노션 동기화: ${equipmentLastLoadedAt || "기록 없음"}`;
+          return;
+        }
+      }
+
+      if (listEl) {
+        listEl.innerHTML = `<div class="notice">${force ? "노션에서 최신 장비 원장을 동기화하는 중입니다." : "저장된 장비 데이터가 없어 노션에서 처음 불러오는 중입니다."}</div>`;
+      }
 
       try {
+        await loadModels(force);
         const data = await api(`/api/equipment`);
         equipmentRows = data.rows || [];
-        equipmentLastLoadedAt = new Date().toLocaleString("ko-KR");
+        const savedAt = Date.now();
+        equipmentLastLoadedAt = cacheTimeText(savedAt);
+        await cacheSet(equipmentCacheKey(), { rows: equipmentRows, savedAt });
 
         refreshEquipmentLocationOptions();
         refreshEquipmentYearOptions();
@@ -3530,19 +3659,26 @@ SN번호복사 / 텍스트
         renderEquipmentDetail();
         renderDashboard();
         if (selectedMonthlySideId) renderMonthlySideDetail(selectedMonthlySideId);
+        if (syncEl) syncEl.textContent = `노션 동기화 완료 · ${equipmentLastLoadedAt}`;
       } catch (error) {
-        equipmentRows = [];
-        $("#equipmentSummary").textContent = "";
-        $("#equipmentSyncNote").textContent = "";
-        $("#equipmentList").innerHTML = `
-          <div class="notice error">
-            장비 원장을 불러오지 못했습니다.<br>
-            ${escapeHtml(error.message)}<br><br>
-            Cloudflare Worker의 NOTION_EQUIPMENT_DATA_SOURCE_ID, NOTION_API_KEY, Notion Integration 연결 여부를 확인하세요.
-          </div>
-        `;
-        $("#equipmentDetail").innerHTML = `<div class="empty">장비 원장 조회 오류가 발생했습니다.</div>`;
-        renderDashboard();
+        if (!equipmentRows.length) {
+          equipmentRows = [];
+          if (summaryEl) summaryEl.textContent = "";
+          if (syncEl) syncEl.textContent = "";
+          if (listEl) {
+            listEl.innerHTML = `
+              <div class="notice error">
+                장비 원장을 불러오지 못했습니다.<br>
+                ${escapeHtml(error.message)}<br><br>
+                Cloudflare Worker의 NOTION_EQUIPMENT_DATA_SOURCE_ID, NOTION_API_KEY, Notion Integration 연결 여부를 확인하세요.
+              </div>
+            `;
+          }
+          if ($("#equipmentDetail")) $("#equipmentDetail").innerHTML = `<div class="empty">장비 원장 조회 오류가 발생했습니다.</div>`;
+          renderDashboard();
+        } else {
+          if (syncEl) syncEl.textContent = `노션 동기화 실패 · 로컬 데이터 유지 · ${error.message}`;
+        }
       }
     }
 
@@ -4091,16 +4227,37 @@ SN번호복사 / 텍스트
       }
     }
 
-    async function loadMonthly(showMessage = true) {
+    async function loadMonthly(showMessage = true, options = {}) {
+      const force = Boolean(options.force);
       const month = $("#monthlyMonth").value || monthNow();
-      if (showMessage) $("#monthlyList").innerHTML = `<div class="notice">월별 현황을 불러오는 중입니다.</div>`;
+
+      if (!force) {
+        const cached = await cacheGet(monthlyCacheKey(month));
+        if (cached?.rows?.length) {
+          monthlyRows = cached.rows || [];
+          refreshMonthlyModelOptions();
+          renderMonthlyList();
+          renderDashboard();
+          if (showMessage && $("#monthlyMsg")) {
+            showNotice($("#monthlyMsg"), `로컬 데이터 표시 중 · 마지막 노션 동기화: ${cacheTimeText(cached.savedAt) || "기록 없음"}`);
+          }
+          return;
+        }
+      }
+
+      if (showMessage) $("#monthlyList").innerHTML = `<div class="notice">${force ? "노션에서 최신 월별 현황을 동기화하는 중입니다." : "저장된 월별 데이터가 없어 노션에서 처음 불러오는 중입니다."}</div>`;
 
       try {
         const data = await api(`/api/monthly?month=${encodeURIComponent(month)}`);
         monthlyRows = data.rows || [];
+        const savedAt = Date.now();
+        await cacheSet(monthlyCacheKey(month), { rows: monthlyRows, savedAt });
         refreshMonthlyModelOptions();
         renderMonthlyList();
         renderDashboard();
+        if (showMessage && $("#monthlyMsg")) {
+          showNotice($("#monthlyMsg"), `노션 동기화 완료 · ${cacheTimeText(savedAt)}`);
+        }
       } catch (error) {
         if (showMessage) $("#monthlyList").innerHTML = `<div class="notice error">${escapeHtml(error.message)}</div>`;
       }
@@ -4326,7 +4483,26 @@ SN번호복사 / 텍스트
     }
 
     function applyMonthlyPatchToLocal(id, patch) {
-      monthlyRows = monthlyRows.map(row => row.id === id ? { ...row, ...patch } : row);
+      let linkedEquipmentId = "";
+      monthlyRows = monthlyRows.map(row => {
+        if (row.id !== id) return row;
+        linkedEquipmentId = row.장비 || "";
+        return { ...row, ...patch };
+      });
+
+      const month = $("#monthlyMonth")?.value || monthNow();
+      cacheSet(monthlyCacheKey(month), { rows: monthlyRows, savedAt: Date.now() });
+
+      // 월별점검 저장 시 Worker가 장비원장의 세부위치/현재특이사항도 갱신하므로
+      // 화면의 로컬 장비 데이터도 같이 맞춰둡니다.
+      if (linkedEquipmentId) {
+        equipmentRows = equipmentRows.map(row => row.id === linkedEquipmentId ? {
+          ...row,
+          ...(patch.이번달위치 !== undefined ? { 세부위치: patch.이번달위치 } : {}),
+          ...(patch.메모 !== undefined ? { 현재특이사항: patch.메모 } : {})
+        } : row);
+        cacheSet(equipmentCacheKey(), { rows: equipmentRows, savedAt: Date.now() });
+      }
     }
 
     function renderMonthlyList() {
@@ -4723,7 +4899,7 @@ SN번호복사 / 텍스트
         }
 
         showNotice($("#monthlyMsg"), `${formatMonth(month)} 생성 완료 · 처리 ${processed}건 · 신규 ${created}건 · 기존 ${skipped}건`);
-        await loadMonthly(false);
+        await loadMonthly(false, { force: true });
       } catch (error) {
         showNotice($("#monthlyMsg"), error.message, true);
       } finally {
@@ -4807,7 +4983,7 @@ SN번호복사 / 텍스트
         $("#addMsg").innerHTML = `등록 완료 · ${data.url ? `<a href="${escapeHtml(data.url)}" target="_blank" rel="noreferrer" style="text-decoration:underline;">노션에서 보기</a>` : ""}`;
         form.reset();
         form.querySelector('[name="월별현황포함"]').checked = true;
-        await loadEquipment();
+        await loadEquipment({ force: true });
       } catch (error) {
         showNotice($("#addMsg"), error.message, true);
       }
@@ -6049,11 +6225,11 @@ SN번호복사 / 텍스트
         if ($("#monthChip") && $("#monthlyMonth")) {
           $("#monthChip").textContent = formatMonth($("#monthlyMonth").value);
         }
-        await loadEquipment();
+        await loadEquipment({ force: true });
         renderDashboard();
       });
 
-      onIfExists("#equipmentReloadBtn", "click", loadEquipment);
+      onIfExists("#equipmentReloadBtn", "click", () => loadEquipment({ force: true }));
 
       onIfExists("#equipmentSearch", "input", () => {
         renderEquipmentList();
@@ -6094,7 +6270,7 @@ SN번호복사 / 텍스트
         setEquipmentMaintenanceOnly(!equipmentMaintenanceOnly);
       });
 
-      onIfExists("#monthlyReloadBtn", "click", () => loadMonthly(true));
+      onIfExists("#monthlyReloadBtn", "click", () => loadMonthly(true, { force: true }));
       onIfExists("#monthlySearch", "input", renderMonthlyList);
       onIfExists("#monthlyLocationFilter", "change", renderMonthlyList);
       onIfExists("#monthlyCheckedFilter", "change", renderMonthlyList);
