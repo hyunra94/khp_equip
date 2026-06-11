@@ -3082,6 +3082,18 @@ SN번호복사 / 텍스트
     let monthlyRows = [];
     let maintenanceRows = [];
     const maintenanceRowCache = new Map();
+
+    function mergeMaintenanceRows(newRows = []) {
+      const map = new Map();
+      [...(maintenanceRows || []), ...(newRows || [])].forEach(row => {
+        if (!row) return;
+        const key = row.id || `${row.장비 || ""}_${row.일자 || ""}_${row.내용 || row.유지보수명 || ""}`;
+        if (key) map.set(key, row);
+      });
+      maintenanceRows = [...map.values()];
+      registerMaintenanceRows(maintenanceRows);
+      return maintenanceRows;
+    }
     let selectedDepreciationId = "";
     let selectedEquipmentId = "";
     let pendingEquipmentAnchorId = "";
@@ -3633,7 +3645,7 @@ SN번호복사 / 텍스트
       }
 
       if (listEl) {
-        listEl.innerHTML = `<div class="notice">${force ? "노션에서 최신 장비 원장을 동기화하는 중입니다." : "저장된 장비 데이터가 없어 노션에서 처음 불러오는 중입니다."}</div>`;
+        listEl.innerHTML = `<div class="notice">${force ? "최신 장비 정보를 동기화하는 중입니다." : "저장된 장비 데이터가 없어 처음 불러오는 중입니다."}</div>`;
       }
 
       try {
@@ -3658,7 +3670,7 @@ SN번호복사 / 텍스트
         renderEquipmentDetail();
         renderDashboard();
         if (selectedMonthlySideId) renderMonthlySideDetail(selectedMonthlySideId);
-        if (syncEl) syncEl.textContent = `동기화 완료 · ${equipmentLastLoadedAt}`;
+        if (syncEl) syncEl.textContent = `최신 정보 동기화 완료 · ${equipmentLastLoadedAt}`;
       } catch (error) {
         if (!equipmentRows.length) {
           equipmentRows = [];
@@ -3676,7 +3688,7 @@ SN번호복사 / 텍스트
           if ($("#equipmentDetail")) $("#equipmentDetail").innerHTML = `<div class="empty">장비 원장 조회 오류가 발생했습니다.</div>`;
           renderDashboard();
         } else {
-          if (syncEl) syncEl.textContent = `동기화 실패 · 로컬 데이터 유지 · ${error.message}`;
+          if (syncEl) syncEl.textContent = `최신 정보 동기화 실패 · 로컬 데이터 유지 · ${error.message}`;
         }
       }
     }
@@ -4255,7 +4267,7 @@ SN번호복사 / 텍스트
         renderMonthlyList();
         renderDashboard();
         if (showMessage && $("#monthlyMsg")) {
-          showNotice($("#monthlyMsg"), `동기화 완료 · ${cacheTimeText(savedAt)}`);
+          showNotice($("#monthlyMsg"), `최신 정보 동기화 완료 · ${cacheTimeText(savedAt)}`);
         }
       } catch (error) {
         if (showMessage) $("#monthlyList").innerHTML = `<div class="notice error">${escapeHtml(error.message)}</div>`;
@@ -5822,7 +5834,10 @@ SN번호복사 / 텍스트
 
     function maintenanceCountForEquipment(equipmentId) {
       if (!equipmentId) return 0;
-      return maintenanceRows.filter(item => item.장비 === equipmentId).length;
+      const row = equipmentRows.find(item => item.id === equipmentId);
+      const fromRows = maintenanceRows.filter(item => item.장비 === equipmentId).length;
+      const fromEquipment = Number(row?.유지보수내역수 || row?.maintenanceCount || 0);
+      return Math.max(fromRows, Number.isFinite(fromEquipment) ? fromEquipment : 0);
     }
 
     function maintenanceBadgeHtml(equipmentId) {
@@ -5837,8 +5852,11 @@ SN번호복사 / 텍스트
 
       try {
         const data = await api(`/api/maintenance?equipment=${encodeURIComponent(row.id)}`);
-        const rows = sortMaintenanceDesc((data.rows || []).filter(item => item.장비 === row.id));
+        const rows = sortMaintenanceDesc((data.rows || []).map(item => ({ ...item, 장비: item.장비 || row.id })));
+        mergeMaintenanceRows(rows);
         renderEquipmentMaintenanceArea(row, area, rows);
+        renderEquipmentList();
+        renderEquipmentDetail();
       } catch (error) {
         area.innerHTML = `<div class="notice error">${escapeHtml(error.message)}</div>`;
       }
