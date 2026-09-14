@@ -2607,6 +2607,7 @@
                   <button type="button" data-mode="model">모델별</button>
                 </div>
               </div>
+              <div class="muted" id="monthlySyncStatus" style="font-size:12px; margin:2px 0 8px;"></div>
               <div class="list-summary" id="monthlySummary"></div>
               <div id="monthlyMsg" class="notice hidden"></div>
               <div class="monthly-list" id="monthlyList"></div>
@@ -3104,6 +3105,9 @@ SN번호복사 / 텍스트
       }
       if (viewId === "reportView") {
         loadReport();
+      }
+      if (viewId === "monthlyView") {
+        loadMonthlyCacheFirst(false);
       }
     }
 
@@ -3844,19 +3848,146 @@ SN번호복사 / 텍스트
       }
     }
 
-    async function loadMonthly(showMessage = true) {
-      const month = $("#monthlyMonth").value || monthNow();
-      if (showMessage) $("#monthlyList").innerHTML = `<div class="notice">월별 현황을 불러오는 중입니다.</div>`;
 
+    // 월별 현황: 캐시 즉시 표시 + 백그라운드 최신화
+    const MONTHLY_CACHE_PREFIX = "eq_monthly_cache_v1_";
+    let pendingMonthlyFresh = null;
+    let monthlySyncSeq = 0;
+
+    function monthlyCacheKey(month) {
+      return MONTHLY_CACHE_PREFIX + String(month || "");
+    }
+
+    function setMonthlySyncStatus(text) {
+      const el = $("#monthlySyncStatus");
+      if (el) el.textContent = text || "";
+    }
+
+    function formatMonthlySyncTime(timestamp) {
+      if (!timestamp) return "";
+      try {
+        return new Intl.DateTimeFormat("ko-KR", { hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date(timestamp));
+      } catch {
+        return "";
+      }
+    }
+
+    function readMonthlyCache(month) {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(monthlyCacheKey(month)) || "null");
+        return parsed && Array.isArray(parsed.rows) ? parsed : null;
+      } catch {
+        return null;
+      }
+    }
+
+    function writeMonthlyCache(month, rows) {
+      try {
+        localStorage.setItem(monthlyCacheKey(month), JSON.stringify({ month, rows, savedAt: Date.now() }));
+      } catch (error) {
+        console.warn("월별 현황 캐시 저장 실패", error);
+      }
+    }
+
+    function monthlyComparable(row) {
+      return {
+        id: row?.id || "",
+        장비: row?.장비 || "",
+        장비명복사: row?.장비명복사 || "",
+        자체일련번호복사: row?.자체일련번호복사 || "",
+        원장기준배치장소: row?.원장기준배치장소 || "",
+        이번달위치: row?.이번달위치 || "",
+        원장기준상태: row?.원장기준상태 || "",
+        이번달상태: row?.이번달상태 || "",
+        확인여부: Boolean(row?.확인여부),
+        확인자명복사: row?.확인자명복사 || "",
+        확인일: row?.확인일 || "",
+        메모: row?.메모 || "",
+        이슈여부: Boolean(row?.이슈여부)
+      };
+    }
+
+    function monthlyDiffCount(before, after) {
+      const a = new Map((before || []).map(row => [row.id, JSON.stringify(monthlyComparable(row))]));
+      const b = new Map((after || []).map(row => [row.id, JSON.stringify(monthlyComparable(row))]));
+      const ids = new Set([...a.keys(), ...b.keys()]);
+      let count = 0;
+      ids.forEach(id => { if (a.get(id) !== b.get(id)) count += 1; });
+      return count;
+    }
+
+    function monthlyEditorActive() {
+      const active = document.activeElement;
+      return Boolean(active && $("#monthlyView")?.contains(active) && ["INPUT", "TEXTAREA", "SELECT"].includes(active.tagName));
+    }
+
+    function renderMonthlyData(rows) {
+      monthlyRows = Array.isArray(rows) ? rows : [];
+      refreshMonthlyModelOptions();
+      renderMonthlyList();
+      renderDashboard();
+    }
+
+    function applyPendingMonthlyFresh() {
+      if (!pendingMonthlyFresh || monthlyEditorActive()) return;
+      const pending = pendingMonthlyFresh;
+      pendingMonthlyFresh = null;
+      renderMonthlyData(pending.rows);
+      setMonthlySyncStatus(pending.changed > 0 ? `${pending.changed}건 변경사항 반영` : "최신 상태입니다");
+    }
+
+    async function refreshMonthlyInBackground(month, force = false) {
+      const seq = ++monthlySyncSeq;
+      const before = [...monthlyRows];
       try {
         const data = await api(`/api/monthly?month=${encodeURIComponent(month)}`);
-        monthlyRows = data.rows || [];
-        refreshMonthlyModelOptions();
-        renderMonthlyList();
-        renderDashboard();
+        if (seq !== monthlySyncSeq || month !== ($("#monthlyMonth")?.value || monthNow())) return;
+        const fresh = data.rows || [];
+        const changed = monthlyDiffCount(before, fresh);
+        writeMonthlyCache(month, fresh);
+
+        if (!force && monthlyEditorActive()) {
+          pendingMonthlyFresh = { rows: fresh, changed };
+          setMonthlySyncStatus(changed > 0 ? `${changed}건 변경 감지 · 입력 완료 후 반영` : "최신 상태입니다");
+          return;
+        }
+
+        pendingMonthlyFresh = null;
+        renderMonthlyData(fresh);
+        setMonthlySyncStatus(changed > 0 ? `${changed}건 변경사항 반영` : "최신 상태입니다");
       } catch (error) {
-        if (showMessage) $("#monthlyList").innerHTML = `<div class="notice error">${escapeHtml(error.message)}</div>`;
+        const cached = readMonthlyCache(month);
+        if (cached) setMonthlySyncStatus("캐시된 데이터 표시 중 · 서버 확인 실패");
+        else setMonthlySyncStatus("월별 현황 조회 실패");
+        if (force && !cached) $("#monthlyList").innerHTML = `<div class="notice error">${escapeHtml(error.message)}</div>`;
       }
+    }
+
+    function loadMonthlyCacheFirst(force = false) {
+      const month = $("#monthlyMonth")?.value || monthNow();
+      pendingMonthlyFresh = null;
+
+      if (force) {
+        setMonthlySyncStatus("최신 데이터 불러오는 중…");
+        return refreshMonthlyInBackground(month, true);
+      }
+
+      const cached = readMonthlyCache(month);
+      if (cached) {
+        renderMonthlyData(cached.rows);
+        const time = formatMonthlySyncTime(cached.savedAt);
+        setMonthlySyncStatus(`캐시된 데이터 표시 중${time ? ` · 마지막 동기화 ${time}` : ""}`);
+      } else {
+        setMonthlySyncStatus("최신 데이터 확인 중…");
+        if (!monthlyRows.length) $("#monthlyList").innerHTML = `<div class="notice">월별 현황을 불러오는 중입니다.</div>`;
+      }
+
+      return refreshMonthlyInBackground(month, false);
+    }
+
+
+    async function loadMonthly(showMessage = true) {
+      return loadMonthlyCacheFirst(Boolean(showMessage));
     }
 
     function monthlyIsIssue(row) {
@@ -5785,6 +5916,7 @@ SN번호복사 / 텍스트
       });
 
       onIfExists("#monthlyReloadBtn", "click", () => loadMonthly(true));
+      onIfExists("#monthlyMonth", "change", () => loadMonthlyCacheFirst(false));
       onIfExists("#monthlySearch", "input", renderMonthlyList);
       onIfExists("#monthlyManagementSearch", "input", (event) => {
         const input = event.currentTarget;
@@ -5800,6 +5932,9 @@ SN번호복사 / 텍스트
         input.focus();
       });
       onIfExists("#monthlyLocationFilter", "change", renderMonthlyList);
+      $("#monthlyView")?.addEventListener("focusout", () => {
+        setTimeout(applyPendingMonthlyFresh, 0);
+      });
       onIfExists("#monthlyCheckedFilter", "change", renderMonthlyList);
       $$("#monthlySortToggle button").forEach(button => {
         button.addEventListener("click", () => setMonthlySortMode(button.dataset.sort));
