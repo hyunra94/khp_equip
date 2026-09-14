@@ -828,15 +828,6 @@
       overflow-wrap: anywhere;
     }
 
-    .monthly-cell .cell-sub {
-      display: block;
-      color: var(--sub);
-      font-size: 11px;
-      font-weight: 750;
-      margin-top: 4px;
-      line-height: 1.3;
-    }
-
     .monthly-inline-location {
       width: 100%;
       min-height: 36px;
@@ -882,23 +873,6 @@
     .monthly-card.open {
       border-color: #c6d6eb;
       background: #fbfdff;
-    }
-
-    .monthly-card.monthly-disabled {
-      background: #f8fafc;
-      opacity: .68;
-    }
-
-    .monthly-card.monthly-disabled .monthly-check-row {
-      cursor: default;
-    }
-
-    .monthly-card.monthly-disabled .monthly-inline-location,
-    .monthly-card.monthly-disabled .monthly-status,
-    .monthly-card.monthly-disabled .monthly-memo,
-    .monthly-card.monthly-disabled .monthly-photo-file {
-      cursor: not-allowed;
-      background: #f3f4f6;
     }
 
     @media (max-width: 840px) {
@@ -1590,128 +1564,6 @@
       gap: 8px;
     }
 
-
-    .maintenance-card,
-    .equipment-maintenance-card {
-      position: relative;
-    }
-
-    .maintenance-card-actions {
-      position: relative;
-      display: inline-flex;
-      align-items: flex-start;
-      gap: 6px;
-      margin-left: auto;
-    }
-
-    .maintenance-menu-btn {
-      width: 32px;
-      height: 32px;
-      border-radius: 10px;
-      background: #fff;
-      color: var(--sub);
-      border: 1px solid var(--line);
-      font-size: 18px;
-      font-weight: 900;
-      line-height: 1;
-      display: inline-grid;
-      place-items: center;
-      opacity: 0;
-      transition: .12s ease-out;
-    }
-
-    .maintenance-card:hover .maintenance-menu-btn,
-    .equipment-maintenance-card:hover .maintenance-menu-btn,
-    .maintenance-menu-btn.active {
-      opacity: 1;
-    }
-
-    .maintenance-action-menu {
-      position: absolute;
-      top: 36px;
-      right: 0;
-      min-width: 96px;
-      padding: 6px;
-      background: #fff;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      box-shadow: 0 14px 34px rgba(31, 41, 55, .14);
-      z-index: 40;
-      display: none;
-    }
-
-    .maintenance-action-menu.open {
-      display: grid;
-      gap: 4px;
-    }
-
-    .maintenance-action-menu button {
-      width: 100%;
-      text-align: left;
-      border-radius: 8px;
-      padding: 8px 9px;
-      background: #fff;
-      color: var(--text);
-      font-weight: 850;
-    }
-
-    .maintenance-action-menu button:hover {
-      background: var(--gray-soft);
-    }
-
-    .maintenance-action-menu button.danger-text {
-      color: var(--danger);
-    }
-
-    .maintenance-edit-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 23, 42, .32);
-      z-index: 200;
-      display: grid;
-      place-items: center;
-      padding: 20px;
-    }
-
-    .maintenance-edit-modal {
-      width: min(620px, 100%);
-      max-height: calc(100vh - 40px);
-      overflow: auto;
-      background: #fff;
-      border-radius: 18px;
-      border: 1px solid var(--line);
-      box-shadow: 0 28px 70px rgba(15, 23, 42, .24);
-      padding: 18px;
-    }
-
-    .maintenance-edit-modal-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 12px;
-      margin-bottom: 14px;
-    }
-
-    .maintenance-edit-modal-head strong {
-      display: block;
-      font-size: 18px;
-      font-weight: 900;
-      letter-spacing: -0.04em;
-    }
-
-    @media (max-width: 840px) {
-      .maintenance-menu-btn {
-        opacity: 1;
-      }
-
-      .maintenance-action-menu {
-        position: fixed;
-        top: auto;
-        right: 18px;
-        min-width: 128px;
-      }
-    }
-
     .maintenance-head {
       display: flex;
       justify-content: space-between;
@@ -1977,6 +1829,104 @@
       }
     }
 
+
+    /* 월별점검 모델별 보기: 모델 헤더가 좁아져 줄바꿈되는 현상 방지 */
+    #monthlyView .model-group-head {
+      grid-template-columns: 64px minmax(220px, 1fr);
+      align-items: center;
+    }
+
+    #monthlyView .model-group-head .model-summary {
+      grid-column: 2;
+      justify-content: flex-start;
+      min-width: 0;
+    }
+
+    #monthlyView .model-group-head .model-title {
+      min-width: 0;
+    }
+
+    #monthlyView .model-group-head .model-title strong,
+    #monthlyView .model-group-head .model-title span {
+      word-break: keep-all;
+      overflow-wrap: normal;
+    }
+
+    #monthlyView .model-group-card > .monthly-list {
+      min-width: 0;
+    }
+
+    #monthlyView .model-group-card .monthly-card {
+      min-width: 0;
+    }
+
+    /* 월별 점검 메모는 기본 접힘 */
+    .monthly-memo-fold {
+      grid-column: 1 / -1;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .monthly-memo-fold > summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 10px 12px;
+      color: var(--sub);
+      font-size: 12px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .monthly-memo-fold > summary::-webkit-details-marker { display: none; }
+    .monthly-memo-fold > summary::after { content: "펼치기"; color: var(--primary); }
+    .monthly-memo-fold[open] > summary::after { content: "접기"; }
+
+    .monthly-memo-fold-body {
+      padding: 0 10px 10px;
+    }
+
+    .monthly-memo-preview {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      min-width: 0;
+      flex: 1;
+      font-weight: 750;
+      color: var(--text);
+    }
+
+    .monthly-excluded-card {
+      background: #fafafa;
+      border-style: dashed;
+    }
+
+    .monthly-excluded-card .monthly-check-row {
+      grid-template-columns: 58px minmax(220px, 1.5fr) minmax(120px, .8fr) minmax(150px, 1fr) minmax(100px, .7fr);
+    }
+
+    @media (max-width: 840px) {
+      #monthlyView .model-group-head {
+        grid-template-columns: 54px minmax(0, 1fr);
+      }
+
+      #monthlyView .model-group-head .model-summary {
+        grid-column: 1 / -1;
+      }
+
+      .monthly-excluded-card .monthly-check-row {
+        grid-template-columns: 50px minmax(0, 1fr);
+      }
+
+      .monthly-excluded-card .monthly-cell {
+        grid-column: 1 / -1;
+      }
+    }
+
     /* 장비관리대장 목록/상세 레이아웃 개선 */
     #equipmentView:not(.detail-open) .layout-2 {
       grid-template-columns: 1fr;
@@ -2182,19 +2132,21 @@
     .equipment-toolbar {
       display: grid;
       grid-template-areas:
-        "search loc status refresh"
-        "tabs tabs tabs tabs";
-      grid-template-columns: minmax(220px, 1.25fr) minmax(160px, .72fr) minmax(150px, .72fr) 104px;
-      gap: 12px;
+        "search loc year status refresh"
+        "sort sort sort sort sort"
+        "mode mode mode mode mode";
+      grid-template-columns: minmax(190px, 1.3fr) minmax(145px, .8fr) minmax(120px, .65fr) minmax(130px, .7fr) 104px;
+      gap: 10px;
       align-items: center;
     }
 
     .equipment-toolbar #equipmentSearch { grid-area: search; }
     .equipment-toolbar #equipmentLocationFilter { grid-area: loc; }
-    .equipment-toolbar #equipmentYearFilter { display: none; }
+    .equipment-toolbar #equipmentYearFilter { grid-area: year; }
     .equipment-toolbar #equipmentStatusFilter { grid-area: status; }
+    .equipment-toolbar #equipmentSortToggle { grid-area: sort; justify-self: start; }
     .equipment-toolbar #equipmentReloadBtn { grid-area: refresh; }
-    .equipment-toolbar .equipment-filter-tabs { grid-area: tabs; }
+    .equipment-toolbar #equipmentModeToggle { grid-area: mode; justify-self: start; }
 
     .equipment-toolbar > .input,
     .equipment-toolbar > .select,
@@ -2202,79 +2154,15 @@
       width: 100%;
     }
 
-    .equipment-filter-tabs {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      min-width: 0;
-    }
-
-    .equipment-filter-tabs .mode-toggle {
-      width: auto;
-      max-width: 100%;
-      overflow-x: auto;
-      scrollbar-width: thin;
-      flex: 0 0 auto;
-    }
-
-    .equipment-filter-tabs #equipmentYearToggle {
-      flex: 0 1 auto;
-      min-width: 0;
-      width: fit-content;
-      max-width: 100%;
-    }
-
-    .equipment-filter-tabs #equipmentSortToggle,
-    .equipment-filter-tabs #equipmentModeToggle,
-    .equipment-filter-tabs #equipmentMaintenanceOnlyToggle {
-      flex: 0 0 auto;
-    }
-
-    .equipment-filter-tabs .mode-toggle button {
-      white-space: nowrap;
-    }
-
-    .eq-status-badges {
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
     @media (max-width: 1320px) {
       .equipment-toolbar {
         grid-template-areas:
           "search refresh"
-          "loc status"
-          "tabs tabs";
+          "loc year"
+          "status status"
+          "sort sort"
+          "mode mode";
         grid-template-columns: minmax(190px, 1fr) 104px;
-      }
-
-      .equipment-filter-tabs {
-        flex-wrap: wrap;
-      }
-
-      .equipment-filter-tabs #equipmentYearToggle {
-        flex: 0 1 auto;
-        width: fit-content;
-        max-width: 100%;
-      }
-    }
-
-
-    @media (min-width: 761px) and (max-width: 840px) {
-      .equipment-filter-tabs #equipmentYearToggle,
-      .equipment-filter-tabs #equipmentSortToggle,
-      .equipment-filter-tabs #equipmentModeToggle,
-      .equipment-filter-tabs #equipmentMaintenanceOnlyToggle {
-        width: fit-content;
-      }
-
-      .equipment-filter-tabs #equipmentYearToggle button,
-      .equipment-filter-tabs #equipmentSortToggle button,
-      .equipment-filter-tabs #equipmentModeToggle button,
-      .equipment-filter-tabs #equipmentMaintenanceOnlyToggle button {
-        flex: 0 0 auto;
       }
     }
 
@@ -2283,30 +2171,16 @@
         grid-template-areas:
           "search"
           "loc"
+          "year"
           "status"
+          "sort"
           "refresh"
-          "tabs";
+          "mode";
         grid-template-columns: 1fr;
       }
 
-      .equipment-filter-tabs {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 8px;
-      }
-
-      .equipment-filter-tabs #equipmentYearToggle,
-      .equipment-filter-tabs #equipmentSortToggle,
-      .equipment-filter-tabs #equipmentModeToggle,
-      .equipment-filter-tabs #equipmentMaintenanceOnlyToggle {
+      .equipment-toolbar #equipmentModeToggle {
         width: 100%;
-      }
-
-      .equipment-filter-tabs #equipmentYearToggle button,
-      .equipment-filter-tabs #equipmentSortToggle button,
-      .equipment-filter-tabs #equipmentModeToggle button,
-      .equipment-filter-tabs #equipmentMaintenanceOnlyToggle button {
-        flex: 1 0 auto;
       }
     }
 
@@ -2462,44 +2336,10 @@
       .card-body { padding: 16px; }
       .toolbar .input, .toolbar .select, .toolbar .btn { flex-basis: 100%; }
     }
-
-    /* 조회전용 권한: 수정/등록/삭제 UI 숨김 */
-    .readonly-mode .admin-only,
-    .readonly-mode #addNavBtn,
-    .readonly-mode #generateMonthlyBtn,
-    .readonly-mode .save-monthly-detail-btn,
-    .readonly-mode .upload-monthly-photo-btn,
-    .readonly-mode .maintenance-card-actions,
-    .readonly-mode .equipment-maintenance-form,
-    .readonly-mode #maintenanceForm,
-    .readonly-mode #addView {
-      display: none !important;
-    }
-
-    .readonly-mode .quick-monthly-check,
-    .readonly-mode .monthly-inline-location,
-    .readonly-mode .monthly-detail input,
-    .readonly-mode .monthly-detail select,
-    .readonly-mode .monthly-detail textarea {
-      pointer-events: none;
-      opacity: .72;
-      background: #f8fafc;
-    }
-
-    .readonly-notice {
-      margin: 0 0 12px;
-      padding: 10px 12px;
-      border-radius: 12px;
-      background: var(--info-soft);
-      color: var(--primary);
-      font-size: 13px;
-      font-weight: 850;
-    }
-
   </style>
 </head>
 <body>
-  <section class="login-page hidden" id="loginPage">
+  <section class="login-page" id="loginPage">
     <div class="login-card">
       <div class="login-brand">
         <div class="brand-mark">EQ</div>
@@ -2541,7 +2381,7 @@
         <button data-view="depreciationView">감가상각비</button>
         <button data-view="reportView">결과보고</button>
         <button data-view="addView" id="addNavBtn">신규 장비 등록</button>
-        <button data-view="schemaView" class="hidden" style="display:none !important;">DB 속성표</button>
+        <button data-view="schemaView">DB 속성표</button>
       </nav>
 
       <div class="side-user">
@@ -2572,7 +2412,7 @@
             </div>
             <div class="toolbar" style="margin:0;">
               <input class="input" type="month" id="dashMonth" />
-              <button class="btn primary" id="dashReloadBtn">최신 정보 동기화</button>
+              <button class="btn primary" id="dashReloadBtn">새로고침</button>
             </div>
           </div>
 
@@ -2629,24 +2469,16 @@
                   <select class="select" id="equipmentLocationFilter"></select>
                   <select class="select" id="equipmentYearFilter"></select>
                   <select class="select" id="equipmentStatusFilter"></select>
-                  <button class="btn refresh" id="equipmentReloadBtn">최신 정보 동기화</button>
-                  <div class="equipment-filter-tabs" aria-label="장비 원장 보기 옵션">
-                    <div class="mode-toggle year-toggle" id="equipmentYearToggle" title="입고년도 필터">
-                      <button type="button" data-year="" class="active">년도 전체</button>
-                    </div>
-                    <div class="mode-toggle sort-toggle" id="equipmentSortToggle" title="정렬 방식">
-                      <button type="button" data-sort="date" class="active">입고일</button>
-                      <button type="button" data-sort="model">모델명</button>
-                      <button type="button" data-sort="serial">관리번호</button>
-                      <button type="button" data-sort="">입력순</button>
-                    </div>
-                    <div class="mode-toggle" id="equipmentModeToggle">
-                      <button type="button" data-mode="list" class="active">개별 장비</button>
-                      <button type="button" data-mode="model">모델별</button>
-                    </div>
-                    <div class="mode-toggle" id="equipmentMaintenanceOnlyToggle" title="유지보수 내역이 있는 장비만 보기">
-                      <button type="button" data-maintenance-only="true">유지보수 내역</button>
-                    </div>
+                  <button class="btn refresh" id="equipmentReloadBtn">새로고침</button>
+                  <div class="mode-toggle sort-toggle" id="equipmentSortToggle" title="정렬 방식">
+                    <button type="button" data-sort="date" class="active">입고일</button>
+                    <button type="button" data-sort="model">모델명</button>
+                    <button type="button" data-sort="serial">관리번호</button>
+                    <button type="button" data-sort="">입력순</button>
+                  </div>
+                  <div class="mode-toggle" id="equipmentModeToggle">
+                    <button type="button" data-mode="list" class="active">개별 장비</button>
+                    <button type="button" data-mode="model">모델별</button>
                   </div>
                 </div>
                 <div class="list-summary" id="equipmentSummary"></div>
@@ -2690,7 +2522,7 @@
             <div class="card-body">
               <div class="toolbar">
                 <input class="input" type="month" id="monthlyMonth" />
-                <input class="input" id="monthlySearch" placeholder="장비명, 관리번호, SN 검색" />
+                <input class="input" id="monthlySearch" placeholder="장비명, 관리번호 검색" />
                 <select class="select" id="monthlyLocationFilter"></select>
                 <div class="mode-toggle sort-toggle" id="monthlySortToggle" title="정렬 방식">
                   <button type="button" data-sort="date" class="active">입고일</button>
@@ -2703,8 +2535,9 @@
                   <option value="unchecked">미확인만</option>
                   <option value="checked">확인 완료만</option>
                   <option value="issue">조치 필요만</option>
+                  <option value="excluded">점검 제외만</option>
                 </select>
-                <button class="btn" id="monthlyReloadBtn">최신 정보 동기화</button>
+                <button class="btn" id="monthlyReloadBtn">조회</button>
                 <div class="mode-toggle" id="monthlyModeToggle">
                   <button type="button" data-mode="list" class="active">개별 장비</button>
                   <button type="button" data-mode="model">모델별</button>
@@ -2977,7 +2810,7 @@
           </div>
         </section>
 
-        <section class="view hidden" id="schemaView" style="display:none !important;">
+        <section class="view" id="schemaView">
           <div class="section-head">
             <div>
               <h1>DB 속성표</h1>
@@ -2994,7 +2827,7 @@ SN번호 / 텍스트
 작성년월일 / 날짜
 제작회사 / 텍스트
 배치장소 / 선택
-세부위치 / 선택
+세부위치 / 텍스트
 규격 / 텍스트
 자체일련번호 / 텍스트
 장비점검일자 / 날짜
@@ -3071,125 +2904,19 @@ SN번호복사 / 텍스트
     let equipmentLastLoadedAt = '';
     let modelRows = [];
     let equipmentViewMode = localStorage.getItem('equipment_view_mode') || 'list';
-    let equipmentMaintenanceOnly = localStorage.getItem('equipment_maintenance_only') === 'true';
     let equipmentSortMode = localStorage.getItem('equipment_sort_mode') || 'date';
     let monthlyViewMode = localStorage.getItem('monthly_view_mode') || 'list';
     let monthlySortMode = localStorage.getItem('monthly_sort_mode') || 'date';
     let selectedMonthlyId = '';
     let selectedMonthlySideId = '';
     let openMonthlyModelGroups = new Set();
-    let openEquipmentModelGroups = new Set();
     let monthlyRows = [];
     let maintenanceRows = [];
-    const maintenanceRowCache = new Map();
-
-    function mergeMaintenanceRows(newRows = []) {
-      const map = new Map();
-      [...(maintenanceRows || []), ...(newRows || [])].forEach(row => {
-        if (!row) return;
-        const key = row.id || `${row.장비 || ""}_${row.일자 || ""}_${row.내용 || row.유지보수명 || ""}`;
-        if (key) map.set(key, row);
-      });
-      maintenanceRows = [...map.values()];
-      registerMaintenanceRows(maintenanceRows);
-      return maintenanceRows;
-    }
     let selectedDepreciationId = "";
     let selectedEquipmentId = "";
-    let pendingEquipmentAnchorId = "";
-    let pendingEquipmentAbsoluteScroll = null;
 
     const $ = (selector) => document.querySelector(selector);
     const $$ = (selector) => [...document.querySelectorAll(selector)];
-
-    const CACHE_DB_NAME = "equipment-management-cache-v1";
-    const CACHE_STORE_NAME = "kv";
-
-    function openCacheDb() {
-      return new Promise((resolve, reject) => {
-        if (!("indexedDB" in window)) {
-          reject(new Error("이 브라우저는 IndexedDB를 지원하지 않습니다."));
-          return;
-        }
-
-        const request = indexedDB.open(CACHE_DB_NAME, 1);
-        request.onupgradeneeded = () => {
-          const db = request.result;
-          if (!db.objectStoreNames.contains(CACHE_STORE_NAME)) {
-            db.createObjectStore(CACHE_STORE_NAME, { keyPath: "key" });
-          }
-        };
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error || new Error("IndexedDB를 열 수 없습니다."));
-      });
-    }
-
-    async function cacheGet(key) {
-      try {
-        const db = await openCacheDb();
-        return await new Promise((resolve, reject) => {
-          const tx = db.transaction(CACHE_STORE_NAME, "readonly");
-          const req = tx.objectStore(CACHE_STORE_NAME).get(key);
-          req.onsuccess = () => resolve(req.result?.value ?? null);
-          req.onerror = () => reject(req.error);
-          tx.oncomplete = () => db.close();
-          tx.onerror = () => db.close();
-        });
-      } catch (error) {
-        console.warn("캐시 읽기 실패", key, error);
-        return null;
-      }
-    }
-
-    async function cacheSet(key, value) {
-      try {
-        const db = await openCacheDb();
-        await new Promise((resolve, reject) => {
-          const tx = db.transaction(CACHE_STORE_NAME, "readwrite");
-          tx.objectStore(CACHE_STORE_NAME).put({ key, value, updatedAt: Date.now() });
-          tx.oncomplete = () => { db.close(); resolve(); };
-          tx.onerror = () => { db.close(); reject(tx.error); };
-        });
-      } catch (error) {
-        console.warn("캐시 저장 실패", key, error);
-      }
-    }
-
-    function cacheScope() {
-      // 관리자 응답에는 Notion URL이 포함될 수 있어 권한별로 캐시를 분리합니다.
-      return `${API_BASE}:${currentUser?.role || "guest"}`;
-    }
-
-    function equipmentCacheKey() {
-      return `${cacheScope()}:equipment`;
-    }
-
-    function modelCacheKey() {
-      return `${cacheScope()}:models`;
-    }
-
-    function monthlyCacheKey(month) {
-      return `${cacheScope()}:monthly:${month || monthNow()}`;
-    }
-
-    function cacheTimeText(value) {
-      const ts = Number(value || 0);
-      return ts ? new Date(ts).toLocaleString("ko-KR") : "";
-    }
-
-    function isReadonlyUser() {
-      return currentUser?.role === "readonly";
-    }
-
-    function isAdminUser() {
-      return currentUser?.role === "admin";
-    }
-
-    function roleLabel(role) {
-      if (role === "admin") return "관리자";
-      if (role === "readonly") return "조회전용";
-      return "직원";
-    }
 
     function monthNow() {
       const d = new Date();
@@ -3211,10 +2938,6 @@ SN번호복사 / 텍스트
         .replaceAll("'", "&#039;");
     }
 
-
-    function escapeCssValue(value) {
-      return String(value ?? "").replaceAll("\\", "\\\\").replaceAll('"', '\"');
-    }
     function money(value) {
       if (value === null || value === undefined || value === "") return "-";
       const number = Number(value);
@@ -3275,11 +2998,6 @@ SN번호복사 / 텍스트
     }
 
     async function api(path, options = {}) {
-      const method = String(options.method || "GET").toUpperCase();
-      if (isReadonlyUser() && !["GET", "HEAD"].includes(method)) {
-        throw new Error("조회전용 계정은 수정할 수 없습니다.");
-      }
-
       const token = localStorage.getItem("eq_token") || "";
       const response = await fetch(`${API_BASE}${path}`, {
         ...options,
@@ -3329,13 +3047,11 @@ SN번호복사 / 텍스트
       currentUser = user;
       $("#loginPage").classList.add("hidden");
       $("#app").classList.remove("hidden");
-      const label = roleLabel(user.role);
-      if ($("#roleChip")) $("#roleChip").textContent = label;
-      if ($("#sideUserText")) $("#sideUserText").textContent = `${user.name} · ${label}`;
+      if ($("#roleChip")) $("#roleChip").textContent = user.role === "admin" ? "관리자" : "직원";
+      if ($("#sideUserText")) $("#sideUserText").textContent = `${user.name} · ${user.role === "admin" ? "관리자" : "직원"}`;
 
-      $("#app")?.classList.toggle("readonly-mode", user.role === "readonly");
       $$(".admin-only").forEach(el => el.classList.toggle("hidden", user.role !== "admin"));
-      $("#addNavBtn")?.classList.toggle("hidden", user.role !== "admin");
+      $("#addNavBtn").classList.toggle("hidden", user.role !== "admin");
 
       loadInitialData();
     }
@@ -3354,29 +3070,16 @@ SN번호복사 / 텍스트
       }
     }
 
-    async function loadModels(force = false) {
-      if (!force) {
-        const cached = await cacheGet(modelCacheKey());
-        if (cached?.rows?.length) {
-          modelRows = cached.rows || [];
-          refreshModelOptions();
-          refreshMaintenanceEquipmentOptions();
-          return;
-        }
-      }
-
+    async function loadModels() {
       try {
         const data = await api("/api/models");
         modelRows = data.rows || [];
-        await cacheSet(modelCacheKey(), { rows: modelRows, savedAt: Date.now() });
         refreshModelOptions();
-        refreshMaintenanceEquipmentOptions();
+      refreshMaintenanceEquipmentOptions();
       } catch (error) {
         console.warn("장비모델 목록을 불러오지 못했습니다.", error);
-        if (!modelRows.length) {
-          modelRows = [];
-          refreshModelOptions();
-        }
+        modelRows = [];
+        refreshModelOptions();
       }
     }
 
@@ -3410,16 +3113,9 @@ SN번호복사 / 텍스트
       if ($("#monthlyMonth")) $("#monthlyMonth").value = now;
       if ($("#monthChip")) $("#monthChip").textContent = formatMonth(now);
 
-      await loadModels(false);
-      await loadEquipment({ force: false });
-      await loadMaintenance();
-
-      const cachedMonthly = await cacheGet(monthlyCacheKey(now));
-      monthlyRows = cachedMonthly?.rows || [];
-      if (monthlyRows.length) {
-        refreshMonthlyModelOptions();
-        renderMonthlyList();
-      }
+      await loadModels();
+      await loadEquipment();
+      monthlyRows = [];
       renderDashboard();
     }
 
@@ -3448,38 +3144,17 @@ SN번호복사 / 텍스트
 
     function refreshEquipmentYearOptions() {
       const select = $("#equipmentYearFilter");
-      const toggle = $("#equipmentYearToggle");
       if (!select) return;
 
       const current = select.value;
       const years = [...new Set(equipmentRows.map(equipmentYearValue).filter(Boolean))]
-        .sort((a, b) => a.localeCompare(b));
-      const nextValue = years.includes(current) ? current : "";
+        .sort((a, b) => b.localeCompare(a));
 
       select.innerHTML = `<option value="">년도 전체</option>` + years.map(year => `
         <option value="${escapeHtml(year)}">${escapeHtml(year)}년</option>
       `).join("");
-      select.value = nextValue;
 
-      if (toggle) {
-        toggle.innerHTML = ["", ...years].map(year => `
-          <button type="button" data-year="${escapeHtml(year)}" class="${year === nextValue ? "active" : ""}">${year ? `${escapeHtml(year)}년` : "년도 전체"}</button>
-        `).join("");
-      }
-    }
-
-
-    function setEquipmentYearFilter(year) {
-      const value = String(year || "");
-      const select = $("#equipmentYearFilter");
-      if (select) select.value = value;
-
-      $$("#equipmentYearToggle button").forEach(btn => {
-        btn.classList.toggle("active", btn.dataset.year === value);
-      });
-
-      renderEquipmentList();
-      renderEquipmentDetail();
+      select.value = years.includes(current) ? current : "";
     }
 
 
@@ -3599,62 +3274,25 @@ SN번호복사 / 텍스트
       const location = $("#equipmentLocationFilter").value;
       const year = $("#equipmentYearFilter")?.value || "";
       const status = $("#equipmentStatusFilter").value;
-      const maintenanceOnly = equipmentMaintenanceOnly;
 
       const rows = equipmentRows.filter(row => {
         const matchQ = !q || `${row.장비명 || ""} ${row.SN번호 || ""} ${row.자체일련번호 || ""} ${row.규격 || ""} ${modelName(row) || ""}`.toLowerCase().includes(q);
         const matchLocation = matchesLocationFilter(row.배치장소, location, row.장비상태등);
         const matchYear = !year || equipmentYearValue(row) === year;
         const matchStatus = !status || row.장비상태등 === status;
-        const matchMaintenance = !maintenanceOnly || maintenanceCountForEquipment(row.id) > 0;
-        return matchQ && matchLocation && matchYear && matchStatus && matchMaintenance;
+        return matchQ && matchLocation && matchYear && matchStatus;
       });
 
       return sortEquipmentLike(rows, equipmentSortMode || "date");
     }
 
-    async function loadEquipment(options = {}) {
-      const force = Boolean(options.force);
-      const listEl = $("#equipmentList");
-      const summaryEl = $("#equipmentSummary");
-      const syncEl = $("#equipmentSyncNote");
-
-      if (!force) {
-        const cached = await cacheGet(equipmentCacheKey());
-        if (cached?.rows?.length) {
-          equipmentRows = cached.rows || [];
-          equipmentLastLoadedAt = cacheTimeText(cached.savedAt);
-
-          refreshEquipmentLocationOptions();
-          refreshEquipmentYearOptions();
-          refreshEquipmentModelOptions();
-          refreshMaintenanceEquipmentOptions();
-          refreshDepreciationModelOptions();
-
-          if (selectedEquipmentId && !equipmentRows.some(row => row.id === selectedEquipmentId)) {
-            selectedEquipmentId = "";
-          }
-
-          renderEquipmentList();
-          renderEquipmentDetail();
-          renderDashboard();
-          if (selectedMonthlySideId) renderMonthlySideDetail(selectedMonthlySideId);
-          if (syncEl) syncEl.textContent = `로컬 데이터 표시 중 · 마지막 동기화: ${equipmentLastLoadedAt || "기록 없음"}`;
-          return;
-        }
-      }
-
-      if (listEl) {
-        listEl.innerHTML = `<div class="notice">${force ? "최신 장비 정보를 동기화하는 중입니다." : "저장된 장비 데이터가 없어 처음 불러오는 중입니다."}</div>`;
-      }
+    async function loadEquipment() {
+      $("#equipmentList").innerHTML = `<div class="notice">장비 원장을 불러오는 중입니다. 최초 1회만 전체 데이터를 가져오고, 이후 필터는 화면 안에서 바로 적용됩니다.</div>`;
 
       try {
-        await loadModels(force);
         const data = await api(`/api/equipment`);
         equipmentRows = data.rows || [];
-        const savedAt = Date.now();
-        equipmentLastLoadedAt = cacheTimeText(savedAt);
-        await cacheSet(equipmentCacheKey(), { rows: equipmentRows, savedAt });
+        equipmentLastLoadedAt = new Date().toLocaleString("ko-KR");
 
         refreshEquipmentLocationOptions();
         refreshEquipmentYearOptions();
@@ -3670,26 +3308,19 @@ SN번호복사 / 텍스트
         renderEquipmentDetail();
         renderDashboard();
         if (selectedMonthlySideId) renderMonthlySideDetail(selectedMonthlySideId);
-        if (syncEl) syncEl.textContent = `최신 정보 동기화 완료 · ${equipmentLastLoadedAt}`;
       } catch (error) {
-        if (!equipmentRows.length) {
-          equipmentRows = [];
-          if (summaryEl) summaryEl.textContent = "";
-          if (syncEl) syncEl.textContent = "";
-          if (listEl) {
-            listEl.innerHTML = `
-              <div class="notice error">
-                장비 원장을 불러오지 못했습니다.<br>
-                ${escapeHtml(error.message)}<br><br>
-                Cloudflare Worker의 NOTION_EQUIPMENT_DATA_SOURCE_ID, NOTION_API_KEY, Notion Integration 연결 여부를 확인하세요.
-              </div>
-            `;
-          }
-          if ($("#equipmentDetail")) $("#equipmentDetail").innerHTML = `<div class="empty">장비 원장 조회 오류가 발생했습니다.</div>`;
-          renderDashboard();
-        } else {
-          if (syncEl) syncEl.textContent = `최신 정보 동기화 실패 · 로컬 데이터 유지 · ${error.message}`;
-        }
+        equipmentRows = [];
+        $("#equipmentSummary").textContent = "";
+        $("#equipmentSyncNote").textContent = "";
+        $("#equipmentList").innerHTML = `
+          <div class="notice error">
+            장비 원장을 불러오지 못했습니다.<br>
+            ${escapeHtml(error.message)}<br><br>
+            Cloudflare Worker의 NOTION_EQUIPMENT_DATA_SOURCE_ID, NOTION_API_KEY, Notion Integration 연결 여부를 확인하세요.
+          </div>
+        `;
+        $("#equipmentDetail").innerHTML = `<div class="empty">장비 원장 조회 오류가 발생했습니다.</div>`;
+        renderDashboard();
       }
     }
 
@@ -3716,22 +3347,6 @@ SN번호복사 / 텍스트
 
       $$("#equipmentModeToggle button").forEach(btn => {
         btn.classList.toggle("active", btn.dataset.mode === equipmentViewMode);
-      });
-      $$("#equipmentMaintenanceOnlyToggle button").forEach(btn => {
-        btn.classList.toggle("active", equipmentMaintenanceOnly);
-      });
-
-      selectedEquipmentId = "";
-      renderEquipmentList();
-      renderEquipmentDetail();
-    }
-
-    function setEquipmentMaintenanceOnly(value) {
-      equipmentMaintenanceOnly = Boolean(value);
-      localStorage.setItem("equipment_maintenance_only", equipmentMaintenanceOnly ? "true" : "false");
-
-      $$("#equipmentMaintenanceOnlyToggle button").forEach(btn => {
-        btn.classList.toggle("active", equipmentMaintenanceOnly);
       });
 
       selectedEquipmentId = "";
@@ -3767,39 +3382,31 @@ SN번호복사 / 텍스트
       return [...map.entries()].sort((a, b) => b[1] - a[1]);
     }
 
-    function isSimpleModelGroupName(name) {
-      const value = String(name || "").trim();
-      return value === "기타" || value === "단일";
-    }
-
     function modelGroupHtml(group) {
       const model = group.model;
       const rows = group.rows;
-      const simpleModelGroup = isSimpleModelGroupName(group.name);
-      const photoUrl = simpleModelGroup ? "" : (model?.대표사진URL || effectivePhotoUrl(rows[0]));
+      const photoUrl = model?.대표사진URL || effectivePhotoUrl(rows[0]);
       const photo = photoUrl
         ? `<img class="model-photo" src="${escapeHtml(photoUrl)}" alt="">`
         : `<div class="model-photo">MODEL</div>`;
 
-      const locations = simpleModelGroup ? [] : summarizeBy(rows, "배치장소").slice(0, 3);
-      const statuses = simpleModelGroup ? [] : summarizeBy(rows, "장비상태등", "상태없음").slice(0, 3);
+      const locations = summarizeBy(rows, "배치장소").slice(0, 3);
+      const statuses = summarizeBy(rows, "장비상태등", "상태없음").slice(0, 3);
 
-      const isOpen = openEquipmentModelGroups.has(group.id);
+      const isOpen = openMonthlyModelGroups.has(group.id);
 
       return `
-        <details class="model-group-card" data-equipment-group-id="${escapeHtml(group.id)}" ${isOpen ? "open" : ""}>
+        <details class="model-group-card" data-monthly-group-id="${escapeHtml(group.id)}" ${isOpen ? "open" : ""}>
           <summary class="model-group-head">
             ${photo}
             <div class="model-title">
               <strong>${escapeHtml(group.name)}</strong>
-              ${simpleModelGroup
-                ? `<span>전체 ${rows.length}개</span>`
-                : `<span>${escapeHtml(model?.제작회사 || "-")} · ${escapeHtml(model?.규격 || "-")}</span>`}
+              <span>${escapeHtml(model?.제작회사 || "-")} · ${escapeHtml(model?.규격 || "-")}</span>
             </div>
             <div class="model-summary">
               <span class="badge dark">전체 ${rows.length}개</span>
-              ${simpleModelGroup ? "" : locations.map(([name, count]) => `<span class="badge gray">${escapeHtml(name)} ${count}</span>`).join("")}
-              ${simpleModelGroup ? "" : statuses.map(([name, count]) => `<span class="badge ${statusClass(name)}">${escapeHtml(name)} ${count}</span>`).join("")}
+              ${locations.map(([name, count]) => `<span class="badge gray">${escapeHtml(name)} ${count}</span>`).join("")}
+              ${statuses.map(([name, count]) => `<span class="badge ${statusClass(name)}">${escapeHtml(name)} ${count}</span>`).join("")}
               <span class="model-open-hint">클릭해서 펼치기</span>
             </div>
           </summary>
@@ -3830,9 +3437,8 @@ SN번호복사 / 텍스트
                   <span class="cell-main">${escapeHtml(row.취득년월일 || "-")}</span>
                   <span class="cell-sub">${money(row.취득가격)}</span>
                 </div>
-                <div class="eq-status-badges">
+                <div>
                   <span class="badge ${statusClass(row.장비상태등)}">${escapeHtml(row.장비상태등 || "-")}</span>
-                  ${maintenanceBadgeHtml(row.id)}
                 </div>
               </div>
               ${row.id === selectedEquipmentId ? equipmentInlineDetailHtml(row) : ""}
@@ -3843,42 +3449,6 @@ SN번호복사 / 텍스트
     }
 
     function renderEquipmentList() {
-      const equipmentScrollBox = document.querySelector("#equipmentView .equipment-list-panel .card-body");
-      const keepEquipmentScrollTop = equipmentScrollBox ? equipmentScrollBox.scrollTop : 0;
-      const keepWindowScrollY = window.scrollY || 0;
-      const anchorId = pendingEquipmentAnchorId || selectedEquipmentId || "";
-      const anchorBefore = anchorId ? document.querySelector(`#equipmentList [data-id="${escapeCssValue(anchorId)}"]`) : null;
-      const anchorBeforeTop = anchorBefore ? anchorBefore.getBoundingClientRect().top : null;
-      pendingEquipmentAnchorId = "";
-
-      const restoreEquipmentScroll = () => {
-        requestAnimationFrame(() => {
-          const box = document.querySelector("#equipmentView .equipment-list-panel .card-body");
-
-          if (pendingEquipmentAbsoluteScroll) {
-            const saved = pendingEquipmentAbsoluteScroll;
-            pendingEquipmentAbsoluteScroll = null;
-            if (box && Number.isFinite(saved.boxTop)) box.scrollTop = saved.boxTop;
-            if (Number.isFinite(saved.windowY)) {
-              window.scrollTo({ top: saved.windowY, left: window.scrollX || 0, behavior: "auto" });
-            }
-            return;
-          }
-
-          const anchorAfter = anchorId ? document.querySelector(`#equipmentList [data-id="${escapeCssValue(anchorId)}"]`) : null;
-
-          if (anchorAfter && anchorBeforeTop !== null) {
-            const delta = anchorAfter.getBoundingClientRect().top - anchorBeforeTop;
-            if (box) box.scrollTop += delta;
-            window.scrollTo({ top: Math.max(0, keepWindowScrollY + delta), left: window.scrollX || 0, behavior: "auto" });
-            return;
-          }
-
-          if (box) box.scrollTop = keepEquipmentScrollTop;
-          window.scrollTo({ top: keepWindowScrollY, left: window.scrollX || 0, behavior: "auto" });
-        });
-      };
-
       const rows = filteredEquipmentRows();
 
       if (selectedEquipmentId && !rows.some(row => row.id === selectedEquipmentId)) {
@@ -3887,10 +3457,9 @@ SN번호복사 / 텍스트
 
       const includeCount = rows.filter(row => row.월별현황포함).length;
       const modelCount = groupRowsByModel(rows).length;
-      const maintenanceFilterText = equipmentMaintenanceOnly ? " · 유지보수 내역 있음만" : "";
       $("#equipmentSummary").textContent = selectedEquipmentId
-        ? `조회 결과 ${rows.length}건 · 모델 ${modelCount}개 · 월별현황 포함 ${includeCount}건${maintenanceFilterText} · 상세 열림`
-        : `조회 결과 ${rows.length}건 · 모델 ${modelCount}개 · 월별현황 포함 ${includeCount}건${maintenanceFilterText}`;
+        ? `조회 결과 ${rows.length}건 · 모델 ${modelCount}개 · 월별현황 포함 ${includeCount}건 · 상세 열림`
+        : `조회 결과 ${rows.length}건 · 모델 ${modelCount}개 · 월별현황 포함 ${includeCount}건`;
 
       $("#equipmentSyncNote").textContent = equipmentLastLoadedAt
         ? `마지막 동기화: ${equipmentLastLoadedAt} · 필터/검색은 저장된 목록 안에서 즉시 적용됩니다. 기본 정렬은 입고일/취득일 순입니다. Notion 변경사항은 새로고침 버튼을 눌러 반영하세요.`
@@ -3903,28 +3472,14 @@ SN번호복사 / 텍스트
 
       if (!rows.length) {
         $("#equipmentList").innerHTML = `<div class="empty">조회된 장비가 없습니다.</div>`;
-        restoreEquipmentScroll();
         return;
       }
 
       if (equipmentViewMode === "model") {
         $("#equipmentList").innerHTML = `<div class="model-group-list">${groupRowsByModel(rows).map(modelGroupHtml).join("")}</div>`;
 
-        $$("#equipmentList .model-group-card").forEach(details => {
-          details.addEventListener("toggle", () => {
-            const id = details.dataset.equipmentGroupId;
-            if (!id) return;
-            if (details.open) openEquipmentModelGroups.add(id);
-            else openEquipmentModelGroups.delete(id);
-          });
-        });
-
         $$("#equipmentList .model-equipment-row").forEach(rowEl => {
           rowEl.addEventListener("click", () => {
-            const row = equipmentRows.find(item => item.id === rowEl.dataset.id);
-            pendingEquipmentAnchorId = rowEl.dataset.id || "";
-            const groupId = row ? (row.장비모델 || "__none__") : "";
-            if (groupId) openEquipmentModelGroups.add(groupId);
             selectedEquipmentId = selectedEquipmentId === rowEl.dataset.id ? "" : rowEl.dataset.id;
             renderEquipmentList();
             renderEquipmentDetail();
@@ -3935,7 +3490,6 @@ SN번호복사 / 텍스트
 
         $$("#equipmentList .equipment-card").forEach(card => {
           card.addEventListener("click", () => {
-            pendingEquipmentAnchorId = card.dataset.id || "";
             if (selectedEquipmentId === card.dataset.id) {
               selectedEquipmentId = "";
             } else {
@@ -3948,7 +3502,6 @@ SN번호복사 / 텍스트
       }
 
       bindInlineDetailButtons();
-      restoreEquipmentScroll();
     }
 
     function modelOf(row) {
@@ -3985,9 +3538,12 @@ SN번호복사 / 텍스트
           </div>
           ${cover}
 
+          ${model ? `<div class="notice" style="margin-top:0;margin-bottom:12px;">연결 모델: ${escapeHtml(model.모델명 || "-")}</div>` : ""}
+
           <div class="kv"><div class="k">① SN번호</div><div class="v">${escapeHtml(row.SN번호 || "-")}</div></div>
           <div class="kv"><div class="k">② 작성년월일</div><div class="v">${escapeHtml(row.작성년월일 || "-")}</div></div>
           <div class="kv"><div class="k">③ 장비명</div><div class="v">${escapeHtml(row.장비명 || "-")}</div></div>
+          <div class="kv"><div class="k">장비모델</div><div class="v">${escapeHtml(modelName(row) || "-")}</div></div>
           <div class="kv"><div class="k">④ 제작회사</div><div class="v">${escapeHtml(effectiveMaker(row) || "-")}</div></div>
           <div class="kv"><div class="k">⑤ 배치장소</div><div class="v">${escapeHtml(row.배치장소 || "-")}${row.세부위치 ? " / " + escapeHtml(row.세부위치) : ""}</div></div>
           <div class="kv"><div class="k">⑥ 규격</div><div class="v">${escapeHtml(effectiveSpec(row) || "-")}</div></div>
@@ -4003,8 +3559,8 @@ SN번호복사 / 텍스트
           <div class="toolbar" style="margin-top:16px;">
             <button class="btn primary load-inline-photos-btn" type="button" data-id="${escapeHtml(row.id)}">▼ ⑭ 장비사진 보기</button>
             ${model ? `<button class="btn ghost load-inline-model-photos-btn" type="button" data-id="${escapeHtml(model.id)}">▼ 모델 공통사진 보기</button>` : ""}
-            <button class="btn ghost load-inline-maintenance-btn" type="button" data-id="${escapeHtml(row.id)}">▼ ⑮ 유지보수 내역${maintenanceCountForEquipment(row.id) ? ` (${maintenanceCountForEquipment(row.id)}건)` : ""}</button>
-            ${isAdminUser() && row.url ? `<a class="btn ghost" href="${escapeHtml(row.url)}" target="_blank" rel="noreferrer">노션에서 열기</a>` : ""}
+            <button class="btn ghost load-inline-maintenance-btn" type="button" data-id="${escapeHtml(row.id)}">▼ ⑮ 유지보수 내역</button>
+            ${row.url ? `<a class="btn ghost" href="${escapeHtml(row.url)}" target="_blank" rel="noreferrer">노션에서 열기</a>` : ""}
           </div>
           <div class="inline-photos-area"></div>
           <div class="inline-model-photos-area"></div>
@@ -4017,12 +3573,6 @@ SN번호복사 / 텍스트
       $$("#equipmentList .close-inline-detail-btn").forEach(button => {
         button.addEventListener("click", (event) => {
           event.stopPropagation();
-          const scrollBox = document.querySelector("#equipmentView .equipment-list-panel .card-body");
-          pendingEquipmentAbsoluteScroll = {
-            boxTop: scrollBox ? scrollBox.scrollTop : 0,
-            windowY: window.scrollY || 0
-          };
-          pendingEquipmentAnchorId = selectedEquipmentId || "";
           selectedEquipmentId = "";
           renderEquipmentList();
           renderEquipmentDetail();
@@ -4093,7 +3643,7 @@ SN번호복사 / 텍스트
             <div class="eq-cell eq-name">
               <span class="eq-label">장비명</span>
               <span class="eq-value">${escapeHtml(row.장비명 || "-")}</span>
-              <span class="eq-sub">SN ${escapeHtml(row.SN번호 || "-")}</span>
+              <span class="eq-sub">${modelName(row) ? "모델 " + escapeHtml(modelName(row)) + " · " : ""}SN ${escapeHtml(row.SN번호 || "-")}</span>
             </div>
           </div>
 
@@ -4121,10 +3671,7 @@ SN번호복사 / 텍스트
 
           <div class="eq-cell">
             <span class="eq-label">상태</span>
-            <div class="eq-status-badges">
-              <span class="badge ${statusClass(row.장비상태등)}">${escapeHtml(row.장비상태등 || "-")}</span>
-              ${maintenanceBadgeHtml(row.id)}
-            </div>
+            <span class="badge ${statusClass(row.장비상태등)}">${escapeHtml(row.장비상태등 || "-")}</span>
           </div>
         </article>
       `;
@@ -4160,6 +3707,7 @@ SN번호복사 / 텍스트
         <div class="kv"><div class="k">① SN번호</div><div class="v">${escapeHtml(row.SN번호 || "-")}</div></div>
         <div class="kv"><div class="k">② 작성년월일</div><div class="v">${escapeHtml(row.작성년월일 || "-")}</div></div>
         <div class="kv"><div class="k">③ 장비명</div><div class="v">${escapeHtml(row.장비명 || "-")}</div></div>
+        <div class="kv"><div class="k">장비모델</div><div class="v">${escapeHtml(modelName(row) || "-")}</div></div>
         <div class="kv"><div class="k">④ 제작회사</div><div class="v">${escapeHtml(effectiveMaker(row) || "-")}</div></div>
         <div class="kv"><div class="k">⑤ 배치장소</div><div class="v">${escapeHtml(row.배치장소 || "-")}${row.세부위치 ? " / " + escapeHtml(row.세부위치) : ""}</div></div>
         <div class="kv"><div class="k">⑥ 규격</div><div class="v">${escapeHtml(effectiveSpec(row) || "-")}</div></div>
@@ -4175,8 +3723,8 @@ SN번호복사 / 텍스트
         <div class="toolbar" style="margin-top:16px;">
           <button class="btn primary" id="loadPhotosBtn">▼ ⑭ 장비사진 보기</button>
           ${model ? `<button class="btn ghost" id="loadModelPhotosBtn">▼ 모델 공통사진 보기</button>` : ""}
-          <button class="btn ghost" id="loadMaintenanceBtn">▼ ⑮ 유지보수 내역${maintenanceCountForEquipment(row.id) ? ` (${maintenanceCountForEquipment(row.id)}건)` : ""}</button>
-          ${isAdminUser() && row.url ? `<a class="btn ghost" href="${escapeHtml(row.url)}" target="_blank" rel="noreferrer">노션에서 열기</a>` : ""}
+          <button class="btn ghost" id="loadMaintenanceBtn">▼ ⑮ 유지보수 내역</button>
+          ${row.url ? `<a class="btn ghost" href="${escapeHtml(row.url)}" target="_blank" rel="noreferrer">노션에서 열기</a>` : ""}
         </div>
         <div id="photosArea"></div>
         <div id="modelPhotosArea"></div>
@@ -4188,12 +3736,6 @@ SN번호복사 / 텍스트
       if (modelPhotosBtn) modelPhotosBtn.addEventListener("click", loadModelPhotos);
       $("#loadMaintenanceBtn").addEventListener("click", loadSelectedEquipmentMaintenance);
       $("#closeDetailBtn").addEventListener("click", () => {
-        const scrollBox = document.querySelector("#equipmentView .equipment-list-panel .card-body");
-        pendingEquipmentAbsoluteScroll = {
-          boxTop: scrollBox ? scrollBox.scrollTop : 0,
-          windowY: window.scrollY || 0
-        };
-        pendingEquipmentAnchorId = selectedEquipmentId || "";
         selectedEquipmentId = "";
         renderEquipmentList();
         renderEquipmentDetail();
@@ -4238,37 +3780,16 @@ SN번호복사 / 텍스트
       }
     }
 
-    async function loadMonthly(showMessage = true, options = {}) {
-      const force = Boolean(options.force);
+    async function loadMonthly(showMessage = true) {
       const month = $("#monthlyMonth").value || monthNow();
-
-      if (!force) {
-        const cached = await cacheGet(monthlyCacheKey(month));
-        if (cached?.rows?.length) {
-          monthlyRows = cached.rows || [];
-          refreshMonthlyModelOptions();
-          renderMonthlyList();
-          renderDashboard();
-          if (showMessage && $("#monthlyMsg")) {
-            showNotice($("#monthlyMsg"), `로컬 데이터 표시 중 · 마지막 동기화: ${cacheTimeText(cached.savedAt) || "기록 없음"}`);
-          }
-          return;
-        }
-      }
-
-      if (showMessage) $("#monthlyList").innerHTML = `<div class="notice">${force ? "노션에서 최신 월별 현황을 동기화하는 중입니다." : "저장된 월별 데이터가 없어 노션에서 처음 불러오는 중입니다."}</div>`;
+      if (showMessage) $("#monthlyList").innerHTML = `<div class="notice">월별 현황을 불러오는 중입니다.</div>`;
 
       try {
         const data = await api(`/api/monthly?month=${encodeURIComponent(month)}`);
         monthlyRows = data.rows || [];
-        const savedAt = Date.now();
-        await cacheSet(monthlyCacheKey(month), { rows: monthlyRows, savedAt });
         refreshMonthlyModelOptions();
         renderMonthlyList();
         renderDashboard();
-        if (showMessage && $("#monthlyMsg")) {
-          showNotice($("#monthlyMsg"), `최신 정보 동기화 완료 · ${cacheTimeText(savedAt)}`);
-        }
       } catch (error) {
         if (showMessage) $("#monthlyList").innerHTML = `<div class="notice error">${escapeHtml(error.message)}</div>`;
       }
@@ -4278,9 +3799,35 @@ SN번호복사 / 텍스트
       return !row.확인여부 || row.이번달위치 !== row.원장기준배치장소 || row.이번달상태 !== "정상" || Boolean((row.메모 || "").trim());
     }
 
-    function monthlyDisabled(row) {
-      const eq = equipmentForMonthly(row);
-      return eq?.월별현황포함 === false;
+    function inspectionExclusionReasons(eq) {
+      const reasons = [];
+      const assetType = String(eq?.자산유형 || "").trim();
+      const usageStatus = String(eq?.사용상태 || "").trim();
+      const equipmentStatus = String(eq?.장비상태등 || "").trim();
+
+      if (eq?.월별현황포함 !== true) reasons.push("월별 점검 제외");
+      if (["소프트웨어", "유지보수", "소모품"].includes(assetType)) reasons.push(assetType);
+      if (["제외", "폐기"].includes(usageStatus)) reasons.push(`사용상태 ${usageStatus}`);
+      if (equipmentStatus === "폐기") reasons.push("장비상태 폐기");
+
+      return [...new Set(reasons)];
+    }
+
+    function monthlyExcludedRows() {
+      return equipmentRows
+        .filter(eq => inspectionExclusionReasons(eq).length > 0)
+        .map(eq => ({
+          id: `excluded:${eq.id}`,
+          장비: eq.id,
+          장비명복사: eq.장비명 || "-",
+          자체일련번호복사: eq.관리번호 || "",
+          이번달위치: eq.배치장소 || "",
+          이번달상태: eq.장비상태등 || "-",
+          확인여부: false,
+          메모: "",
+          _excluded: true,
+          _exclusionReasons: inspectionExclusionReasons(eq)
+        }));
     }
 
 
@@ -4430,7 +3977,7 @@ SN번호복사 / 텍스트
         <div class="monthly-side-head">
           <div>
             <strong>${escapeHtml(row.장비명복사 || "-")}</strong>
-            <span>${escapeHtml(monthlyModelName(row) || "-")} · SN ${escapeHtml(row.SN번호복사 || "-")}</span>
+            <span>${escapeHtml(monthlyModelName(row) || "-")} · 관리번호 ${escapeHtml(eq?.관리번호 || row.자체일련번호복사 || "-")}</span>
           </div>
           <button class="btn" id="closeMonthlySideBtn" type="button">닫기</button>
         </div>
@@ -4439,7 +3986,6 @@ SN번호복사 / 텍스트
 
         <div class="monthly-side-kv"><div class="k">규격</div><div class="v">${escapeHtml(effectiveSpec(eq) || "-")}</div></div>
         <div class="monthly-side-kv"><div class="k">관리번호</div><div class="v">${escapeHtml(eq?.관리번호 || row.자체일련번호복사 || "-")}</div></div>
-        <div class="monthly-side-kv"><div class="k">기준 장소</div><div class="v">${escapeHtml(row.원장기준배치장소 || "-")}</div></div>
         <div class="monthly-side-kv"><div class="k">이번달 위치</div><div class="v">${escapeHtml(row.이번달위치 || "-")}</div></div>
         <div class="monthly-side-kv"><div class="k">이번달 상태</div><div class="v"><span class="badge ${statusClass(row.이번달상태)}">${escapeHtml(row.이번달상태 || "-")}</span></div></div>
         <div class="monthly-side-kv"><div class="k">확인자</div><div class="v">${escapeHtml(row.확인자명복사 || "-")}</div></div>
@@ -4494,26 +4040,7 @@ SN번호복사 / 텍스트
     }
 
     function applyMonthlyPatchToLocal(id, patch) {
-      let linkedEquipmentId = "";
-      monthlyRows = monthlyRows.map(row => {
-        if (row.id !== id) return row;
-        linkedEquipmentId = row.장비 || "";
-        return { ...row, ...patch };
-      });
-
-      const month = $("#monthlyMonth")?.value || monthNow();
-      cacheSet(monthlyCacheKey(month), { rows: monthlyRows, savedAt: Date.now() });
-
-      // 월별점검 저장 시 Worker가 장비원장의 세부위치/현재특이사항도 갱신하므로
-      // 화면의 로컬 장비 데이터도 같이 맞춰둡니다.
-      if (linkedEquipmentId) {
-        equipmentRows = equipmentRows.map(row => row.id === linkedEquipmentId ? {
-          ...row,
-          ...(patch.이번달위치 !== undefined ? { 세부위치: patch.이번달위치 } : {}),
-          ...(patch.메모 !== undefined ? { 현재특이사항: patch.메모 } : {})
-        } : row);
-        cacheSet(equipmentCacheKey(), { rows: equipmentRows, savedAt: Date.now() });
-      }
+      monthlyRows = monthlyRows.map(row => row.id === id ? { ...row, ...patch } : row);
     }
 
     function renderMonthlyList() {
@@ -4521,18 +4048,14 @@ SN번호복사 / 텍스트
       const location = $("#monthlyLocationFilter").value;
       const checkedFilter = $("#monthlyCheckedFilter").value;
 
-      let rows = [...monthlyRows];
+      let rows = checkedFilter === "excluded" ? monthlyExcludedRows() : [...monthlyRows];
 
       if (q) {
         rows = rows.filter(row => {
           const eq = equipmentForMonthly(row);
           const text = [
             row.장비명복사,
-            row.자체일련번호복사,
-            row.SN번호복사,
             eq?.관리번호,
-            eq?.자체일련번호,
-            eq?.SN번호,
             monthlyModelName(row)
           ].filter(Boolean).join(" ").toLowerCase();
           return text.includes(q);
@@ -4550,16 +4073,21 @@ SN번호복사 / 텍스트
       }
 
       const checkedCount = rows.filter(row => row.확인여부).length;
-      const disabledCount = rows.filter(monthlyDisabled).length;
       const modelCount = groupMonthlyRowsByModel(rows).length;
-      $("#monthlySummary").textContent = `조회 결과 ${rows.length}건 · 모델 ${modelCount}개 · 확인완료 ${checkedCount}건 · 미확인 ${rows.length - checkedCount}건${disabledCount ? ` · 월별점검 제외 ${disabledCount}건` : ""}`;
+      if (checkedFilter === "excluded") {
+        $("#monthlySummary").textContent = `점검 제외 ${rows.length}건 · 모델 ${modelCount}개`;
+      } else {
+        $("#monthlySummary").textContent = `조회 결과 ${rows.length}건 · 모델 ${modelCount}개 · 확인완료 ${checkedCount}건 · 미확인 ${rows.length - checkedCount}건`;
+      }
 
       $$("#monthlyModeToggle button").forEach(btn => {
         btn.classList.toggle("active", btn.dataset.mode === monthlyViewMode);
       });
 
       if (!rows.length) {
-        $("#monthlyList").innerHTML = `<div class="empty">조회된 월별 현황이 없습니다. 관리자 계정으로 월별 현황을 생성하세요.</div>`;
+        $("#monthlyList").innerHTML = checkedFilter === "excluded"
+          ? `<div class="empty">점검 제외 장비가 없습니다.</div>`
+          : `<div class="empty">조회된 월별 현황이 없습니다. 관리자 계정으로 월별 현황을 생성하세요.</div>`;
         return;
       }
 
@@ -4575,6 +4103,27 @@ SN번호복사 / 텍스트
           else openMonthlyModelGroups.delete(id);
         });
       });
+
+      // 점검 제외 항목은 조회 전용이므로 아래 편집 이벤트를 연결하지 않습니다.
+      if (checkedFilter === "excluded") {
+        $$(".monthly-side-open-btn").forEach(button => {
+          button.addEventListener("click", (event) => {
+            event.stopPropagation();
+            const eqId = button.dataset.excludedEquipmentId;
+            if (!eqId) return;
+            selectedEquipmentId = eqId;
+            if ($("#equipmentSearch")) $("#equipmentSearch").value = "";
+            if ($("#equipmentLocationFilter")) $("#equipmentLocationFilter").value = "";
+            if ($("#equipmentYearFilter")) $("#equipmentYearFilter").value = "";
+            if ($("#equipmentModelFilter")) $("#equipmentModelFilter").value = "";
+            if ($("#equipmentStatusFilter")) $("#equipmentStatusFilter").value = "";
+            showView("equipmentView");
+            renderEquipmentList();
+            renderEquipmentDetail();
+          });
+        });
+        return;
+      }
 
       $$(".quick-monthly-check").forEach(input => {
         input.addEventListener("click", event => event.stopPropagation());
@@ -4616,35 +4165,68 @@ SN번호복사 / 텍스트
         ? `<img class="eq-photo" src="${escapeHtml(photoUrl)}" alt="">`
         : `<div class="eq-photo">EQ</div>`;
 
+      const managementNo = eq?.관리번호 || row.자체일련번호복사 || "-";
+
+      if (row._excluded) {
+        const reasons = (row._exclusionReasons || []).join(" · ") || "점검 제외";
+        return `
+          <article class="monthly-card monthly-excluded-card" data-id="${escapeHtml(row.id)}">
+            <div class="monthly-check-row">
+              <button class="monthly-thumb-button monthly-side-open-btn" type="button" data-excluded-equipment-id="${escapeHtml(eq?.id || "")}" title="관리대장으로 이동">
+                ${photo}
+              </button>
+              <div class="monthly-row-title">
+                <strong>${escapeHtml(row.장비명복사 || "-")}</strong>
+                <span>${escapeHtml(monthlyModelName(row))} · 관리번호 ${escapeHtml(managementNo)}</span>
+              </div>
+              <div class="monthly-cell">
+                <span class="cell-label">규격</span>
+                <span class="cell-main">${escapeHtml(effectiveSpec(eq) || "-")}</span>
+              </div>
+              <div class="monthly-cell">
+                <span class="cell-label">현재 위치</span>
+                <span class="cell-main">${escapeHtml(eq?.배치장소 || "-")}</span>
+              </div>
+              <div class="monthly-cell">
+                <span class="cell-label">점검 여부</span>
+                <span class="badge gray">점검 제외</span>
+                <span class="cell-main" style="margin-top:4px;font-size:11px;color:var(--sub);">${escapeHtml(reasons)}</span>
+              </div>
+            </div>
+          </article>
+        `;
+      }
+
       const isOpen = selectedMonthlyId === row.id;
       const status = row.이번달상태 || "정상";
-      const isDisabled = monthlyDisabled(row);
-      const disabledAttr = isDisabled ? "disabled" : "";
-      const disabledBadge = isDisabled ? `<span class="badge gray">월별점검 제외</span>` : "";
+      const memoText = String(row.메모 || "").trim();
+      const memoPreview = memoText || "메모 없음";
       const detailHtml = isOpen ? `
           <div class="monthly-detail">
             <div class="monthly-detail-grid">
-              <label>기준 장소
-                <input class="input" value="${escapeHtml(row.원장기준배치장소 || "-")}" readonly />
-              </label>
               <label>이번달 상태
-                <select class="select monthly-status" ${disabledAttr}>
+                <select class="select monthly-status">
                   ${optionHtml(statuses, status)}
                 </select>
               </label>
-              <label>메모
-                <input class="input monthly-memo" value="${escapeHtml(row.메모 || "")}" placeholder="필요한 경우만 입력" ${disabledAttr} />
-              </label>
+
+              <details class="monthly-memo-fold">
+                <summary><span>메모</span><span class="monthly-memo-preview">${escapeHtml(memoPreview)}</span></summary>
+                <div class="monthly-memo-fold-body">
+                  <input class="input monthly-memo" style="width:100%;" value="${escapeHtml(row.메모 || "")}" placeholder="필요한 경우만 입력" />
+                </div>
+              </details>
+
               <label class="full">점검사진
-                <input class="input monthly-photo-file" type="file" accept="image/*" multiple ${disabledAttr} />
+                <input class="input monthly-photo-file" type="file" accept="image/*" multiple />
               </label>
             </div>
 
             <div class="small" style="color:var(--sub);font-size:13px;">확인자: ${escapeHtml(row.확인자명복사 || "-")} · 확인일: ${escapeHtml(row.확인일 || "-")}</div>
 
             <div class="monthly-photo-actions">
-              <button class="btn primary save-monthly-detail-btn" type="button" ${disabledAttr}>상세 저장</button>
-              <button class="btn ghost upload-monthly-photo-btn" type="button" ${disabledAttr}>점검사진 업로드</button>
+              <button class="btn primary save-monthly-detail-btn" type="button">상세 저장</button>
+              <button class="btn ghost upload-monthly-photo-btn" type="button">점검사진 업로드</button>
               <button class="btn" type="button" data-photo-target="${escapeHtml(row.id)}">점검사진 보기</button>
             </div>
             <div class="monthly-photos-area"></div>
@@ -4652,10 +4234,10 @@ SN번호복사 / 텍스트
         ` : "";
 
       return `
-        <article class="monthly-card ${isOpen ? "open" : ""} ${isDisabled ? "monthly-disabled" : ""}" data-id="${escapeHtml(row.id)}" data-disabled="${isDisabled ? "true" : "false"}">
+        <article class="monthly-card ${isOpen ? "open" : ""}" data-id="${escapeHtml(row.id)}">
           <div class="monthly-check-row">
             <div class="check-wrap">
-              <input class="quick-monthly-check" type="checkbox" ${row.확인여부 ? "checked" : ""} ${disabledAttr} title="정상 확인" />
+              <input class="quick-monthly-check" type="checkbox" ${row.확인여부 ? "checked" : ""} title="정상 확인" />
             </div>
             <button class="monthly-thumb-button monthly-side-open-btn" type="button" data-monthly-side-id="${escapeHtml(row.id)}" title="점검 상세 보기">
               ${photo}
@@ -4663,7 +4245,7 @@ SN번호복사 / 텍스트
 
             <div class="monthly-row-title">
               <strong>${escapeHtml(row.장비명복사 || "-")}</strong>
-              <span>${monthlyModelName(row)} · SN ${escapeHtml(row.SN번호복사 || "-")}</span>
+              <span>${escapeHtml(monthlyModelName(row))} · 관리번호 ${escapeHtml(managementNo)}</span>
             </div>
 
             <div class="monthly-cell">
@@ -4673,16 +4255,14 @@ SN번호복사 / 텍스트
 
             <div class="monthly-cell monthly-location-cell">
               <span class="cell-label">이번달 위치</span>
-              <select class="monthly-inline-location monthly-location" ${disabledAttr}>
+              <select class="monthly-inline-location monthly-location">
                 ${optionHtml(locations, row.이번달위치)}
               </select>
-              <span class="cell-sub">기준: ${escapeHtml(row.원장기준배치장소 || "-")}</span>
             </div>
 
             <div class="monthly-cell monthly-status-cell">
               <span class="cell-label">상태</span>
               <span class="badge ${statusClass(status)}">${escapeHtml(status)}</span>
-              ${disabledBadge}
             </div>
 
             <button class="btn monthly-toggle-detail-btn toggle-monthly-detail-btn" type="button">${isOpen ? "▼" : "▶"}</button>
@@ -4709,11 +4289,6 @@ SN번호복사 / 텍스트
 
     async function uploadMonthlyPhotos(card) {
       const id = card.dataset.id;
-      const row = monthlyRows.find(item => item.id === id);
-      if (row && monthlyDisabled(row)) {
-        alert("월별현황포함이 해제된 장비는 점검사진을 업로드할 수 없습니다.");
-        return;
-      }
       const fileInput = card.querySelector(".monthly-photo-file");
       const files = fileInput?.files || [];
       const area = card.querySelector(".monthly-photos-area");
@@ -4767,11 +4342,6 @@ SN번호복사 / 텍스트
       const checkbox = card.querySelector(".quick-monthly-check");
       const id = card.dataset.id;
       const row = monthlyRows.find(item => item.id === id);
-      if (row && monthlyDisabled(row)) {
-        alert("월별현황포함이 해제된 장비는 월별점검에서 수정할 수 없습니다.");
-        renderMonthlyList();
-        return;
-      }
       const groupId = row ? monthlyGroupIdForRow(row) : "";
 
       if (groupId) openMonthlyModelGroups.add(groupId);
@@ -4805,11 +4375,6 @@ SN번호복사 / 텍스트
     async function saveMonthly(card, markChecked = true) {
       const id = card.dataset.id;
       const row = monthlyRows.find(item => item.id === id);
-      if (row && monthlyDisabled(row)) {
-        alert("월별현황포함이 해제된 장비는 월별점검에서 수정할 수 없습니다.");
-        renderMonthlyList();
-        return;
-      }
       const groupId = row ? monthlyGroupIdForRow(row) : "";
       const button = card.querySelector(".save-monthly-detail-btn");
 
@@ -4910,7 +4475,7 @@ SN번호복사 / 텍스트
         }
 
         showNotice($("#monthlyMsg"), `${formatMonth(month)} 생성 완료 · 처리 ${processed}건 · 신규 ${created}건 · 기존 ${skipped}건`);
-        await loadMonthly(false, { force: true });
+        await loadMonthly(false);
       } catch (error) {
         showNotice($("#monthlyMsg"), error.message, true);
       } finally {
@@ -4994,7 +4559,7 @@ SN번호복사 / 텍스트
         $("#addMsg").innerHTML = `등록 완료 · ${data.url ? `<a href="${escapeHtml(data.url)}" target="_blank" rel="noreferrer" style="text-decoration:underline;">노션에서 보기</a>` : ""}`;
         form.reset();
         form.querySelector('[name="월별현황포함"]').checked = true;
-        await loadEquipment({ force: true });
+        await loadEquipment();
       } catch (error) {
         showNotice($("#addMsg"), error.message, true);
       }
@@ -5647,202 +5212,12 @@ SN번호복사 / 텍스트
       setTimeout(() => document.body.classList.remove("print-report"), 500);
     }
 
-
-    function registerMaintenanceRows(rows = []) {
-      rows.forEach(row => {
-        if (row?.id) maintenanceRowCache.set(row.id, row);
-      });
-    }
-
-    function maintenanceActionMarkup(id) {
-      if (isReadonlyUser()) return "";
-      return `
-        <div class="maintenance-card-actions">
-          <button class="maintenance-menu-btn" type="button" data-maintenance-menu="${escapeHtml(id)}" aria-label="유지보수 메뉴">⋯</button>
-          <div class="maintenance-action-menu" data-maintenance-menu-panel="${escapeHtml(id)}">
-            <button type="button" class="maintenance-edit-btn" data-maintenance-id="${escapeHtml(id)}">수정</button>
-            <button type="button" class="maintenance-delete-btn danger-text" data-maintenance-id="${escapeHtml(id)}">삭제</button>
-          </div>
-        </div>
-      `;
-    }
-
-    function closeMaintenanceMenus() {
-      $$(".maintenance-action-menu.open").forEach(menu => menu.classList.remove("open"));
-      $$(".maintenance-menu-btn.active").forEach(btn => btn.classList.remove("active"));
-    }
-
-    function optionSelected(value, target) {
-      return String(value || "") === String(target || "") ? "selected" : "";
-    }
-
-    function openMaintenanceEditModal(row) {
-      if (!row?.id) return;
-      closeMaintenanceMenus();
-      $("#maintenanceEditBackdrop")?.remove();
-
-      const backdrop = document.createElement("div");
-      backdrop.className = "maintenance-edit-backdrop";
-      backdrop.id = "maintenanceEditBackdrop";
-      backdrop.innerHTML = `
-        <div class="maintenance-edit-modal" role="dialog" aria-modal="true">
-          <div class="maintenance-edit-modal-head">
-            <div>
-              <strong>유지보수 내역 수정</strong>
-              <div class="small" style="color:var(--sub);font-size:13px;margin-top:4px;">${escapeHtml(row.장비명 || "")}</div>
-            </div>
-            <button class="btn" type="button" data-maintenance-close>닫기</button>
-          </div>
-          <form id="maintenanceEditForm" class="maintenance-form-grid">
-            <label>일자
-              <input class="input" type="date" name="일자" value="${escapeHtml(row.일자 || "")}" />
-            </label>
-            <label>구분
-              <select class="select" name="구분">
-                <option ${optionSelected(row.구분, "유지보수")}>유지보수</option>
-                <option ${optionSelected(row.구분, "수리")}>수리</option>
-                <option ${optionSelected(row.구분, "점검")}>점검</option>
-                <option ${optionSelected(row.구분, "교체")}>교체</option>
-                <option ${optionSelected(row.구분, "기타")}>기타</option>
-              </select>
-            </label>
-            <label>상태
-              <select class="select" name="상태">
-                <option ${optionSelected(row.상태, "접수")}>접수</option>
-                <option ${optionSelected(row.상태, "진행중")}>진행중</option>
-                <option ${optionSelected(row.상태, "완료")}>완료</option>
-                <option ${optionSelected(row.상태, "보류")}>보류</option>
-              </select>
-            </label>
-            <label>비용
-              <input class="input" type="number" name="비용" value="${escapeHtml(row.비용 ?? "")}" />
-            </label>
-            <label class="full">내용
-              <textarea class="textarea" name="내용">${escapeHtml(row.내용 || "")}</textarea>
-            </label>
-            <label class="full">처리결과
-              <textarea class="textarea" name="처리결과">${escapeHtml(row.처리결과 || "")}</textarea>
-            </label>
-            <label class="full">비고
-              <input class="input" name="비고" value="${escapeHtml(row.비고 || "")}" />
-            </label>
-            <div class="full" style="display:flex;justify-content:flex-end;gap:8px;">
-              <button class="btn" type="button" data-maintenance-close>취소</button>
-              <button class="btn primary" type="submit">수정 저장</button>
-            </div>
-          </form>
-        </div>
-      `;
-
-      document.body.appendChild(backdrop);
-      backdrop.addEventListener("click", event => {
-        if (event.target === backdrop || event.target.closest("[data-maintenance-close]")) backdrop.remove();
-      });
-
-      $("#maintenanceEditForm").addEventListener("submit", async event => {
-        event.preventDefault();
-        const form = event.currentTarget;
-        const button = form.querySelector("button[type='submit']");
-        const payload = Object.fromEntries(new FormData(form).entries());
-        payload.장비 = row.장비 || "";
-        payload.유지보수명 = row.유지보수명 || "";
-
-        button.disabled = true;
-        button.textContent = "저장 중";
-        try {
-          await api(`/api/maintenance/${encodeURIComponent(row.id)}`, {
-            method: "PATCH",
-            body: JSON.stringify(payload)
-          });
-          backdrop.remove();
-          await refreshMaintenanceAfterChange(row);
-        } catch (error) {
-          alert(error.message);
-        } finally {
-          button.disabled = false;
-          button.textContent = "수정 저장";
-        }
-      });
-    }
-
-    async function deleteMaintenanceRow(row) {
-      if (!row?.id) return;
-      closeMaintenanceMenus();
-      if (!confirm("이 유지보수 내역을 삭제할까요?")) return;
-
-      try {
-        await api(`/api/maintenance/${encodeURIComponent(row.id)}`, { method: "DELETE" });
-        await refreshMaintenanceAfterChange(row);
-      } catch (error) {
-        alert(error.message);
-      }
-    }
-
-    async function refreshMaintenanceAfterChange(row = {}) {
-      maintenanceRowCache.delete(row.id);
-
-      if ($("#maintenanceView")?.classList.contains("active")) {
-        await loadMaintenance();
-      }
-
-      if (selectedEquipmentId && (!row.장비 || row.장비 === selectedEquipmentId)) {
-        await loadSelectedEquipmentMaintenance();
-      }
-    }
-
-    function handleMaintenanceActionClick(event) {
-      const menuBtn = event.target.closest(".maintenance-menu-btn");
-      if (menuBtn) {
-        event.stopPropagation();
-        const id = menuBtn.dataset.maintenanceMenu;
-        const menu = document.querySelector(`[data-maintenance-menu-panel="${CSS.escape(id)}"]`);
-        const willOpen = !menu?.classList.contains("open");
-        closeMaintenanceMenus();
-        if (willOpen && menu) {
-          menu.classList.add("open");
-          menuBtn.classList.add("active");
-        }
-        return;
-      }
-
-      const editBtn = event.target.closest(".maintenance-edit-btn");
-      if (editBtn) {
-        event.stopPropagation();
-        const row = maintenanceRowCache.get(editBtn.dataset.maintenanceId);
-        if (row) openMaintenanceEditModal(row);
-        return;
-      }
-
-      const deleteBtn = event.target.closest(".maintenance-delete-btn");
-      if (deleteBtn) {
-        event.stopPropagation();
-        const row = maintenanceRowCache.get(deleteBtn.dataset.maintenanceId);
-        if (row) deleteMaintenanceRow(row);
-        return;
-      }
-
-      if (!event.target.closest(".maintenance-card-actions")) closeMaintenanceMenus();
-    }
-
     function maintenanceDateKey(item) {
       return String(item?.일자 || "0000-00-00").slice(0, 10);
     }
 
     function sortMaintenanceDesc(rows) {
       return [...rows].sort((a, b) => maintenanceDateKey(b).localeCompare(maintenanceDateKey(a)));
-    }
-
-    function maintenanceCountForEquipment(equipmentId) {
-      if (!equipmentId) return 0;
-      const row = equipmentRows.find(item => item.id === equipmentId);
-      const fromRows = maintenanceRows.filter(item => item.장비 === equipmentId).length;
-      const fromEquipment = Number(row?.유지보수내역수 || row?.maintenanceCount || 0);
-      return Math.max(fromRows, Number.isFinite(fromEquipment) ? fromEquipment : 0);
-    }
-
-    function maintenanceBadgeHtml(equipmentId) {
-      const count = maintenanceCountForEquipment(equipmentId);
-      return count > 0 ? `<span class="badge need">유지보수 ${count}건</span>` : "";
     }
 
     async function loadEquipmentMaintenanceForArea(row, area) {
@@ -5852,18 +5227,14 @@ SN번호복사 / 텍스트
 
       try {
         const data = await api(`/api/maintenance?equipment=${encodeURIComponent(row.id)}`);
-        const rows = sortMaintenanceDesc((data.rows || []).map(item => ({ ...item, 장비: item.장비 || row.id })));
-        mergeMaintenanceRows(rows);
+        const rows = sortMaintenanceDesc((data.rows || []).filter(item => item.장비 === row.id));
         renderEquipmentMaintenanceArea(row, area, rows);
-        renderEquipmentList();
-        renderEquipmentDetail();
       } catch (error) {
         area.innerHTML = `<div class="notice error">${escapeHtml(error.message)}</div>`;
       }
     }
 
     function renderEquipmentMaintenanceArea(row, area, rows = []) {
-      registerMaintenanceRows(rows);
       area.innerHTML = `
         <div class="kv"><div class="k">⑮ 유지보수 내역</div><div class="v">${rows.length}건</div></div>
 
@@ -5876,10 +5247,7 @@ SN번호복사 / 텍스트
                   ${escapeHtml(item.일자 || "-")} · ${escapeHtml(item.구분 || "-")}
                 </div>
               </div>
-              <div style="display:flex;align-items:flex-start;gap:8px;">
-                <span class="badge ${item.상태 === "완료" ? "normal" : item.상태 === "진행중" ? "loan" : "need"}">${escapeHtml(item.상태 || "-")}</span>
-                ${maintenanceActionMarkup(item.id)}
-              </div>
+              <span class="badge ${item.상태 === "완료" ? "normal" : item.상태 === "진행중" ? "loan" : "need"}">${escapeHtml(item.상태 || "-")}</span>
             </div>
             ${item.내용 ? `<div class="small"><b>내용</b> ${escapeHtml(item.내용)}</div>` : ""}
             ${item.처리결과 ? `<div class="small"><b>처리결과</b> ${escapeHtml(item.처리결과)}</div>` : ""}
@@ -5937,10 +5305,6 @@ SN번호복사 / 텍스트
 
     async function submitEquipmentMaintenanceForArea(event, row, area) {
       event.preventDefault();
-      if (isReadonlyUser()) {
-        alert("조회전용 계정은 수정할 수 없습니다.");
-        return;
-      }
 
       const form = event.currentTarget;
       const button = form.querySelector("button[type='submit']");
@@ -5977,7 +5341,6 @@ SN번호복사 / 텍스트
       if (!area) return;
 
       const rows = sortMaintenanceDesc(maintenanceRows.filter(item => item.장비 === row.id));
-      registerMaintenanceRows(rows);
 
       area.innerHTML = `
         <div class="kv"><div class="k">⑮ 유지보수 내역</div><div class="v">${rows.length}건</div></div>
@@ -5991,10 +5354,7 @@ SN번호복사 / 텍스트
                   ${escapeHtml(item.일자 || "-")} · ${escapeHtml(item.구분 || "-")}
                 </div>
               </div>
-              <div style="display:flex;align-items:flex-start;gap:8px;">
-                <span class="badge ${item.상태 === "완료" ? "normal" : item.상태 === "진행중" ? "loan" : "need"}">${escapeHtml(item.상태 || "-")}</span>
-                ${maintenanceActionMarkup(item.id)}
-              </div>
+              <span class="badge ${item.상태 === "완료" ? "normal" : item.상태 === "진행중" ? "loan" : "need"}">${escapeHtml(item.상태 || "-")}</span>
             </div>
             ${item.내용 ? `<div class="small"><b>내용</b> ${escapeHtml(item.내용)}</div>` : ""}
             ${item.처리결과 ? `<div class="small"><b>처리결과</b> ${escapeHtml(item.처리결과)}</div>` : ""}
@@ -6051,10 +5411,6 @@ SN번호복사 / 텍스트
 
     async function submitSelectedEquipmentMaintenance(event, row) {
       event.preventDefault();
-      if (isReadonlyUser()) {
-        alert("조회전용 계정은 수정할 수 없습니다.");
-        return;
-      }
 
       const form = event.currentTarget;
       const button = form.querySelector("button[type='submit']");
@@ -6086,12 +5442,7 @@ SN번호복사 / 텍스트
       try {
         const data = await api("/api/maintenance");
         maintenanceRows = data.rows || [];
-        registerMaintenanceRows(maintenanceRows);
         renderMaintenanceList();
-        if (equipmentRows.length) {
-          renderEquipmentList();
-          renderEquipmentDetail();
-        }
       } catch (error) {
         $("#maintenanceList").innerHTML = `<div class="notice error">${escapeHtml(error.message)}</div>`;
       }
@@ -6103,7 +5454,6 @@ SN번호복사 / 텍스트
       const status = $("#maintenanceStatusFilter")?.value || "";
 
       let rows = sortMaintenanceDesc(maintenanceRows);
-      registerMaintenanceRows(rows);
 
       if (q) {
         rows = rows.filter(row => {
@@ -6135,10 +5485,7 @@ SN번호복사 / 텍스트
                   ${escapeHtml(row.일자 || "-")} · ${escapeHtml(row.장비명 || "-")}
                 </div>
               </div>
-              <div style="display:flex;align-items:flex-start;gap:8px;">
-                <span class="badge ${row.상태 === "완료" ? "normal" : row.상태 === "진행중" ? "loan" : "need"}">${escapeHtml(row.상태 || "-")}</span>
-                ${maintenanceActionMarkup(row.id)}
-              </div>
+              <span class="badge ${row.상태 === "완료" ? "normal" : row.상태 === "진행중" ? "loan" : "need"}">${escapeHtml(row.상태 || "-")}</span>
             </div>
             <div class="maintenance-meta">
               ${row.구분 ? `<span class="badge gray">${escapeHtml(row.구분)}</span>` : ""}
@@ -6154,10 +5501,6 @@ SN번호복사 / 텍스트
 
     async function submitMaintenance(event) {
       event.preventDefault();
-      if (isReadonlyUser()) {
-        showNotice($("#maintenanceMsg"), "조회전용 계정은 수정할 수 없습니다.", true);
-        return;
-      }
 
       const form = event.currentTarget;
       const button = form.querySelector("button[type='submit']");
@@ -6242,11 +5585,11 @@ SN번호복사 / 텍스트
         if ($("#monthChip") && $("#monthlyMonth")) {
           $("#monthChip").textContent = formatMonth($("#monthlyMonth").value);
         }
-        await loadEquipment({ force: true });
+        await loadEquipment();
         renderDashboard();
       });
 
-      onIfExists("#equipmentReloadBtn", "click", () => loadEquipment({ force: true }));
+      onIfExists("#equipmentReloadBtn", "click", loadEquipment);
 
       onIfExists("#equipmentSearch", "input", () => {
         renderEquipmentList();
@@ -6259,13 +5602,8 @@ SN번호복사 / 텍스트
       });
 
       onIfExists("#equipmentYearFilter", "change", () => {
-        setEquipmentYearFilter($("#equipmentYearFilter")?.value || "");
-      });
-
-      onIfExists("#equipmentYearToggle", "click", event => {
-        const button = event.target.closest("button[data-year]");
-        if (!button) return;
-        setEquipmentYearFilter(button.dataset.year || "");
+        renderEquipmentList();
+        renderEquipmentDetail();
       });
 
       onIfExists("#equipmentStatusFilter", "change", () => {
@@ -6281,13 +5619,7 @@ SN번호복사 / 텍스트
         button.addEventListener("click", () => setEquipmentViewMode(button.dataset.mode));
       });
 
-      onIfExists("#equipmentMaintenanceOnlyToggle", "click", event => {
-        const button = event.target.closest("button[data-maintenance-only]");
-        if (!button) return;
-        setEquipmentMaintenanceOnly(!equipmentMaintenanceOnly);
-      });
-
-      onIfExists("#monthlyReloadBtn", "click", () => loadMonthly(true, { force: true }));
+      onIfExists("#monthlyReloadBtn", "click", () => loadMonthly(true));
       onIfExists("#monthlySearch", "input", renderMonthlyList);
       onIfExists("#monthlyLocationFilter", "change", renderMonthlyList);
       onIfExists("#monthlyCheckedFilter", "change", renderMonthlyList);
@@ -6317,7 +5649,6 @@ SN번호복사 / 텍스트
       onIfExists("#maintenanceEquipmentFilter", "change", renderMaintenanceList);
       onIfExists("#maintenanceStatusFilter", "change", renderMaintenanceList);
       onIfExists("#maintenanceForm", "submit", submitMaintenance);
-      document.addEventListener("click", handleMaintenanceActionClick);
 
       onIfExists("#depreciationReloadBtn", "click", renderDepreciation);
       onIfExists("#depreciationYear", "input", renderDepreciation);
@@ -6346,8 +5677,6 @@ SN번호복사 / 텍스트
     function initSelects() {
       setHtmlIfExists("#equipmentLocationFilter", optionHtml([], "", "배치장소 전체"));
       setHtmlIfExists("#equipmentYearFilter", `<option value="">년도 전체</option>`);
-      setHtmlIfExists("#equipmentYearToggle", `<button type="button" data-year="" class="active">년도 전체</button>`);
-      setHtmlIfExists("#equipmentMaintenanceOnlyToggle", `<button type="button" data-maintenance-only="true" class="${equipmentMaintenanceOnly ? "active" : ""}">유지보수 내역</button>`);
       setHtmlIfExists("#equipmentStatusFilter", optionHtml(statuses, "", "상태 전체"));
       setHtmlIfExists("#monthlyLocationFilter", optionHtml(locations, "", "위치 전체"));
 
@@ -6383,20 +5712,15 @@ SN번호복사 / 텍스트
         try {
           const data = await api("/api/me");
           setLoggedIn(data.user);
-          return;
         } catch {
           localStorage.removeItem("eq_token");
+          $("#loginPage").classList.remove("hidden");
         }
       }
-
-      $("#app")?.classList.add("hidden");
-      $("#loginPage")?.classList.remove("hidden");
     }
 
     boot().catch(error => {
       console.error(error);
-      $("#app")?.classList.add("hidden");
-      $("#loginPage")?.classList.remove("hidden");
       const msg = document.getElementById("loginMsg");
       if (msg) {
         msg.classList.remove("hidden");
