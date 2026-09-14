@@ -2347,14 +2347,41 @@
 </style>
 
 
+
+
 <style>
-.monthly-other-location-toggle{
-  display:inline-flex;align-items:center;gap:7px;min-height:38px;padding:0 10px;
-  border:1px solid var(--line);border-radius:10px;background:#fff;
-  font-size:12px;font-weight:800;color:var(--sub);white-space:nowrap;cursor:pointer;
+.sidebar-collapse-btn{
+  margin-left:auto;
+  width:34px;
+  height:34px;
+  border:1px solid rgba(255,255,255,.16);
+  border-radius:9px;
+  background:rgba(255,255,255,.08);
+  color:#fff;
+  font-weight:900;
+  cursor:pointer;
+  flex:0 0 auto;
 }
-.monthly-other-location-toggle input{width:16px;height:16px;margin:0;accent-color:currentColor;}
-.monthly-other-location-toggle:has(input:checked){color:var(--text);background:#f7f9fc;}
+.sidebar-collapse-btn:hover{background:rgba(255,255,255,.14);}
+.sidebar-top-toggle{display:inline-flex;}
+.app.sidebar-collapsed{grid-template-columns:0 minmax(0,1fr);}
+.app.sidebar-collapsed .sidebar{
+  width:0;min-width:0;padding-left:0;padding-right:0;overflow:hidden;
+  opacity:0;pointer-events:none;
+}
+@media (max-width:840px){
+  .sidebar-collapse-btn,.sidebar-top-toggle{display:none !important;}
+  .app.sidebar-collapsed{grid-template-columns:1fr;}
+  .app.sidebar-collapsed .sidebar{
+    width:280px;padding:24px 18px;opacity:1;pointer-events:auto;
+  }
+}
+.monthly-sync-base-wrap{
+  display:flex;align-items:center;gap:8px;min-height:38px;
+  font-size:13px;font-weight:800;color:var(--text);
+}
+.monthly-sync-base-wrap input{width:16px;height:16px;}
+.monthly-sync-base-help{color:var(--sub);font-size:12px;font-weight:650;}
 </style>
 
 </head>
@@ -2391,6 +2418,7 @@
           <div class="side-title">장비 현황 관리</div>
           <div class="side-sub">Equipment Register</div>
         </div>
+        <button class="sidebar-collapse-btn" id="sidebarCollapseBtn" type="button" title="메뉴 접기" aria-label="사이드 메뉴 접기">◀</button>
       </div>
 
       <nav class="nav">
@@ -2414,6 +2442,7 @@
       <header class="topbar">
         <div style="display:flex;align-items:center;gap:10px;">
           <button class="btn mobile-menu" id="mobileMenuBtn">메뉴</button>
+          <button class="btn sidebar-top-toggle" id="sidebarTopToggleBtn" type="button" title="사이드 메뉴 열기/접기">☰</button>
           <div class="page-title" id="pageTitle">대시보드</div>
         </div>
         <div class="top-actions">
@@ -2529,7 +2558,10 @@
               <h1>월별 점검 목록</h1>
               <p>월별 장비 위치와 상태를 점검하고, 확인 완료 시 로그인 사용자가 자동 기록됩니다.</p>
             </div>
-            <button class="btn primary admin-only" id="generateMonthlyBtn">월별 현황 생성</button>
+            <div class="toolbar" style="margin:0; justify-content:flex-end;">
+              <button class="btn admin-only" id="syncMonthlyBaseLocationsBtn" type="button">이번달 위치 원장 반영</button>
+              <button class="btn primary admin-only" id="generateMonthlyBtn">월별 현황 생성</button>
+            </div>
           </div>
 
           <div class="card">
@@ -2545,10 +2577,6 @@
                 <input class="input" id="monthlySearch" placeholder="장비명, 모델명 검색" />
                 <input class="input" id="monthlyManagementSearch" type="tel" inputmode="numeric" pattern="[0-9]*" enterkeyhint="search" autocomplete="off" placeholder="관리번호 숫자 검색" aria-label="관리번호 검색" />
                 <button type="button" class="btn secondary monthly-management-clear-btn" id="monthlyManagementClearBtn" aria-label="관리번호 검색 지우기">지우기</button>
-                <label class="monthly-other-location-toggle" title="선택한 위치에서 관리번호가 없을 때 다른 위치의 동일 관리번호 장비도 함께 조회합니다.">
-                  <input type="checkbox" id="monthlyOtherLocationToggle" />
-                  <span>다른 위치도 찾기</span>
-                </label>
                 <select class="select" id="monthlyLocationFilter"></select>
                 <div class="mode-toggle sort-toggle" id="monthlySortToggle" title="정렬 방식">
                   <button type="button" data-sort="date" class="active">입고일</button>
@@ -4094,21 +4122,7 @@ SN번호복사 / 텍스트
           return managementNo.includes(managementQ);
         });
       }
-      if (location) {
-        const otherLocationOn = Boolean($("#monthlyOtherLocationToggle")?.checked);
-        const selectedLocationRows = rows.filter(row =>
-          matchesLocationFilter(row.이번달위치, location, row.이번달상태)
-        );
-
-        // 기본은 선택 위치만 조회합니다.
-        // 관리번호를 입력했고 '다른 위치도 찾기'가 켜진 경우,
-        // 선택 위치에서 해당 관리번호가 발견되지 않을 때만 위치 조건을 풀어 전체 위치에서 찾습니다.
-        if (otherLocationOn && managementQ && selectedLocationRows.length === 0) {
-          // rows 유지: 관리번호 필터까지 적용된 전체 위치 결과
-        } else {
-          rows = selectedLocationRows;
-        }
-      }
+      if (location) rows = rows.filter(row => matchesLocationFilter(row.이번달위치, location, row.이번달상태));
       if (checkedFilter === "checked") rows = rows.filter(row => row.확인여부);
       if (checkedFilter === "unchecked") rows = rows.filter(row => !row.확인여부);
       if (checkedFilter === "issue") rows = rows.filter(monthlyIsIssue);
@@ -4264,6 +4278,12 @@ SN번호복사 / 텍스트
                 </div>
               </details>
 
+              <label class="full monthly-sync-base-wrap">
+                <input class="monthly-sync-base-location" type="checkbox" ${String(row.이번달위치 || "").includes("대여") ? "" : "checked"} />
+                <span>변경한 위치를 장비 원장의 기본 위치에도 반영</span>
+              </label>
+              <div class="full monthly-sync-base-help">대여중 위치는 임시 이동으로 보고 기본 위치 반영을 기본 해제합니다.</div>
+
               <label class="full">점검사진
                 <input class="input monthly-photo-file" type="file" accept="image/*" multiple />
               </label>
@@ -4385,6 +4405,19 @@ SN번호복사 / 텍스트
       });
     }
 
+    function shouldSyncBaseLocation(card, locationValue) {
+      const explicit = card?.querySelector(".monthly-sync-base-location");
+      if (explicit) return explicit.checked;
+      return !String(locationValue || "").includes("대여");
+    }
+
+    function syncEquipmentLocationLocal(row, patch) {
+      if (!row || !patch?.기본위치반영 || !patch?.이번달위치) return;
+      equipmentRows = equipmentRows.map(eq =>
+        eq.id === row.장비 ? { ...eq, 배치장소: patch.이번달위치 } : eq
+      );
+    }
+
     async function quickCheckMonthly(card) {
       const checkbox = card.querySelector(".quick-monthly-check");
       const id = card.dataset.id;
@@ -4394,11 +4427,13 @@ SN번호복사 / 텍스트
       if (groupId) openMonthlyModelGroups.add(groupId);
       checkbox.disabled = true;
 
+      const quickLocation = card.querySelector(".monthly-location").value;
       const patch = {
-        이번달위치: card.querySelector(".monthly-location").value,
+        이번달위치: quickLocation,
         이번달상태: "정상",
         메모: "",
-        확인여부: checkbox.checked
+        확인여부: checkbox.checked,
+        기본위치반영: shouldSyncBaseLocation(card, quickLocation)
       };
 
       try {
@@ -4408,6 +4443,7 @@ SN번호복사 / 텍스트
         });
 
         applyMonthlyPatchToLocal(id, patch);
+        syncEquipmentLocationLocal(row, patch);
         renderMonthlyList();
         renderDashboard();
         if (selectedMonthlySideId === id) renderMonthlySideDetail(id);
@@ -4432,11 +4468,13 @@ SN번호복사 / 텍스트
         button.textContent = "저장 중";
       }
 
+      const selectedLocation = card.querySelector(".monthly-location").value;
       const patch = {
-        이번달위치: card.querySelector(".monthly-location").value,
+        이번달위치: selectedLocation,
         이번달상태: card.querySelector(".monthly-status")?.value || "정상",
         메모: card.querySelector(".monthly-memo")?.value || "",
-        확인여부: markChecked ? true : card.querySelector(".quick-monthly-check")?.checked || false
+        확인여부: markChecked ? true : card.querySelector(".quick-monthly-check")?.checked || false,
+        기본위치반영: shouldSyncBaseLocation(card, selectedLocation)
       };
 
       try {
@@ -4446,6 +4484,7 @@ SN번호복사 / 텍스트
         });
 
         applyMonthlyPatchToLocal(id, patch);
+        syncEquipmentLocationLocal(row, patch);
         renderMonthlyList();
         renderDashboard();
         if (selectedMonthlySideId === id) renderMonthlySideDetail(id);
@@ -4461,6 +4500,51 @@ SN번호복사 / 텍스트
 
     function wait(ms) {
       return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function syncMonthlyBaseLocations() {
+      const month = $("#monthlyMonth")?.value || monthNow();
+      const button = $("#syncMonthlyBaseLocationsBtn");
+      const ok = confirm(
+        `${formatMonth(month)} 점검에서 확인 완료된 장비 중 위치가 변경된 항목을 장비 원장의 기본 위치에 일괄 반영합니다.\n\n` +
+        `대여중 위치는 임시 이동으로 보고 제외됩니다. 계속할까요?`
+      );
+      if (!ok) return;
+
+      if (button) {
+        button.disabled = true;
+        button.textContent = "반영 중";
+      }
+      showNotice($("#monthlyMsg"), `${formatMonth(month)} 변경 위치를 장비 원장에 반영하는 중입니다.`);
+
+      try {
+        const result = await api("/api/monthly/sync-base-locations", {
+          method: "POST",
+          body: JSON.stringify({ month })
+        });
+
+        const parts = [
+          `반영 ${result.synced || 0}건`,
+          `변경 없음 ${result.unchanged || 0}건`,
+          `미확인 제외 ${result.skippedUnchecked || 0}건`,
+          `대여중 제외 ${result.skippedRental || 0}건`
+        ];
+        if (result.missingRelation) parts.push(`장비 연결 없음 ${result.missingRelation}건`);
+        if (result.failed) parts.push(`실패 ${result.failed}건`);
+
+        showNotice($("#monthlyMsg"), `${formatMonth(month)} 원장 위치 동기화 완료 · ${parts.join(" · ")}`, Boolean(result.failed));
+
+        // 갱신된 원장 위치를 화면에도 즉시 반영합니다.
+        await loadEquipment();
+        await loadMonthly(false);
+      } catch (error) {
+        showNotice($("#monthlyMsg"), error.message, true);
+      } finally {
+        if (button) {
+          button.disabled = false;
+          button.textContent = "이번달 위치 원장 반영";
+        }
+      }
     }
 
     async function generateMonthly() {
@@ -5613,6 +5697,30 @@ SN번호복사 / 텍스트
         location.reload();
       });
 
+      const appEl = $("#app");
+      const applySidebarCollapsed = (collapsed) => {
+        if (!appEl) return;
+        appEl.classList.toggle("sidebar-collapsed", collapsed);
+        localStorage.setItem("eq_sidebar_collapsed", collapsed ? "1" : "0");
+        const collapseBtn = $("#sidebarCollapseBtn");
+        if (collapseBtn) {
+          collapseBtn.textContent = collapsed ? "▶" : "◀";
+          collapseBtn.title = collapsed ? "메뉴 펼치기" : "메뉴 접기";
+        }
+      };
+
+      if (window.innerWidth > 840) {
+        applySidebarCollapsed(localStorage.getItem("eq_sidebar_collapsed") === "1");
+      }
+
+      onIfExists("#sidebarCollapseBtn", "click", () => {
+        applySidebarCollapsed(!appEl?.classList.contains("sidebar-collapsed"));
+      });
+
+      onIfExists("#sidebarTopToggleBtn", "click", () => {
+        applySidebarCollapsed(!appEl?.classList.contains("sidebar-collapsed"));
+      });
+
       onIfExists("#mobileMenuBtn", "click", () => {
         $("#sidebar")?.classList.toggle("open");
       });
@@ -5681,7 +5789,6 @@ SN번호복사 / 텍스트
         renderMonthlyList();
         input.focus();
       });
-      onIfExists("#monthlyOtherLocationToggle", "change", renderMonthlyList);
       onIfExists("#monthlyLocationFilter", "change", renderMonthlyList);
       onIfExists("#monthlyCheckedFilter", "change", renderMonthlyList);
       $$("#monthlySortToggle button").forEach(button => {
@@ -5690,6 +5797,7 @@ SN번호복사 / 텍스트
       $$("#monthlyModeToggle button").forEach(button => {
         button.addEventListener("click", () => setMonthlyViewMode(button.dataset.mode));
       });
+      onIfExists("#syncMonthlyBaseLocationsBtn", "click", syncMonthlyBaseLocations);
       onIfExists("#generateMonthlyBtn", "click", generateMonthly);
       onIfExists("#photoReviewReloadBtn", "click", () => loadPhotoReview(false));
       onIfExists("#photoReviewCacheClearBtn", "click", clearPhotoReviewCache);
