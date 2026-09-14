@@ -783,6 +783,11 @@
       align-items: center;
     }
 
+
+    .monthly-quick-fields {
+      display: contents;
+    }
+
     .monthly-check-row .check-wrap {
       display: grid;
       place-items: center;
@@ -885,26 +890,175 @@
     }
 
     @media (max-width: 840px) {
+      .monthly-card {
+        padding: 13px 12px;
+      }
+
       .monthly-check-row {
-        grid-template-columns: 30px 50px minmax(0, 1fr) 38px;
-        gap: 10px;
+        grid-template-columns: 30px 48px minmax(0, 1fr) 38px;
+        grid-template-rows: auto auto;
+        gap: 9px 8px;
+        align-items: center;
       }
 
-      .monthly-check-row .monthly-cell,
-      .monthly-check-row .monthly-status-cell {
-        grid-column: 3 / 5;
+      /* 첫 줄: 확인 체크 / 썸네일 / 장비명 / 상세 화살표 */
+      .monthly-check-row .check-wrap {
+        grid-column: 1;
+        grid-row: 1;
       }
 
-      .monthly-check-row .monthly-location-cell {
-        grid-column: 1 / 5;
+      .monthly-check-row .monthly-thumb-button {
+        grid-column: 2;
+        grid-row: 1;
       }
 
+      .monthly-check-row .monthly-row-title {
+        grid-column: 3;
+        grid-row: 1;
+      }
+
+      .monthly-check-row .monthly-toggle-detail-btn {
+        grid-column: 4;
+        grid-row: 1;
+        justify-self: end;
+        align-self: center;
+        width: 36px;
+        min-width: 36px;
+        height: 36px;
+        padding: 0;
+        display: grid;
+        place-items: center;
+      }
+
+      /* 둘째 줄: 이번달 위치 / 상태 / 규격을 한 줄에 */
+      .monthly-quick-fields {
+        display: grid;
+        grid-column: 1 / -1;
+        grid-row: 2;
+        grid-template-columns: minmax(150px, 1.6fr) minmax(62px, .58fr) minmax(72px, .72fr);
+        gap: 8px;
+        align-items: end;
+        min-width: 0;
+      }
+
+      .monthly-quick-fields .monthly-cell {
+        min-width: 0;
+      }
+
+      .monthly-quick-fields .cell-label {
+        margin-bottom: 3px;
+        font-size: 10px;
+        white-space: nowrap;
+      }
+
+      .monthly-quick-fields .monthly-inline-location {
+        min-height: 34px;
+        height: 34px;
+        padding: 5px 7px;
+        font-size: 12px;
+      }
+
+      .monthly-quick-fields .monthly-status-cell {
+        align-self: end;
+      }
+
+      .monthly-quick-fields .monthly-status-cell .badge {
+        min-height: 34px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        white-space: nowrap;
+      }
+
+      .monthly-quick-fields .monthly-spec-cell .cell-main {
+        min-height: 34px;
+        display: flex;
+        align-items: center;
+        font-size: 12px;
+        line-height: 1.2;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      /* 상세 입력: 이번달 상태 + 원장 위치 반영 체크박스를 같은 줄에 */
       .monthly-detail-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(118px, .78fr) minmax(0, 1.7fr);
+        gap: 8px 10px;
+        align-items: end;
+      }
+
+      .monthly-detail-grid > label:first-child {
+        grid-column: 1;
+        grid-row: 1;
+      }
+
+      .monthly-detail-grid > .monthly-sync-base-wrap {
+        grid-column: 2;
+        grid-row: 1;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        min-height: 40px;
+        color: var(--text);
+        font-size: 11px;
+        line-height: 1.15;
+      }
+
+      .monthly-detail-grid > .monthly-sync-base-wrap input[type="checkbox"] {
+        flex: 0 0 auto;
+        width: 20px;
+        height: 20px;
+      }
+
+      .monthly-detail-grid > .monthly-sync-base-wrap span {
+        display: block;
+        min-width: 0;
+      }
+
+      .monthly-detail-grid > .monthly-sync-base-help {
+        grid-column: 2;
+        grid-row: 2;
+        font-size: 10px;
+        line-height: 1.2;
+        white-space: nowrap;
+        color: var(--sub);
+        margin-top: -3px;
+      }
+
+      .monthly-detail-grid > .monthly-memo-fold {
+        grid-column: 1 / -1;
+        grid-row: 3;
+      }
+
+      .monthly-detail-grid > label.full:last-of-type {
+        grid-column: 1 / -1;
+        grid-row: 4;
       }
 
       .monthly-detail-grid .full {
         grid-column: auto;
+      }
+    }
+
+    @media (max-width: 430px) {
+      .monthly-quick-fields {
+        grid-template-columns: minmax(128px, 1.55fr) minmax(58px, .55fr) minmax(64px, .68fr);
+        gap: 6px;
+      }
+
+      .monthly-detail-grid {
+        grid-template-columns: minmax(106px, .72fr) minmax(0, 1.8fr);
+        gap: 7px 8px;
+      }
+
+      .monthly-detail-grid > .monthly-sync-base-wrap {
+        font-size: 10px;
+        gap: 5px;
+      }
+
+      .monthly-detail-grid > .monthly-sync-base-help {
+        font-size: 9px;
       }
     }
 
@@ -4475,7 +4629,7 @@ SN번호복사 / 텍스트
                 <input class="monthly-sync-base-location" type="checkbox" ${String(row.이번달위치 || "").includes("대여") ? "" : "checked"} />
                 <span>변경한 위치를 장비 원장의 기본 위치에도 반영</span>
               </label>
-              <div class="full monthly-sync-base-help">대여중 위치는 임시 이동으로 보고 기본 위치 반영을 기본 해제합니다.</div>
+              <div class="full monthly-sync-base-help">대여중은 기본 위치에 반영하지 않습니다.</div>
 
               <label class="full">점검사진
                 <input class="input monthly-photo-file" type="file" accept="image/*" multiple />
@@ -4508,24 +4662,26 @@ SN번호복사 / 텍스트
               <span>${escapeHtml(monthlyModelName(row))} · 관리번호 ${escapeHtml(managementNo)}</span>
             </div>
 
-            <div class="monthly-cell">
-              <span class="cell-label">규격</span>
-              <span class="cell-main">${escapeHtml(effectiveSpec(eq) || "-")}</span>
+            <div class="monthly-quick-fields">
+              <div class="monthly-cell monthly-spec-cell">
+                <span class="cell-label">규격</span>
+                <span class="cell-main">${escapeHtml(effectiveSpec(eq) || "-")}</span>
+              </div>
+
+              <div class="monthly-cell monthly-location-cell">
+                <span class="cell-label">이번달 위치</span>
+                <select class="monthly-inline-location monthly-location">
+                  ${optionHtml(locations, row.이번달위치)}
+                </select>
+              </div>
+
+              <div class="monthly-cell monthly-status-cell">
+                <span class="cell-label">상태</span>
+                <span class="badge ${statusClass(status)}">${escapeHtml(status)}</span>
+              </div>
             </div>
 
-            <div class="monthly-cell monthly-location-cell">
-              <span class="cell-label">이번달 위치</span>
-              <select class="monthly-inline-location monthly-location">
-                ${optionHtml(locations, row.이번달위치)}
-              </select>
-            </div>
-
-            <div class="monthly-cell monthly-status-cell">
-              <span class="cell-label">상태</span>
-              <span class="badge ${statusClass(status)}">${escapeHtml(status)}</span>
-            </div>
-
-            <button class="btn monthly-toggle-detail-btn toggle-monthly-detail-btn" type="button">${isOpen ? "▼" : "▶"}</button>
+            <button class="btn monthly-toggle-detail-btn toggle-monthly-detail-btn" type="button" aria-label="상세 점검 입력">${isOpen ? "▼" : "▶"}</button>
           </div>
 
           ${detailHtml}
