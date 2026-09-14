@@ -4,6 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>장비 현황 관리 시스템</title>
+
+  <meta name="theme-color" content="#18283d" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="장비관리" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="./icons/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
   <style>
     :root {
       --bg: #f4f6f9;
@@ -2448,6 +2457,7 @@
         <div class="top-actions">
           <span class="chip" id="monthChip"></span>
           <span class="chip dark" id="roleChip">사용자</span>
+          <button class="btn hidden" id="installPwaBtn" type="button">앱 설치</button>
           <button class="btn" id="logoutBtn">로그아웃</button>
         </div>
       </header>
@@ -5869,9 +5879,63 @@ SN번호복사 / 텍스트
       if ($("#monthChip")) $("#monthChip").textContent = formatMonth(now);
     }
 
+
+    // PWA 설치 및 서비스워커
+    let deferredPwaPrompt = null;
+
+    function isStandalonePwa() {
+      return window.matchMedia("(display-mode: standalone)").matches ||
+        window.navigator.standalone === true;
+    }
+
+    function updatePwaInstallButton() {
+      const button = document.getElementById("installPwaBtn");
+      if (!button) return;
+      const canInstall = Boolean(deferredPwaPrompt) && !isStandalonePwa();
+      button.classList.toggle("hidden", !canInstall);
+    }
+
+    window.addEventListener("beforeinstallprompt", (event) => {
+      event.preventDefault();
+      deferredPwaPrompt = event;
+      updatePwaInstallButton();
+    });
+
+    window.addEventListener("appinstalled", () => {
+      deferredPwaPrompt = null;
+      updatePwaInstallButton();
+    });
+
+    window.matchMedia("(display-mode: standalone)").addEventListener?.("change", updatePwaInstallButton);
+
+    async function promptPwaInstall() {
+      if (!deferredPwaPrompt) return;
+      const promptEvent = deferredPwaPrompt;
+      deferredPwaPrompt = null;
+      updatePwaInstallButton();
+      await promptEvent.prompt();
+      await promptEvent.userChoice.catch(() => null);
+    }
+
+    function registerPwa() {
+      onIfExists("#installPwaBtn", "click", promptPwaInstall);
+
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", async () => {
+          try {
+            const registration = await navigator.serviceWorker.register("./sw.js", { scope: "./" });
+            registration.update().catch(() => {});
+          } catch (error) {
+            console.warn("서비스워커 등록 실패:", error);
+          }
+        });
+      }
+    }
+
     async function boot() {
       initSelects();
       bindEvents();
+      registerPwa();
       initEquipmentPaneResize();
 
       await loadLoginUsers();
