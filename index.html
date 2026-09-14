@@ -2391,11 +2391,50 @@
 }
 .monthly-sync-base-wrap input{width:16px;height:16px;}
 .monthly-sync-base-help{color:var(--sub);font-size:12px;font-weight:650;}
+
+    .boot-page {
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg, #f4f6f9);
+      padding: 24px;
+    }
+    .boot-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 18px 22px;
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: 0 12px 34px rgba(20, 35, 55, .10);
+      color: var(--text, #1f2d3d);
+      font-weight: 800;
+    }
+    .boot-spinner {
+      width: 22px;
+      height: 22px;
+      border: 3px solid rgba(49, 93, 147, .18);
+      border-top-color: #315d93;
+      border-radius: 50%;
+      animation: boot-spin .75s linear infinite;
+      flex: 0 0 auto;
+    }
+    @keyframes boot-spin { to { transform: rotate(360deg); } }
+
 </style>
 
 </head>
 <body>
-  <section class="login-page" id="loginPage">
+
+  <section class="boot-page" id="bootPage" aria-live="polite" aria-busy="true">
+    <div class="boot-card">
+      <span class="boot-spinner" aria-hidden="true"></span>
+      <span>장비관리 불러오는 중…</span>
+    </div>
+  </section>
+  <section class="login-page hidden" id="loginPage">
     <div class="login-card">
       <div class="login-brand">
         <div class="brand-mark">EQ</div>
@@ -3056,6 +3095,18 @@ SN번호복사 / 텍스트
       return loc === filterValue;
     }
 
+
+    function hideBootPage() {
+      const boot = $("#bootPage");
+      if (boot) boot.classList.add("hidden");
+    }
+
+    function showLoginPage() {
+      hideBootPage();
+      $("#app")?.classList.add("hidden");
+      $("#loginPage")?.classList.remove("hidden");
+    }
+
     function showNotice(element, message, isError = false) {
       element.classList.remove("hidden");
       element.classList.toggle("error", isError);
@@ -3114,6 +3165,7 @@ SN번호복사 / 텍스트
     function setLoggedIn(user) {
       currentUser = user;
       $("#loginPage").classList.add("hidden");
+      hideBootPage();
       $("#app").classList.remove("hidden");
       if ($("#roleChip")) $("#roleChip").textContent = user.role === "admin" ? "관리자" : "직원";
       if ($("#sideUserText")) $("#sideUserText").textContent = `${user.name} · ${user.role === "admin" ? "관리자" : "직원"}`;
@@ -6073,22 +6125,31 @@ SN번호복사 / 텍스트
       registerPwa();
       initEquipmentPaneResize();
 
-      await loadLoginUsers();
-
       const token = localStorage.getItem("eq_token");
+
       if (token) {
         try {
           const data = await api("/api/me");
           setLoggedIn(data.user);
-        } catch {
+          return;
+        } catch (error) {
+          console.warn("저장된 로그인 세션 확인 실패:", error);
           localStorage.removeItem("eq_token");
-          $("#loginPage").classList.remove("hidden");
         }
       }
+
+      // 로그인 정보가 없거나 기존 토큰이 만료된 경우에만 로그인 화면을 표시합니다.
+      try {
+        await loadLoginUsers();
+      } catch (error) {
+        console.warn("로그인 사용자 정보 준비 실패:", error);
+      }
+      showLoginPage();
     }
 
     boot().catch(error => {
       console.error(error);
+      showLoginPage();
       const msg = document.getElementById("loginMsg");
       if (msg) {
         msg.classList.remove("hidden");
