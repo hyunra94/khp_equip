@@ -2522,7 +2522,8 @@
             <div class="card-body">
               <div class="toolbar">
                 <input class="input" type="month" id="monthlyMonth" />
-                <input class="input" id="monthlySearch" placeholder="장비명, 관리번호 검색" />
+                <input class="input" id="monthlySearch" placeholder="장비명, 모델명 검색" />
+                <input class="input" id="monthlyManagementSearch" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="관리번호 숫자 검색" aria-label="관리번호 검색" />
                 <select class="select" id="monthlyLocationFilter"></select>
                 <div class="mode-toggle sort-toggle" id="monthlySortToggle" title="정렬 방식">
                   <button type="button" data-sort="date" class="active">입고일</button>
@@ -4045,6 +4046,7 @@ SN번호복사 / 텍스트
 
     function renderMonthlyList() {
       const q = ($("#monthlySearch")?.value || "").trim().toLowerCase();
+      const managementQ = ($("#monthlyManagementSearch")?.value || "").replace(/\D/g, "");
       const location = $("#monthlyLocationFilter").value;
       const checkedFilter = $("#monthlyCheckedFilter").value;
 
@@ -4052,13 +4054,19 @@ SN번호복사 / 텍스트
 
       if (q) {
         rows = rows.filter(row => {
-          const eq = equipmentForMonthly(row);
           const text = [
             row.장비명복사,
-            eq?.관리번호,
             monthlyModelName(row)
           ].filter(Boolean).join(" ").toLowerCase();
           return text.includes(q);
+        });
+      }
+
+      if (managementQ) {
+        rows = rows.filter(row => {
+          const eq = equipmentForMonthly(row);
+          const managementNo = String(eq?.관리번호 || row.자체일련번호복사 || "").replace(/\D/g, "");
+          return managementNo.includes(managementQ);
         });
       }
       if (location) rows = rows.filter(row => matchesLocationFilter(row.이번달위치, location, row.이번달상태));
@@ -5621,6 +5629,12 @@ SN번호복사 / 텍스트
 
       onIfExists("#monthlyReloadBtn", "click", () => loadMonthly(true));
       onIfExists("#monthlySearch", "input", renderMonthlyList);
+      onIfExists("#monthlyManagementSearch", "input", (event) => {
+        const input = event.currentTarget;
+        const digitsOnly = input.value.replace(/\D/g, "");
+        if (input.value !== digitsOnly) input.value = digitsOnly;
+        renderMonthlyList();
+      });
       onIfExists("#monthlyLocationFilter", "change", renderMonthlyList);
       onIfExists("#monthlyCheckedFilter", "change", renderMonthlyList);
       $$("#monthlySortToggle button").forEach(button => {
