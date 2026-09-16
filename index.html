@@ -3275,7 +3275,6 @@
                   <select class="select" id="userCreateRole">
                     <option value="staff">직원</option>
                     <option value="admin">관리자</option>
-                    <option value="readonly">조회전용</option>
                   </select>
 
                   <label class="check-line" style="margin-top:14px;">
@@ -6393,9 +6392,9 @@ SN번호복사 / 텍스트
       area.innerHTML = `<div class="notice">사용자 목록을 불러오는 중입니다.</div>`;
       try {
         const data = await api("/api/admin/users");
-        const users = data.users || [];
+        const users = (data.users || []).filter(user => user.name !== currentUser?.name);
         if (!users.length) {
-          area.innerHTML = `<div class="empty">등록된 사용자가 없습니다.</div>`;
+          area.innerHTML = `<div class="empty">관리할 다른 사용자가 없습니다.</div>`;
           return;
         }
         area.innerHTML = users.map(user => `
@@ -6403,13 +6402,12 @@ SN번호복사 / 텍스트
             <div class="user-admin-main">
               <strong>${escapeHtml(user.name)}</strong>
               <span class="badge ${user.active ? "normal" : "gray"}">${user.active ? "사용중" : "사용중지"}</span>
-              <span class="small">${user.role === "admin" ? "관리자" : user.role === "readonly" ? "조회전용" : "직원"}</span>
+              <span class="small">${user.role === "admin" ? "관리자" : "직원"}</span>
             </div>
             <div class="user-admin-actions">
               <select class="select user-role-select" aria-label="권한">
                 <option value="staff" ${user.role === "staff" ? "selected" : ""}>직원</option>
                 <option value="admin" ${user.role === "admin" ? "selected" : ""}>관리자</option>
-                <option value="readonly" ${user.role === "readonly" ? "selected" : ""}>조회전용</option>
               </select>
               <button class="btn user-active-btn" type="button">${user.active ? "사용 중지" : "사용 재개"}</button>
               <button class="btn user-reset-btn" type="button">보안코드 재설정</button>
@@ -6438,9 +6436,6 @@ SN번호복사 / 텍스트
             const row = button.closest(".user-admin-row");
             const user = users.find(item => item.id === row.dataset.userId);
             if (!user) return;
-            if (user.name === currentUser?.name && user.active) {
-              if (!confirm("현재 로그인한 관리자 계정을 사용 중지하시겠습니까? 다음 로그인부터 접속할 수 없습니다.")) return;
-            }
             try {
               await api(`/api/admin/users/${encodeURIComponent(user.id)}`, {
                 method: "PATCH",
