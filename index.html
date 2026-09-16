@@ -2615,6 +2615,42 @@
       }
     }
 
+
+    .photo-web-upload {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+      margin: 10px 0;
+    }
+    .photo-web-upload input[type="file"] {
+      min-width: 0;
+    }
+    @media (max-width: 560px) {
+      .photo-web-upload {
+        grid-template-columns: 1fr;
+      }
+      .photo-web-upload .btn {
+        width: 100%;
+      }
+    }
+
+
+    .monthly-auto-note {
+      display: inline-flex;
+      align-items: center;
+      color: var(--sub);
+      font-size: 12px;
+      line-height: 1.35;
+      margin-left: 8px;
+    }
+    @media (max-width: 840px) {
+      .monthly-auto-note {
+        width: 100%;
+        margin: 6px 0 0;
+      }
+    }
+
 </style>
 
 <style>
@@ -2879,7 +2915,8 @@
             </div>
             <div class="toolbar" style="margin:0; justify-content:flex-end;">
               <button class="btn admin-only" id="syncMonthlyBaseLocationsBtn" type="button">이번달 위치 원장 반영</button>
-              <button class="btn primary admin-only" id="generateMonthlyBtn">월별 현황 생성</button>
+              <button class="btn primary admin-only" id="generateMonthlyBtn">누락 점검기록 보완</button>
+<span class="small monthly-auto-note">월별 점검 기록은 매월 자동 생성됩니다. 이 버튼은 누락된 기록을 보완할 때만 사용합니다.</span>
             </div>
           </div>
 
@@ -3974,14 +4011,14 @@ SN번호복사 / 텍스트
           event.stopPropagation();
           const rowId = button.dataset.id;
           const area = button.closest(".mobile-inline-detail").querySelector(".inline-photos-area");
-          area.innerHTML = `<div class="notice">노션 페이지 내부의 ⑭ 장비사진을 불러오는 중입니다.</div>`;
+          area.innerHTML = `<div class="notice">장비사진을 불러오는 중입니다.</div>`;
 
           try {
             const data = await api(`/api/equipment/${encodeURIComponent(rowId)}/photos`);
             const photos = data.photos || [];
             area.innerHTML = photos.length
               ? `<div class="photos-grid">${photos.map(photo => `<img src="${escapeHtml(photo.url)}" alt="">`).join("")}</div>`
-              : `<div class="notice">조회된 장비사진이 없습니다. 노션 페이지 내부에 “⑭ 장비 사진” 토글이 있는지 확인하세요.</div>`;
+              : `<div class="notice">등록된 장비사진이 없습니다. 위의 장비사진 등록에서 바로 추가할 수 있습니다.</div>`;
           } catch (error) {
             area.innerHTML = `<div class="notice error">${escapeHtml(error.message)}</div>`;
           }
@@ -4000,7 +4037,7 @@ SN번호복사 / 텍스트
             const photos = data.photos || [];
             area.innerHTML = photos.length
               ? `<div class="photos-grid">${photos.map(photo => `<img src="${escapeHtml(photo.url)}" alt="">`).join("")}</div>`
-              : `<div class="notice">조회된 모델 공통사진이 없습니다. 모델 페이지 내부에 “모델 공통사진” 토글이 있는지 확인하세요.</div>`;
+              : `<div class="notice">등록된 모델 공통사진이 없습니다. 위의 모델 공통사진 등록에서 바로 추가할 수 있습니다.</div>`;
           } catch (error) {
             area.innerHTML = `<div class="notice error">${escapeHtml(error.message)}</div>`;
           }
@@ -4116,14 +4153,53 @@ SN번호복사 / 텍스트
           <button class="btn ghost" id="loadMaintenanceBtn">▼ ⑮ 유지보수 내역</button>
           ${row.url ? `<a class="btn ghost" href="${escapeHtml(row.url)}" target="_blank" rel="noreferrer">노션에서 열기</a>` : ""}
         </div>
+        <div id="equipmentPhotoUploadArea">
+          ${photoUploadControl("equipment", row.id, "equipmentPhotoFile", "uploadEquipmentPhotoBtn", "장비사진 등록")}
+        </div>
         <div id="photosArea"></div>
+        ${model ? `<div id="modelPhotoUploadArea">${photoUploadControl("model", model.id, "modelPhotoFile", "uploadModelPhotoBtn", "모델 공통사진 등록")}</div>` : ""}
         <div id="modelPhotosArea"></div>
         <div id="equipmentMaintenanceArea" class="equipment-maintenance-area"></div>
       `;
 
       $("#loadPhotosBtn").addEventListener("click", loadPhotos);
+
+      const uploadEquipmentPhotoBtn = $("#uploadEquipmentPhotoBtn");
+      if (uploadEquipmentPhotoBtn) {
+        uploadEquipmentPhotoBtn.addEventListener("click", async () => {
+          const input = $("#equipmentPhotoFile");
+          const ok = await uploadPhotosToEndpoint(
+            `/api/equipment/${encodeURIComponent(row.id)}/photos`,
+            input?.files,
+            $("#photosArea"),
+            "장비사진"
+          );
+          if (ok) {
+            input.value = "";
+            await loadPhotos();
+          }
+        });
+      }
+
       const modelPhotosBtn = $("#loadModelPhotosBtn");
       if (modelPhotosBtn) modelPhotosBtn.addEventListener("click", loadModelPhotos);
+
+      const uploadModelPhotoBtn = $("#uploadModelPhotoBtn");
+      if (uploadModelPhotoBtn && model) {
+        uploadModelPhotoBtn.addEventListener("click", async () => {
+          const input = $("#modelPhotoFile");
+          const ok = await uploadPhotosToEndpoint(
+            `/api/models/${encodeURIComponent(model.id)}/photos`,
+            input?.files,
+            $("#modelPhotosArea"),
+            "모델 공통사진"
+          );
+          if (ok) {
+            input.value = "";
+            await loadModelPhotos();
+          }
+        });
+      }
       $("#loadMaintenanceBtn").addEventListener("click", loadSelectedEquipmentMaintenance);
       $("#closeDetailBtn").addEventListener("click", () => {
         selectedEquipmentId = "";
@@ -4132,11 +4208,51 @@ SN번호복사 / 텍스트
       });
     }
 
+
+    async function uploadPhotosToEndpoint(endpoint, files, area, successLabel = "사진") {
+      if (!files || !files.length) {
+        alert("등록할 사진을 선택해주세요.");
+        return false;
+      }
+
+      const token = localStorage.getItem("eq_token");
+      const formData = new FormData();
+      [...files].forEach(file => formData.append("photos", file));
+
+      if (area) area.innerHTML = `<div class="notice">${escapeHtml(successLabel)} 업로드 중입니다.</div>`;
+
+      try {
+        const response = await fetch(`${API_BASE}${endpoint}`, {
+          method: "POST",
+          headers: {
+            ...(token ? { Authorization: `Bearer ${token}` } : {})
+          },
+          body: formData
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error || `${successLabel} 업로드 중 오류가 발생했습니다.`);
+        if (area) area.innerHTML = `<div class="notice">${escapeHtml(successLabel)} ${data.count || 0}개 등록 완료</div>`;
+        return true;
+      } catch (error) {
+        if (area) area.innerHTML = `<div class="notice error">${escapeHtml(error.message)}</div>`;
+        return false;
+      }
+    }
+
+    function photoUploadControl(kind, id, inputId, buttonId, label) {
+      return `
+        <div class="photo-web-upload">
+          <input class="input" id="${escapeHtml(inputId)}" type="file" accept="image/*" multiple />
+          <button class="btn primary" id="${escapeHtml(buttonId)}" type="button">${escapeHtml(label)}</button>
+        </div>
+      `;
+    }
+
     async function loadPhotos() {
       const row = equipmentRows.find(item => item.id === selectedEquipmentId);
       if (!row) return;
 
-      $("#photosArea").innerHTML = `<div class="notice">노션 페이지 내부의 ⑭ 장비사진을 불러오는 중입니다.</div>`;
+      $("#photosArea").innerHTML = `<div class="notice">장비사진을 불러오는 중입니다.</div>`;
 
       try {
         const data = await api(`/api/equipment/${encodeURIComponent(row.id)}/photos`);
@@ -4144,7 +4260,7 @@ SN번호복사 / 텍스트
 
         $("#photosArea").innerHTML = photos.length
           ? `<div class="photos-grid">${photos.map(photo => `<img src="${escapeHtml(photo.url)}" alt="">`).join("")}</div>`
-          : `<div class="notice">조회된 장비사진이 없습니다. 노션 페이지 내부에 “⑭ 장비 사진” 토글이 있는지 확인하세요.</div>`;
+          : `<div class="notice">등록된 장비사진이 없습니다. 위의 장비사진 등록에서 바로 추가할 수 있습니다.</div>`;
       } catch (error) {
         $("#photosArea").innerHTML = `<div class="notice error">${escapeHtml(error.message)}</div>`;
       }
@@ -4164,7 +4280,7 @@ SN번호복사 / 텍스트
 
         $("#modelPhotosArea").innerHTML = photos.length
           ? `<div class="photos-grid">${photos.map(photo => `<img src="${escapeHtml(photo.url)}" alt="">`).join("")}</div>`
-          : `<div class="notice">조회된 모델 공통사진이 없습니다. 모델 페이지 내부에 “모델 공통사진” 토글이 있는지 확인하세요.</div>`;
+          : `<div class="notice">등록된 모델 공통사진이 없습니다. 위의 모델 공통사진 등록에서 바로 추가할 수 있습니다.</div>`;
       } catch (error) {
         $("#modelPhotosArea").innerHTML = `<div class="notice error">${escapeHtml(error.message)}</div>`;
       }
@@ -4500,6 +4616,8 @@ SN번호복사 / 텍스트
         </div>
 
         ${photo}
+        ${eq ? photoUploadControl("equipment", eq.id, "sideEquipmentPhotoFile", "sideUploadEquipmentPhotoBtn", "장비사진 등록/추가") : ""}
+        <div class="monthly-side-equipment-photos-area"></div>
 
         <div class="monthly-side-kv"><div class="k">규격</div><div class="v">${escapeHtml(effectiveSpec(eq) || "-")}</div></div>
         <div class="monthly-side-kv"><div class="k">관리번호</div><div class="v">${escapeHtml(eq?.관리번호 || row.자체일련번호복사 || "-")}</div></div>
@@ -4513,6 +4631,10 @@ SN번호복사 / 텍스트
           <button class="btn primary" type="button" id="sideLoadMonthlyPhotosBtn">점검사진 보기</button>
           <button class="btn ghost" type="button" id="sideOpenEquipmentBtn">관리대장으로 이동</button>
         </div>
+        <div class="photo-web-upload">
+          <input class="input" id="sideMonthlyPhotoFile" type="file" accept="image/*" multiple />
+          <button class="btn" type="button" id="sideUploadMonthlyPhotoBtn">점검사진 등록/추가</button>
+        </div>
         <div class="monthly-side-photos-area"></div>
       `;
 
@@ -4523,6 +4645,52 @@ SN번호복사 / 텍스트
 
       $("#sideLoadMonthlyPhotosBtn").addEventListener("click", () => {
         loadMonthlyPhotos(row.id, panel.querySelector(".monthly-side-photos-area"));
+      });
+
+      const sideUploadEquipmentPhotoBtn = $("#sideUploadEquipmentPhotoBtn");
+      if (sideUploadEquipmentPhotoBtn && eq) {
+        sideUploadEquipmentPhotoBtn.addEventListener("click", async () => {
+          const input = $("#sideEquipmentPhotoFile");
+          const area = panel.querySelector(".monthly-side-equipment-photos-area");
+          const ok = await uploadPhotosToEndpoint(
+            `/api/equipment/${encodeURIComponent(eq.id)}/photos`,
+            input?.files,
+            area,
+            "장비사진"
+          );
+          if (ok) {
+            input.value = "";
+            const data = await api(`/api/equipment/${encodeURIComponent(eq.id)}/photos`);
+            const photos = data.photos || [];
+            area.innerHTML = photos.length
+              ? `<div class="photos-grid">${photos.map(photo => `<img src="${escapeHtml(photo.url)}" alt="">`).join("")}</div>`
+              : `<div class="notice">등록된 장비사진이 없습니다.</div>`;
+            const first = photos[0]?.url;
+            const coverEl = panel.querySelector(".monthly-side-cover");
+            if (first && coverEl) {
+              const img = document.createElement("img");
+              img.className = "monthly-side-cover";
+              img.src = first;
+              img.alt = "";
+              coverEl.replaceWith(img);
+            }
+          }
+        });
+      }
+
+      $("#sideUploadMonthlyPhotoBtn").addEventListener("click", async () => {
+        const input = $("#sideMonthlyPhotoFile");
+        const area = panel.querySelector(".monthly-side-photos-area");
+        const ok = await uploadPhotosToEndpoint(
+          `/api/monthly/${encodeURIComponent(row.id)}/photos`,
+          input?.files,
+          area,
+          "점검사진"
+        );
+        if (ok) {
+          input.value = "";
+          await loadMonthlyPhotos(row.id, area);
+        }
       });
 
       $("#sideOpenEquipmentBtn").addEventListener("click", () => {
