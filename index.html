@@ -2651,6 +2651,30 @@
       }
     }
 
+
+    .user-admin-layout { align-items: start; }
+    .user-admin-list { display: grid; gap: 10px; }
+    .user-admin-row {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+    }
+    .user-admin-main, .user-admin-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .user-admin-main strong { font-size: 16px; }
+    .user-admin-actions .select { min-width: 110px; width: auto; }
+    @media (max-width: 640px) {
+      .user-admin-layout { grid-template-columns: 1fr; }
+      .user-admin-actions { display: grid; grid-template-columns: 1fr 1fr; }
+      .user-admin-actions .select { width: 100%; grid-column: 1 / -1; }
+    }
+
 </style>
 
 <style>
@@ -2783,6 +2807,7 @@
         <button data-view="depreciationView">감가상각비</button>
         <button data-view="reportView">결과보고</button>
         <button data-view="addView" id="addNavBtn">신규 장비 등록</button>
+        <button data-view="userAdminView" id="userAdminNavBtn" class="admin-only">사용자 관리</button>
         <button data-view="schemaView">DB 속성표</button>
       </nav>
 
@@ -3221,6 +3246,65 @@
           </div>
         </section>
 
+        <section class="view" id="userAdminView">
+          <div class="section-head">
+            <div>
+              <h1>사용자 관리</h1>
+              <p>관리자가 웹에서 계정을 등록하고 권한·사용여부·보안코드를 관리합니다. 보안코드 원문은 저장하지 않습니다.</p>
+            </div>
+            <button class="btn" id="userAdminReloadBtn" type="button">새로고침</button>
+          </div>
+
+          <div class="layout-2 user-admin-layout">
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <h2 class="card-title">사용자 등록</h2>
+                  <div class="card-sub">별도 Hash 생성기는 필요하지 않습니다. Worker가 LOGIN_SECRET을 사용해 Hash만 저장합니다.</div>
+                </div>
+              </div>
+              <div class="card-body">
+                <form id="userCreateForm">
+                  <label class="label">사용자명</label>
+                  <input class="input" id="userCreateName" autocomplete="off" placeholder="이름 입력" required />
+
+                  <label class="label" style="margin-top:12px;">보안코드</label>
+                  <input class="input" id="userCreateCode" type="password" inputmode="numeric" pattern="[0-9]*" autocomplete="new-password" placeholder="숫자 4~12자리" required />
+
+                  <label class="label" style="margin-top:12px;">권한</label>
+                  <select class="select" id="userCreateRole">
+                    <option value="staff">직원</option>
+                    <option value="admin">관리자</option>
+                    <option value="readonly">조회전용</option>
+                  </select>
+
+                  <label class="check-line" style="margin-top:14px;">
+                    <input type="checkbox" id="userCreateActive" checked />
+                    <span>사용 가능 계정으로 등록</span>
+                  </label>
+
+                  <button class="btn primary" type="submit" style="width:100%;margin-top:16px;">사용자 등록</button>
+                </form>
+                <div id="userCreateMsg" class="notice hidden" style="margin-top:12px;"></div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <h2 class="card-title">등록 사용자</h2>
+                  <div class="card-sub">권한 변경, 사용 중지/재개, 보안코드 재설정이 가능합니다.</div>
+                </div>
+              </div>
+              <div class="card-body">
+                <div id="userAdminList" class="user-admin-list">
+                  <div class="empty">사용자 관리 메뉴를 열면 목록을 불러옵니다.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section class="view" id="schemaView">
           <div class="section-head">
             <div>
@@ -3285,6 +3369,7 @@ SN번호복사 / 텍스트
 [사용자 관리 DB]
 사용자명 / 제목
 사용자코드 / 텍스트
+보안코드Hash / 텍스트
 권한 / 선택
 사용여부 / 체크박스
 기본담당위치 / 다중선택
@@ -3450,6 +3535,7 @@ SN번호복사 / 텍스트
         equipmentView: "장비관리대장",
         monthlyView: "월별 점검 목록",
         addView: "신규 장비 등록",
+        userAdminView: "사용자 관리",
         schemaView: "DB 속성표",
         photoReviewView: "점검 사진 확인",
         depreciationView: "감가상각비",
@@ -3467,6 +3553,9 @@ SN번호복사 / 텍스트
       if (viewId === "monthlyView") {
         loadMonthlyCacheFirst(false);
       }
+      if (viewId === "userAdminView" && currentUser?.role === "admin") {
+        loadAdminUsers();
+      }
     }
 
     function setLoggedIn(user) {
@@ -3479,6 +3568,7 @@ SN번호복사 / 텍스트
 
       $$(".admin-only").forEach(el => el.classList.toggle("hidden", user.role !== "admin"));
       $("#addNavBtn").classList.toggle("hidden", user.role !== "admin");
+      $("#userAdminNavBtn")?.classList.toggle("hidden", user.role !== "admin");
 
       loadInitialData();
     }
@@ -6296,6 +6386,132 @@ SN번호복사 / 텍스트
       if (el) el.addEventListener(eventName, handler);
     }
 
+
+    async function loadAdminUsers() {
+      const area = $("#userAdminList");
+      if (!area || currentUser?.role !== "admin") return;
+      area.innerHTML = `<div class="notice">사용자 목록을 불러오는 중입니다.</div>`;
+      try {
+        const data = await api("/api/admin/users");
+        const users = data.users || [];
+        if (!users.length) {
+          area.innerHTML = `<div class="empty">등록된 사용자가 없습니다.</div>`;
+          return;
+        }
+        area.innerHTML = users.map(user => `
+          <div class="user-admin-row" data-user-id="${escapeHtml(user.id)}">
+            <div class="user-admin-main">
+              <strong>${escapeHtml(user.name)}</strong>
+              <span class="badge ${user.active ? "normal" : "gray"}">${user.active ? "사용중" : "사용중지"}</span>
+              <span class="small">${user.role === "admin" ? "관리자" : user.role === "readonly" ? "조회전용" : "직원"}</span>
+            </div>
+            <div class="user-admin-actions">
+              <select class="select user-role-select" aria-label="권한">
+                <option value="staff" ${user.role === "staff" ? "selected" : ""}>직원</option>
+                <option value="admin" ${user.role === "admin" ? "selected" : ""}>관리자</option>
+                <option value="readonly" ${user.role === "readonly" ? "selected" : ""}>조회전용</option>
+              </select>
+              <button class="btn user-active-btn" type="button">${user.active ? "사용 중지" : "사용 재개"}</button>
+              <button class="btn user-reset-btn" type="button">보안코드 재설정</button>
+            </div>
+          </div>
+        `).join("");
+
+        area.querySelectorAll(".user-role-select").forEach(select => {
+          select.addEventListener("change", async () => {
+            const row = select.closest(".user-admin-row");
+            try {
+              await api(`/api/admin/users/${encodeURIComponent(row.dataset.userId)}`, {
+                method: "PATCH",
+                body: JSON.stringify({ role: select.value })
+              });
+              await loadAdminUsers();
+            } catch (error) {
+              alert(error.message);
+              await loadAdminUsers();
+            }
+          });
+        });
+
+        area.querySelectorAll(".user-active-btn").forEach(button => {
+          button.addEventListener("click", async () => {
+            const row = button.closest(".user-admin-row");
+            const user = users.find(item => item.id === row.dataset.userId);
+            if (!user) return;
+            if (user.name === currentUser?.name && user.active) {
+              if (!confirm("현재 로그인한 관리자 계정을 사용 중지하시겠습니까? 다음 로그인부터 접속할 수 없습니다.")) return;
+            }
+            try {
+              await api(`/api/admin/users/${encodeURIComponent(user.id)}`, {
+                method: "PATCH",
+                body: JSON.stringify({ active: !user.active })
+              });
+              await loadAdminUsers();
+            } catch (error) {
+              alert(error.message);
+            }
+          });
+        });
+
+        area.querySelectorAll(".user-reset-btn").forEach(button => {
+          button.addEventListener("click", async () => {
+            const row = button.closest(".user-admin-row");
+            const user = users.find(item => item.id === row.dataset.userId);
+            if (!user) return;
+            const code = prompt(`${user.name} 사용자의 새 보안코드를 입력하세요. (숫자 4~12자리)`);
+            if (code === null) return;
+            if (!/^\d{4,12}$/.test(code.trim())) {
+              alert("보안코드는 숫자 4~12자리로 입력해주세요.");
+              return;
+            }
+            try {
+              await api(`/api/admin/users/${encodeURIComponent(user.id)}/reset-code`, {
+                method: "POST",
+                body: JSON.stringify({ code: code.trim() })
+              });
+              alert("보안코드가 재설정되었습니다.");
+              await loadAdminUsers();
+            } catch (error) {
+              alert(error.message);
+            }
+          });
+        });
+      } catch (error) {
+        area.innerHTML = `<div class="notice error">${escapeHtml(error.message)}</div>`;
+      }
+    }
+
+    async function submitAdminUser(event) {
+      event.preventDefault();
+      const button = event.currentTarget.querySelector('button[type="submit"]');
+      const msg = $("#userCreateMsg");
+      const payload = {
+        name: ($("#userCreateName")?.value || "").trim(),
+        code: ($("#userCreateCode")?.value || "").trim(),
+        role: $("#userCreateRole")?.value || "staff",
+        active: Boolean($("#userCreateActive")?.checked)
+      };
+      if (!payload.name) return showNotice(msg, "사용자명을 입력해주세요.", true);
+      if (!/^\d{4,12}$/.test(payload.code)) return showNotice(msg, "보안코드는 숫자 4~12자리로 입력해주세요.", true);
+
+      if (button) { button.disabled = true; button.textContent = "등록 중"; }
+      try {
+        await api("/api/admin/users", {
+          method: "POST",
+          body: JSON.stringify(payload)
+        });
+        event.currentTarget.reset();
+        $("#userCreateActive").checked = true;
+        $("#userCreateRole").value = "staff";
+        showNotice(msg, "사용자가 등록되었습니다. 보안코드 원문은 저장되지 않습니다.");
+        await loadAdminUsers();
+      } catch (error) {
+        showNotice(msg, error.message, true);
+      } finally {
+        if (button) { button.disabled = false; button.textContent = "사용자 등록"; }
+      }
+    }
+
     function bindEvents() {
       onIfExists("#loginForm", "submit", async (event) => {
         event.preventDefault();
@@ -6468,6 +6684,8 @@ SN번호복사 / 텍스트
 
       onIfExists("#newModel", "change", applySelectedModelToForm);
       onIfExists("#addForm", "submit", submitAddForm);
+      onIfExists("#userAdminReloadBtn", "click", loadAdminUsers);
+      onIfExists("#userCreateForm", "submit", submitAdminUser);
     }
 
     function setHtmlIfExists(selector, html) {
