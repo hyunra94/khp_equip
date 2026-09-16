@@ -2808,7 +2808,6 @@
         <button data-view="reportView">결과보고</button>
         <button data-view="addView" id="addNavBtn">신규 장비 등록</button>
         <button data-view="userAdminView" id="userAdminNavBtn" class="admin-only">사용자 관리</button>
-        <button data-view="schemaView">DB 속성표</button>
       </nav>
 
       <div class="side-user">
@@ -3523,6 +3522,7 @@ SN번호복사 / 텍스트
     }
 
     function showView(viewId) {
+      if (viewId === "schemaView") return;
       $$(".view").forEach(view => view.classList.remove("active"));
       const targetView = $("#" + viewId);
       if (targetView) targetView.classList.add("active");
